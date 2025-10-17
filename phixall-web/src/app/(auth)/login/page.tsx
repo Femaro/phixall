@@ -18,7 +18,7 @@ export default function LoginPage(): JSX.Element {
     if (signInError) {
       setError(signInError.message);
     } else {
-      window.location.href = '/';
+      window.location.href = '/dashboard';
     }
     setLoading(false);
   }

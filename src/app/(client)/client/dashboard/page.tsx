@@ -1,11 +1,12 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { auth, db, storage } from '@/lib/firebaseClient';
+import { getFirebase } from '@/lib/firebaseClient';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
 
-export default function ClientDashboardPage(): JSX.Element {
+export default function ClientDashboardPage() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [scheduledAt, setScheduledAt] = useState('');
@@ -14,8 +15,9 @@ export default function ClientDashboardPage(): JSX.Element {
 	const [message, setMessage] = useState<string | null>(null);
 
 	useEffect(() => {
-		import('firebase/auth').then(({ onAuthStateChanged }) => {
-			onAuthStateChanged(auth, (user) => {
+    const { auth } = getFirebase();
+    import('firebase/auth').then(({ onAuthStateChanged }) => {
+        onAuthStateChanged(auth, (user) => {
 				if (!user) window.location.href = '/login';
 			});
 		});
@@ -26,6 +28,7 @@ export default function ClientDashboardPage(): JSX.Element {
 		setSubmitting(true);
 		setMessage(null);
 
+    const { auth, db, storage } = getFirebase();
     const user = auth.currentUser;
     if (!user) { window.location.href = '/login'; return; }
     const jobDoc = await addDoc(collection(db, 'jobs'), {
@@ -54,7 +57,7 @@ export default function ClientDashboardPage(): JSX.Element {
 			<div className="mx-auto max-w-4xl">
                 <div className="flex items-center justify-between">
 					<h1 className="text-2xl font-semibold">Client Dashboard</h1>
-                    <button onClick={async ()=>{ const { signOut } = await import('firebase/auth'); await signOut(auth); window.location.href='/login'; }} className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-100">Sign out</button>
+                    <button onClick={async ()=>{ const { auth } = getFirebase(); const { signOut } = await import('firebase/auth'); await signOut(auth); window.location.href='/login'; }} className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-100">Sign out</button>
 				</div>
 
 				<div className="mt-6 grid gap-6 md:grid-cols-2">

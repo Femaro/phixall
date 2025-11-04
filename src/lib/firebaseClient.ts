@@ -17,15 +17,24 @@ if (!config.apiKey) {
   console.warn('Missing Firebase env vars. Set NEXT_PUBLIC_FIREBASE_*');
 }
 
-let app: FirebaseApp;
-if (!getApps().length) {
-  app = initializeApp(config);
-} else {
-  app = getApps()[0]!;
-}
+let app: FirebaseApp | undefined;
 
-export const auth: Auth = getAuth(app);
-export const db: Firestore = getFirestore(app);
-export const storage: FirebaseStorage = getStorage(app);
+export function getFirebase(): { auth: Auth; db: Firestore; storage: FirebaseStorage } {
+  if (typeof window === 'undefined') {
+    throw new Error('Firebase must be initialized on the client only');
+  }
+  if (!app) {
+    if (!getApps().length) {
+      app = initializeApp(config);
+    } else {
+      app = getApps()[0]!;
+    }
+  }
+  return {
+    auth: getAuth(app),
+    db: getFirestore(app),
+    storage: getStorage(app),
+  };
+}
 
 

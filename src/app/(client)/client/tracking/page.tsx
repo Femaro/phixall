@@ -1,28 +1,31 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { db } from '@/lib/firebaseClient';
+import { getFirebase } from '@/lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
 
-export default function ClientTrackingPage(): JSX.Element {
+export default function ClientTrackingPage() {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	const [status, setStatus] = useState('Loading map…');
 
 	useEffect(() => {
-		let map: google.maps.Map | null = null;
-		let artisanMarker: google.maps.Marker | null = null;
-		let clientMarker: google.maps.Marker | null = null;
-		let ignore = false;
+    	let map: any = null;
+    	let artisanMarker: any = null;
+    	let clientMarker: any = null;
+    	let ignore = false;
+        let unsubscribe: undefined | (() => void);
 
 		async function init() {
 			try {
-				const loader = new Loader({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', version: 'weekly' });
-				const googleObj = await loader.load();
-				if (!mapRef.current) return;
-				map = new googleObj.maps.Map(mapRef.current, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 11 });
+                const loader = new Loader({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', version: 'weekly' });
+                const googleObj = await loader.load();
+                if (!mapRef.current) return;
+                map = new googleObj.maps.Map(mapRef.current, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 11 });
 				setStatus('Listening for artisan location…');
 
                 // Firestore live updates for a demo job id
+                const { db } = getFirebase();
                 const unsub = onSnapshot(doc(db, 'jobLocations', 'job-123'), (snap) => {
                     if (ignore) return;
                     const data = snap.data() as any;
@@ -48,16 +51,17 @@ export default function ClientTrackingPage(): JSX.Element {
 					});
 				}
 
-                return () => { unsub(); };
+                unsubscribe = unsub;
+                return;
 			} catch (_e) {
 				setStatus('Failed to load map');
 			}
 		}
 
-		const cleanup = init();
+        init();
 		return () => {
 			ignore = true;
-			if (typeof cleanup === 'function') cleanup();
+            if (unsubscribe) unsubscribe();
 		};
 	}, []);
 

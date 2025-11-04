@@ -1,14 +1,16 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { auth, db } from '@/lib/firebaseClient';
+import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc } from 'firebase/firestore';
 
-export default function ArtisanDashboardPage(): JSX.Element {
+export default function ArtisanDashboardPage() {
 	const [available, setAvailable] = useState(false);
 	const [jobs, setJobs] = useState<Array<{ id: string; title: string; distance_km?: number }>>([]);
 
   useEffect(() => {
+    const { auth } = getFirebase();
     import('firebase/auth').then(({ onAuthStateChanged }) => {
       onAuthStateChanged(auth, (user) => { if (!user) window.location.href = '/login'; });
     });
@@ -18,6 +20,7 @@ export default function ArtisanDashboardPage(): JSX.Element {
     const next = !available;
     setAvailable(next);
     try {
+      const { auth, db } = getFirebase();
       const uid = auth.currentUser?.uid;
       if (uid) await updateDoc(doc(db, 'profiles', uid), { available: next });
     } catch {}
@@ -28,7 +31,7 @@ export default function ArtisanDashboardPage(): JSX.Element {
 			<div className="mx-auto max-w-4xl">
                 <div className="flex items-center justify-between">
 					<h1 className="text-2xl font-semibold">Artisan Dashboard</h1>
-                    <button onClick={async ()=>{ const { signOut } = await import('firebase/auth'); await signOut(auth); window.location.href='/login'; }} className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-100">Sign out</button>
+                    <button onClick={async ()=>{ const { auth } = getFirebase(); const { signOut } = await import('firebase/auth'); await signOut(auth); window.location.href='/login'; }} className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm hover:bg-gray-100">Sign out</button>
 				</div>
 
 				<div className="mt-6 grid gap-6 md:grid-cols-2">

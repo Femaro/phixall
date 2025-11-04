@@ -1,34 +1,29 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { auth, db } from '@/lib/firebaseClient';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { getFirebase } from '@/lib/firebaseClient';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
-export default function RegisterPage(): JSX.Element {
+export default function LoginPage() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [role, setRole] = useState<'client' | 'artisan'>('client');
 	const [loading, setLoading] = useState(false);
-	const [message, setMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	async function handleSubmit(e: React.FormEvent): Promise<void> {
 		e.preventDefault();
 		setLoading(true);
 		setError(null);
-		setMessage(null);
     try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await setDoc(doc(db, 'profiles', cred.user.uid), {
-        email,
-        role,
-        available: role === 'artisan' ? false : null,
-        createdAt: serverTimestamp(),
-      });
-      setMessage('Account created. You can now sign in.');
+      const { auth, db } = getFirebase();
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const profSnap = await getDoc(doc(db, 'profiles', cred.user.uid));
+      const role = (profSnap.exists() ? profSnap.data()?.role : 'client') as 'client' | 'artisan';
+      window.location.href = role === 'artisan' ? '/artisan/dashboard' : '/client/dashboard';
     } catch (err: any) {
-      setError(err?.message || 'Failed to create account');
+      setError(err?.message || 'Failed to sign in');
     }
 		setLoading(false);
 	}
@@ -36,8 +31,8 @@ export default function RegisterPage(): JSX.Element {
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
 			<div className="w-full max-w-md rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-				<h1 className="text-2xl font-semibold tracking-tight">Create account</h1>
-				<p className="mt-1 text-sm text-gray-500">Join Phixall</p>
+				<h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+				<p className="mt-1 text-sm text-gray-500">Welcome back to Phixall</p>
 				<form onSubmit={handleSubmit} className="mt-6 space-y-4">
 					<div>
 						<label className="block text-sm font-medium text-gray-700">Email</label>
@@ -57,36 +52,21 @@ export default function RegisterPage(): JSX.Element {
 							value={password}
 							onChange={(e) => setPassword(e.target.value)}
 							required
-							minLength={6}
 						/>
 					</div>
-					<div>
-						<label className="block text-sm font-medium text-gray-700">I am a</label>
-						<div className="mt-1 flex gap-4 text-sm">
-							<label className="inline-flex items-center gap-2">
-								<input type="radio" name="role" value="client" checked={role==='client'} onChange={()=>setRole('client')} />
-								<span>Client (Facility Owner)</span>
-							</label>
-							<label className="inline-flex items-center gap-2">
-								<input type="radio" name="role" value="artisan" checked={role==='artisan'} onChange={()=>setRole('artisan')} />
-								<span>Artisan (Skilled Worker)</span>
-							</label>
-						</div>
-					</div>
 					{error && <p className="text-sm text-red-600">{error}</p>}
-					{message && <p className="text-sm text-green-700">{message}</p>}
 					<button
 						type="submit"
 						disabled={loading}
 						className="mt-2 w-full rounded-lg bg-black px-4 py-2.5 text-white transition-opacity hover:opacity-90 disabled:opacity-60"
 					>
-						{loading ? 'Creating…' : 'Create account'}
+						{loading ? 'Signing in…' : 'Sign in'}
 					</button>
 				</form>
 				<p className="mt-4 text-center text-sm text-gray-600">
-					Already have an account?{' '}
-					<Link href="/login" className="font-medium text-black underline-offset-2 hover:underline">
-						Sign in
+					No account?{' '}
+					<Link href="/register" className="font-medium text-black underline-offset-2 hover:underline">
+						Create one
 					</Link>
 				</p>
 			</div>

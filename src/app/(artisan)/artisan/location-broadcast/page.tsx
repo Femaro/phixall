@@ -1,9 +1,10 @@
 'use client';
+export const dynamic = 'force-dynamic';
 import React, { useEffect, useRef, useState } from 'react';
-import { db } from '@/lib/firebaseClient';
+import { getFirebase } from '@/lib/firebaseClient';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-export default function LocationBroadcastPage(): JSX.Element {
+export default function LocationBroadcastPage() {
 	const [broadcasting, setBroadcasting] = useState(false);
 	const watchIdRef = useRef<number | null>(null);
 
@@ -14,6 +15,7 @@ export default function LocationBroadcastPage(): JSX.Element {
 	}, []);
 
   function start(): void {
+    const { db } = getFirebase();
     const id = navigator.geolocation.watchPosition(async (pos) => {
       const payload = { lat: pos.coords.latitude, lng: pos.coords.longitude, updatedAt: serverTimestamp() } as any;
       // TODO: replace job-123 and artisan-uid

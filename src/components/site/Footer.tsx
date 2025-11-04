@@ -5,9 +5,9 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p>© {new Date().getFullYear()} Phixall Technical Company Limited</p>
           <div className="flex items-center gap-4">
-            <a href="/about" className="hover:text-black">About</a>
-            <a href="/clients" className="hover:text-black">Clients</a>
-            <a href="/artisans" className="hover:text-black">Artisans</a>
+            <a href="/about" className="hover:text-brand-700">About</a>
+            <a href="/clients" className="hover:text-brand-700">Clients</a>
+            <a href="/artisans" className="hover:text-brand-700">Artisans</a>
           </div>
         </div>
       </div>

@@ -21,8 +21,26 @@ export default function ArtisansPage() {
             <p className="mt-1 text-gray-600">Track cleared funds and request withdrawals.</p>
           </div>
         </div>
-        <div className="mt-8">
-          <a href="/register" className="rounded-md bg-black px-4 py-2.5 text-white hover:opacity-90">Join as an Artisan</a>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="rounded-xl bg-gray-50 p-6">
+            <p className="font-medium text-gray-900">Grow your business</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Consistent job pipeline</li>
+              <li>Professional quotes and invoicing</li>
+              <li>Training resources and certifications</li>
+            </ul>
+          </div>
+          <div className="rounded-xl bg-gray-50 p-6">
+            <p className="font-medium text-gray-900">Fair, transparent payouts</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Clear commission and fees</li>
+              <li>On-time payments</li>
+              <li>Track earnings and history</li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-10">
+          <a href="/register" className="rounded-md bg-brand-600 px-4 py-2.5 text-white hover:bg-brand-700">Join as an Artisan</a>
         </div>
       </section>
     </main>

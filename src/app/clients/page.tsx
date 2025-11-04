@@ -21,8 +21,26 @@ export default function ClientsPage() {
             <p className="mt-1 text-gray-600">Transparent quotes and secure checkout.</p>
           </div>
         </div>
-        <div className="mt-8">
-          <a href="/register" className="rounded-md bg-black px-4 py-2.5 text-white hover:opacity-90">Get Started</a>
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="rounded-xl bg-gray-50 p-6">
+            <p className="font-medium text-gray-900">Corporate controls</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Multi-location dashboards and role-based access</li>
+              <li>Approval workflows and audit trails</li>
+              <li>Exportable reports and billing summaries</li>
+            </ul>
+          </div>
+          <div className="rounded-xl bg-gray-50 p-6">
+            <p className="font-medium text-gray-900">SLA-driven reliability</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Response time targets with live status</li>
+              <li>Verified artisans and quality controls</li>
+              <li>Customer support 24/7</li>
+            </ul>
+          </div>
+        </div>
+        <div className="mt-10">
+          <a href="/register" className="rounded-md bg-brand-600 px-4 py-2.5 text-white hover:bg-brand-700">Get Started</a>
         </div>
       </section>
     </main>

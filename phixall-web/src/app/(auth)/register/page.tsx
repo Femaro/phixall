@@ -1,12 +1,14 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { auth } from '@/lib/firebaseClient';
+import { auth, db } from '@/lib/firebaseClient';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 export default function RegisterPage(): JSX.Element {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [role, setRole] = useState<'client' | 'artisan'>('client');
 	const [loading, setLoading] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -17,7 +19,13 @@ export default function RegisterPage(): JSX.Element {
 		setError(null);
 		setMessage(null);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, 'profiles', cred.user.uid), {
+        email,
+        role,
+        available: role === 'artisan' ? false : null,
+        createdAt: serverTimestamp(),
+      });
       setMessage('Account created. You can now sign in.');
     } catch (err: any) {
       setError(err?.message || 'Failed to create account');
@@ -51,6 +59,19 @@ export default function RegisterPage(): JSX.Element {
 							required
 							minLength={6}
 						/>
+					</div>
+					<div>
+						<label className="block text-sm font-medium text-gray-700">I am a</label>
+						<div className="mt-1 flex gap-4 text-sm">
+							<label className="inline-flex items-center gap-2">
+								<input type="radio" name="role" value="client" checked={role==='client'} onChange={()=>setRole('client')} />
+								<span>Client (Facility Owner)</span>
+							</label>
+							<label className="inline-flex items-center gap-2">
+								<input type="radio" name="role" value="artisan" checked={role==='artisan'} onChange={()=>setRole('artisan')} />
+								<span>Artisan (Skilled Worker)</span>
+							</label>
+						</div>
 					</div>
 					{error && <p className="text-sm text-red-600">{error}</p>}
 					{message && <p className="text-sm text-green-700">{message}</p>}

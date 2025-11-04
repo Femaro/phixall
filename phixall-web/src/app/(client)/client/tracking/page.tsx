@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
+import { db } from '@/lib/firebaseClient';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 export default function ClientTrackingPage(): JSX.Element {
 	const mapRef = useRef<HTMLDivElement | null>(null);
@@ -20,7 +22,23 @@ export default function ClientTrackingPage(): JSX.Element {
 				map = new googleObj.maps.Map(mapRef.current, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 11 });
 				setStatus('Listening for artisan location…');
 
-                // TODO: Replace with Firebase-based realtime channel (e.g., Firestore onSnapshot)
+                // Firestore live updates for a demo job id
+                const unsub = onSnapshot(doc(db, 'jobLocations', 'job-123'), (snap) => {
+                    if (ignore) return;
+                    const data = snap.data() as any;
+                    const loc = data?.artisan;
+                    const lat = loc?.lat;
+                    const lng = loc?.lng;
+                    if (typeof lat === 'number' && typeof lng === 'number' && map) {
+                        if (!artisanMarker) {
+                            artisanMarker = new googleObj.maps.Marker({ position: { lat, lng }, map, label: 'A' });
+                        } else {
+                            artisanMarker.setPosition({ lat, lng });
+                        }
+                        map.setCenter({ lat, lng });
+                        setStatus('Tracking artisan…');
+                    }
+                });
 
 				// Optionally show client location if permitted
 				if (navigator.geolocation) {
@@ -30,7 +48,7 @@ export default function ClientTrackingPage(): JSX.Element {
 					});
 				}
 
-                return () => {};
+                return () => { unsub(); };
 			} catch (_e) {
 				setStatus('Failed to load map');
 			}

@@ -1,8 +1,9 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { auth } from '@/lib/firebaseClient';
+import { auth, db } from '@/lib/firebaseClient';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function LoginPage(): JSX.Element {
 	const [email, setEmail] = useState('');
@@ -15,8 +16,10 @@ export default function LoginPage(): JSX.Element {
 		setLoading(true);
 		setError(null);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = '/client/dashboard';
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const profSnap = await getDoc(doc(db, 'profiles', cred.user.uid));
+      const role = (profSnap.exists() ? profSnap.data()?.role : 'client') as 'client' | 'artisan';
+      window.location.href = role === 'artisan' ? '/artisan/dashboard' : '/client/dashboard';
     } catch (err: any) {
       setError(err?.message || 'Failed to sign in');
     }

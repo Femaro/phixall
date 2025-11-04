@@ -42,6 +42,32 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
   - `profiles` (user profile/availability)
   - `jobLocations` (live tracking payloads)
 
+Security rules (starter):
+
+```jsonc
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() { return request.auth != null; }
+
+    match /profiles/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /jobs/{jobId} {
+      allow create: if isSignedIn();
+      allow read, update: if isSignedIn();
+    }
+
+    match /jobLocations/{jobId} {
+      allow read, write: if isSignedIn();
+    }
+  }
+}
+```
+
 4) Deploy on Vercel
 
 - Add the env vars above in Project → Settings → Environment Variables.

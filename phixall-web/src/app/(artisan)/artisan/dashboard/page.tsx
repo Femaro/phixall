@@ -9,7 +9,9 @@ export default function ArtisanDashboardPage(): JSX.Element {
 	const [jobs, setJobs] = useState<Array<{ id: string; title: string; distance_km?: number }>>([]);
 
   useEffect(() => {
-    // TODO: Wire realtime jobs via Firestore or WebSocket backend
+    import('firebase/auth').then(({ onAuthStateChanged }) => {
+      onAuthStateChanged(auth, (user) => { if (!user) window.location.href = '/login'; });
+    });
   }, []);
 
   async function toggleAvailability(): Promise<void> {

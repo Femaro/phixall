@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { auth, db, storage } from '@/lib/firebaseClient';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
@@ -12,6 +12,14 @@ export default function ClientDashboardPage(): JSX.Element {
 	const [files, setFiles] = useState<FileList | null>(null);
 	const [submitting, setSubmitting] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
+
+	useEffect(() => {
+		import('firebase/auth').then(({ onAuthStateChanged }) => {
+			onAuthStateChanged(auth, (user) => {
+				if (!user) window.location.href = '/login';
+			});
+		});
+	}, []);
 
 	async function handleSubmit(e: React.FormEvent): Promise<void> {
 		e.preventDefault();

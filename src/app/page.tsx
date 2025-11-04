@@ -125,6 +125,57 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="border-t border-gray-200">
+        <div className="mx-auto max-w-6xl px-4 py-14">
+          <h2 className="text-2xl font-semibold text-gray-900">Coverage</h2>
+          <p className="mt-2 max-w-3xl text-gray-700">Nationwide network in major cities with expanding regional coverage. Contact us to confirm availability in your area.</p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+            {['Lagos','Abuja','Port Harcourt','Kano','Ibadan','Abeokuta'].map((city) => (
+              <div key={city} className="rounded-xl border border-gray-200 bg-white p-4 text-gray-800">
+                {city}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gray-50">
+        <div className="mx-auto max-w-6xl px-4 py-14">
+          <h2 className="text-2xl font-semibold text-gray-900">Testimonials</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              { quote: 'Fast response and professional work—highly recommend.', author: 'Facility Manager, Retail' },
+              { quote: 'Clear quotes and great communication throughout.', author: 'Property Owner' },
+              { quote: 'Reliable artisans and on-time delivery.', author: 'Operations Lead' },
+            ].map((t, i) => (
+              <div key={i} className="rounded-xl bg-white p-6 shadow-sm">
+                <p className="text-gray-800">“{t.quote}”</p>
+                <p className="mt-2 text-sm text-gray-600">{t.author}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t border-gray-200">
+        <div className="mx-auto max-w-6xl px-4 py-14">
+          <h2 className="text-2xl font-semibold text-gray-900">FAQs</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {[
+              { q: 'How quickly can I book a service?', a: 'Most requests are confirmed within hours, with same-day options in supported areas.' },
+              { q: 'Are artisans vetted?', a: 'Yes. Identity, skills, and track record are verified with ongoing performance reviews.' },
+              { q: 'Do you support corporate facilities?', a: 'Yes. We offer multi-location dashboards, approvals, and reporting for enterprises.' },
+              { q: 'What payment methods are supported?', a: 'Card payments via secure checkout, with invoices and receipts provided.' },
+            ].map((f, i) => (
+              <div key={i} className="rounded-xl bg-white p-6 shadow-sm">
+                <p className="font-medium text-gray-900">{f.q}</p>
+                <p className="mt-1 text-gray-700">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section>
         <div className="mx-auto max-w-6xl px-4 py-14 text-center">
           <h2 className="text-2xl font-semibold text-gray-900">Ready to get started?</h2>

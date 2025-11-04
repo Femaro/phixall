@@ -39,6 +39,32 @@ export default function ArtisansPage() {
             </ul>
           </div>
         </div>
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="font-medium">Requirements</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Valid ID and proof of skills</li>
+              <li>Smartphone with GPS</li>
+              <li>Professional conduct</li>
+            </ul>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="font-medium">Onboarding</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Profile verification</li>
+              <li>Training modules</li>
+              <li>First job coaching</li>
+            </ul>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="font-medium">Safety</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Job details before arrival</li>
+              <li>In-app support</li>
+              <li>Incident reporting</li>
+            </ul>
+          </div>
+        </div>
         <div className="mt-10">
           <a href="/register" className="rounded-md bg-brand-600 px-4 py-2.5 text-white hover:bg-brand-700">Join as an Artisan</a>
         </div>

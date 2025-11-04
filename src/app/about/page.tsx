@@ -41,6 +41,26 @@ export default function AboutPage() {
             </ul>
           </div>
         </div>
+
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="font-medium text-gray-900">Our Story</p>
+            <p className="mt-2 text-gray-700">Born from the need for dependable, transparent facility services, Phixall blends technology and trusted professionals to deliver outcomes you can measure.</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <p className="font-medium text-gray-900">Values</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-700">
+              <li>Reliability: on-time, every time</li>
+              <li>Transparency: clear quotes and communication</li>
+              <li>Quality: vetted artisans and guaranteed work</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-10 rounded-xl bg-white p-6 shadow-sm">
+          <p className="font-medium text-gray-900">Leadership</p>
+          <p className="mt-2 text-gray-700">Our leadership team brings experience across facility operations, engineering, and software platforms to scale service excellence.</p>
+        </div>
       </section>
     </main>
   );

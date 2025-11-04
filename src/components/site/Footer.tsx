@@ -8,6 +8,7 @@ export default function Footer() {
             <a href="/about" className="hover:text-brand-700">About</a>
             <a href="/clients" className="hover:text-brand-700">Clients</a>
             <a href="/artisans" className="hover:text-brand-700">Artisans</a>
+            <a href="/contact" className="hover:text-brand-700">Contact</a>
           </div>
         </div>
       </div>

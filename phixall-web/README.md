@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Phixall Web App (Next.js + Supabase)
 
-## Getting Started
+This is the web-only version of Phixall, built with Next.js App Router and Supabase for Auth, Database, and Storage.
 
-First, run the development server:
+## 1) Environment variables
+
+Create `.env.local` in this folder with:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```
+
+On Vercel, add the same vars in Project → Settings → Environment Variables.
+
+## 2) Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Visit `/register` to create an account (confirm email if required).
+- Then `/login` → redirected to `/dashboard` (protected page).
+- Use `/logout` to sign out.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 3) Supabase setup (database + auth)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- In Supabase → Auth → URL Configuration:
+  - Site URL: `http://localhost:3000` (replace with your Vercel URL after deploy)
+  - Redirect URLs: include both localhost and Vercel domain
 
-## Learn More
+- Create `profiles` table (SQL):
 
-To learn more about Next.js, take a look at the following resources:
+```sql
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text,
+  created_at timestamp with time zone default now()
+);
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+alter table profiles enable row level security;
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+create policy "Profiles are viewable by owner" on profiles
+  for select using ( auth.uid() = id );
 
-## Deploy on Vercel
+create policy "Users can upsert their own profile" on profiles
+  for insert with check ( auth.uid() = id )
+  with check ( auth.uid() = id );
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+create policy "Users can update their own profile" on profiles
+  for update using ( auth.uid() = id );
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- The app upserts a `profiles` row on first visit to `/dashboard`.
+
+## 4) Route protection
+
+- `middleware.ts` protects `/dashboard` and redirects:
+  - Unauthed → `/login`
+  - Authed visiting `/login`/`/register` → `/dashboard`
+
+## 5) Deploy to Vercel
+
+1. Import the repository on Vercel.
+2. Set Project Root to `phixall-web` if deploying from monorepo.
+3. Add env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app`.
+4. Deploy.
+
+That’s it—this repo is now a web app backed by Supabase.

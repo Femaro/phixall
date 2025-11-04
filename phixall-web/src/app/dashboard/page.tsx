@@ -9,7 +9,7 @@ export default function DashboardPage(): JSX.Element {
 
   useEffect(() => {
     let isMounted = true;
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       if (!isMounted) return;
       const session = data.session;
       if (!session) {
@@ -17,6 +17,12 @@ export default function DashboardPage(): JSX.Element {
         return;
       }
       setEmail(session.user.email ?? null);
+      // Ensure profile row exists (safe no-op if already present)
+      try {
+        await fetch('/api/profile/init', { method: 'POST' });
+      } catch (_e) {
+        // ignore
+      }
       setLoading(false);
     });
     return () => {

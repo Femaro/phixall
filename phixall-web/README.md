@@ -54,6 +54,36 @@ create policy "Users can update their own profile" on profiles
 
 - The app upserts a `profiles` row on first visit to `/dashboard`.
 
+### Storage (avatars)
+
+1. In Supabase → Storage → Create bucket named `avatars` and set it to Public.
+2. Add Storage policies (SQL → New Policy on bucket `avatars`):
+
+```sql
+-- Allow anyone to view files in the avatars bucket
+create policy "Public read" on storage.objects
+  for select to public
+  using ( bucket_id = 'avatars' );
+
+-- Allow authenticated users to upload/update only within their own folder
+create policy "Users can manage their folder" on storage.objects
+  for insert to authenticated
+  with check (
+    bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "Users can update their folder" on storage.objects
+  for update to authenticated
+  using (
+    bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text
+  )
+  with check (
+    bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text
+  );
+```
+
+- The Profile page uploads to `avatars/<userId>/avatar` and reads via public URL.
+
 ## 4) Route protection
 
 - `middleware.ts` protects `/dashboard` and redirects:

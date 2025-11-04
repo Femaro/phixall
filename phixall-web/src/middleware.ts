@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
   const pathname = url.pathname;
 
   const isAuthPage = pathname === '/login' || pathname === '/register';
-  const isProtected = pathname.startsWith('/dashboard');
+  const isProtected = pathname.startsWith('/dashboard') || pathname.startsWith('/profile');
 
   if (!session && isProtected) {
     const loginUrl = new URL('/login', url.origin);
@@ -28,7 +28,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/login', '/register', '/dashboard/:path*'],
+  matcher: ['/login', '/register', '/dashboard/:path*', '/profile/:path*'],
 };
 
 

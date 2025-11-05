@@ -58,17 +58,32 @@ export default function RegisterPage() {
         router.push('/client/dashboard');
       }
     } catch (err: unknown) {
-      console.error(err);
+      console.error('Registration error:', err);
       if (err && typeof err === 'object' && 'code' in err) {
-        if (err.code === 'auth/email-already-in-use') {
-          setError('This email is already registered. Please sign in instead.');
-        } else if (err.code === 'auth/invalid-email') {
-          setError('Please enter a valid email address.');
-        } else {
-          setError('Failed to create account. Please try again.');
+        const errorCode = err.code as string;
+        switch (errorCode) {
+          case 'auth/email-already-in-use':
+            setError('This email is already registered. Please sign in instead.');
+            break;
+          case 'auth/invalid-email':
+            setError('Please enter a valid email address.');
+            break;
+          case 'auth/operation-not-allowed':
+            setError('Email/Password authentication is not enabled. Please contact support or enable it in Firebase Console.');
+            break;
+          case 'auth/weak-password':
+            setError('Password is too weak. Please use at least 6 characters.');
+            break;
+          case 'permission-denied':
+            setError('Permission denied. Please check Firestore security rules.');
+            break;
+          default:
+            setError(`Failed to create account: ${errorCode}. Please try again or check browser console for details.`);
         }
+      } else if (err && typeof err === 'object' && 'message' in err) {
+        setError(`Error: ${err.message}`);
       } else {
-        setError('Failed to create account. Please try again.');
+        setError('Failed to create account. Please check browser console for details.');
       }
       setLoading(false);
     }

@@ -44,12 +44,33 @@ export default function ArtisanDashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalEarnings: 0, totalCashout: 0, pendingBalance: 0 });
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'available' | 'my-jobs' | 'wallet'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'available' | 'my-jobs' | 'wallet' | 'profile' | 'settings'>('overview');
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
   const [cashoutAmount, setCashoutAmount] = useState('');
   const [processingCashout, setProcessingCashout] = useState(false);
   const [bankAccount, setBankAccount] = useState({ accountNumber: '', bankName: '', accountName: '' });
+  
+  // Profile states
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    skills: '',
+    experience: ''
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+  
+  // Settings states
+  const [settingsForm, setSettingsForm] = useState({
+    emailNotifications: true,
+    smsNotifications: false,
+    pushNotifications: true,
+    language: 'en',
+    timezone: 'Africa/Lagos'
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const CASHOUT_FEE_PERCENT = 2.5; // 2.5% fee
   const MIN_CASHOUT = 1000; // Minimum ₦1,000
@@ -71,6 +92,23 @@ export default function ArtisanDashboardPage() {
             if (profileData.bankAccount) {
               setBankAccount(profileData.bankAccount);
             }
+            // Populate profile form
+            setProfileForm({
+              name: profileData.name || '',
+              email: profileData.email || currentUser.email,
+              phone: profileData.phone || '',
+              address: profileData.address || '',
+              skills: profileData.skills || '',
+              experience: profileData.experience || ''
+            });
+            // Populate settings form
+            setSettingsForm({
+              emailNotifications: profileData.emailNotifications ?? true,
+              smsNotifications: profileData.smsNotifications ?? false,
+              pushNotifications: profileData.pushNotifications ?? true,
+              language: profileData.language || 'en',
+              timezone: profileData.timezone || 'Africa/Lagos'
+            });
           }
           
           setLoading(false);
@@ -247,6 +285,54 @@ export default function ArtisanDashboardPage() {
     }
   }
 
+  async function handleSaveProfile() {
+    setSavingProfile(true);
+    try {
+      const { db } = getFirebase();
+      const profileRef = doc(db, 'profiles', user.uid);
+      
+      await updateDoc(profileRef, {
+        name: profileForm.name,
+        phone: profileForm.phone,
+        address: profileForm.address,
+        skills: profileForm.skills,
+        experience: profileForm.experience,
+        updatedAt: serverTimestamp(),
+      });
+
+      alert('Profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function handleSaveSettings() {
+    setSavingSettings(true);
+    try {
+      const { db } = getFirebase();
+      const profileRef = doc(db, 'profiles', user.uid);
+      
+      await updateDoc(profileRef, {
+        emailNotifications: settingsForm.emailNotifications,
+        smsNotifications: settingsForm.smsNotifications,
+        pushNotifications: settingsForm.pushNotifications,
+        language: settingsForm.language,
+        timezone: settingsForm.timezone,
+        updatedAt: serverTimestamp(),
+      });
+
+      alert('Settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save settings. Please try again.');
+    } finally {
+      setSavingSettings(false);
+    }
+  }
+
   async function handleCashout(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     setProcessingCashout(true);
@@ -376,7 +462,9 @@ export default function ArtisanDashboardPage() {
               </Link>
               <div>
                 <h1 className="text-2xl font-bold text-neutral-900">Artisan Dashboard</h1>
-                <p className="text-sm text-neutral-600">Welcome, {user?.displayName || user?.email}</p>
+                <p className="text-sm text-neutral-600">
+                  Welcome back, <span className="font-semibold text-brand-600">{profile?.name || user?.displayName || user?.email?.split('@')[0]}</span>! 👋
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -432,6 +520,8 @@ export default function ArtisanDashboardPage() {
               { id: 'available', label: 'Available Jobs', icon: '🔔', badge: availableJobs.length },
               { id: 'my-jobs', label: 'My Jobs', icon: '💼', badge: myJobs.length },
               { id: 'wallet', label: 'Wallet', icon: '💰' },
+              { id: 'profile', label: 'Profile', icon: '👤' },
+              { id: 'settings', label: 'Settings', icon: '⚙️' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -977,6 +1067,215 @@ export default function ArtisanDashboardPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div>
+            <h2 className="text-xl font-bold text-neutral-900 mb-6">Profile Information</h2>
+            <div className="max-w-2xl">
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={profileForm.email}
+                      disabled
+                      className="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-500 cursor-not-allowed"
+                    />
+                    <p className="mt-1 text-xs text-neutral-500">Email cannot be changed</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={profileForm.phone}
+                      onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="+234 800 000 0000"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Address
+                    </label>
+                    <textarea
+                      value={profileForm.address}
+                      onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
+                      rows={3}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter your address"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Skills & Expertise
+                    </label>
+                    <textarea
+                      value={profileForm.skills}
+                      onChange={(e) => setProfileForm({ ...profileForm, skills: e.target.value })}
+                      rows={3}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="e.g., Plumbing, Electrical, HVAC"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Years of Experience
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.experience}
+                      onChange={(e) => setProfileForm({ ...profileForm, experience: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="e.g., 5 years"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={savingProfile}
+                      className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {savingProfile ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div>
+            <h2 className="text-xl font-bold text-neutral-900 mb-6">Dashboard Settings</h2>
+            <div className="max-w-2xl space-y-6">
+              {/* Notifications */}
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Notifications</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">Email Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive job updates via email</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.emailNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, emailNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">SMS Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive job updates via SMS</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.smsNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, smsNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">Push Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive push notifications for new jobs</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.pushNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, pushNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preferences */}
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Preferences</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Language
+                    </label>
+                    <select
+                      value={settingsForm.language}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="en">English</option>
+                      <option value="yo">Yoruba</option>
+                      <option value="ig">Igbo</option>
+                      <option value="ha">Hausa</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Timezone
+                    </label>
+                    <select
+                      value={settingsForm.timezone}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, timezone: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="Africa/Lagos">Lagos (WAT)</option>
+                      <option value="Africa/Abuja">Abuja (WAT)</option>
+                      <option value="Africa/Port_Harcourt">Port Harcourt (WAT)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingSettings ? 'Saving...' : 'Save Settings'}
+                </button>
+              </div>
             </div>
           </div>
         )}

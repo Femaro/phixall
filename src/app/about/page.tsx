@@ -160,19 +160,19 @@ export default function AboutPage() {
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: 'Adebayo Johnson',
-                role: 'CEO & Co-Founder',
-                bio: '10+ years in PropTech and facility management',
+                name: 'Femi Ajakaiye',
+                role: 'CEO',
+                bio: 'Visionary leader driving innovation in facility management',
               },
               {
-                name: 'Ngozi Okonkwo',
-                role: 'CTO & Co-Founder',
-                bio: 'Former Lead Engineer at top tech companies',
+                name: 'Okon Otoudung',
+                role: 'CTO',
+                bio: 'Technology expert building scalable solutions',
               },
               {
-                name: 'Tunde Balogun',
+                name: 'Olufemi Babatunde',
                 role: 'Head of Operations',
-                bio: 'Scaling operations across multiple cities',
+                bio: 'Operations specialist ensuring excellence across all services',
               },
             ].map((member) => (
               <div key={member.name} className="rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-soft">

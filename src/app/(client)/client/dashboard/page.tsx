@@ -49,10 +49,31 @@ export default function ClientDashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalDeposits: 0, totalSpent: 0 });
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'request' | 'jobs' | 'wallet'>('overview');
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'request' | 'jobs' | 'wallet' | 'profile' | 'settings'>('overview');
   const [loading, setLoading] = useState(true);
   const [depositAmount, setDepositAmount] = useState('');
   const [processingPayment, setProcessingPayment] = useState(false);
+  
+  // Profile states
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+    company: ''
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+  
+  // Settings states
+  const [settingsForm, setSettingsForm] = useState({
+    emailNotifications: true,
+    smsNotifications: false,
+    pushNotifications: true,
+    language: 'en',
+    timezone: 'Africa/Lagos'
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     const { auth } = getFirebase();
@@ -67,6 +88,37 @@ export default function ClientDashboardPage() {
       });
     });
   }, []);
+
+  // Load user profile
+  useEffect(() => {
+    if (!user) return;
+
+    const { db } = getFirebase();
+    const profileRef = doc(db, 'profiles', user.uid);
+    
+    const unsubscribe = onSnapshot(profileRef, (doc) => {
+      if (doc.exists()) {
+        const profile = doc.data();
+        setUserProfile(profile);
+        setProfileForm({
+          name: profile.name || '',
+          email: profile.email || user.email,
+          phone: profile.phone || '',
+          address: profile.address || '',
+          company: profile.company || ''
+        });
+        setSettingsForm({
+          emailNotifications: profile.emailNotifications ?? true,
+          smsNotifications: profile.smsNotifications ?? false,
+          pushNotifications: profile.pushNotifications ?? true,
+          language: profile.language || 'en',
+          timezone: profile.timezone || 'Africa/Lagos'
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
 
   // Load wallet data
   useEffect(() => {
@@ -232,6 +284,53 @@ export default function ClientDashboardPage() {
     }
   }
 
+  async function handleSaveProfile() {
+    setSavingProfile(true);
+    try {
+      const { db } = getFirebase();
+      const profileRef = doc(db, 'profiles', user.uid);
+      
+      await updateDoc(profileRef, {
+        name: profileForm.name,
+        phone: profileForm.phone,
+        address: profileForm.address,
+        company: profileForm.company,
+        updatedAt: serverTimestamp(),
+      });
+
+      setMessage({ text: 'Profile updated successfully!', type: 'success' });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setMessage({ text: 'Failed to update profile. Please try again.', type: 'error' });
+    } finally {
+      setSavingProfile(false);
+    }
+  }
+
+  async function handleSaveSettings() {
+    setSavingSettings(true);
+    try {
+      const { db } = getFirebase();
+      const profileRef = doc(db, 'profiles', user.uid);
+      
+      await updateDoc(profileRef, {
+        emailNotifications: settingsForm.emailNotifications,
+        smsNotifications: settingsForm.smsNotifications,
+        pushNotifications: settingsForm.pushNotifications,
+        language: settingsForm.language,
+        timezone: settingsForm.timezone,
+        updatedAt: serverTimestamp(),
+      });
+
+      setMessage({ text: 'Settings saved successfully!', type: 'success' });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setMessage({ text: 'Failed to save settings. Please try again.', type: 'error' });
+    } finally {
+      setSavingSettings(false);
+    }
+  }
+
   async function handlePayForJob(jobId: string, amount: number) {
     if (wallet.balance < amount) {
       setMessage({ text: 'Insufficient balance. Please deposit funds.', type: 'error' });
@@ -334,7 +433,9 @@ export default function ClientDashboardPage() {
               </Link>
               <div>
                 <h1 className="text-2xl font-bold text-neutral-900">Client Dashboard</h1>
-                <p className="text-sm text-neutral-600">Welcome, {user?.displayName || user?.email}</p>
+                <p className="text-sm text-neutral-600">
+                  Welcome back, <span className="font-semibold text-brand-600">{userProfile?.name || user?.displayName || user?.email?.split('@')[0]}</span>! 👋
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -376,6 +477,8 @@ export default function ClientDashboardPage() {
               { id: 'request', label: 'Request Service', icon: '➕' },
               { id: 'jobs', label: 'My Jobs', icon: '📋', badge: jobs.length },
               { id: 'wallet', label: 'Wallet', icon: '💰' },
+              { id: 'profile', label: 'Profile', icon: '👤' },
+              { id: 'settings', label: 'Settings', icon: '⚙️' },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -870,6 +973,202 @@ export default function ClientDashboardPage() {
                   </div>
                 ))
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Profile Tab */}
+        {activeTab === 'profile' && (
+          <div>
+            <h2 className="text-xl font-bold text-neutral-900 mb-6">Profile Information</h2>
+            <div className="max-w-2xl">
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.name}
+                      onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={profileForm.email}
+                      disabled
+                      className="w-full rounded-lg border border-neutral-300 bg-neutral-50 px-4 py-2 text-neutral-500 cursor-not-allowed"
+                    />
+                    <p className="mt-1 text-xs text-neutral-500">Email cannot be changed</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      value={profileForm.phone}
+                      onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="+234 800 000 0000"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Address
+                    </label>
+                    <textarea
+                      value={profileForm.address}
+                      onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
+                      rows={3}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter your address"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Company/Organization (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.company}
+                      onChange={(e) => setProfileForm({ ...profileForm, company: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter company name"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4">
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={savingProfile}
+                      className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {savingProfile ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && (
+          <div>
+            <h2 className="text-xl font-bold text-neutral-900 mb-6">Dashboard Settings</h2>
+            <div className="max-w-2xl space-y-6">
+              {/* Notifications */}
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Notifications</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">Email Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive updates via email</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.emailNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, emailNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">SMS Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive updates via SMS</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.smsNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, smsNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-neutral-900">Push Notifications</p>
+                      <p className="text-sm text-neutral-600">Receive push notifications</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={settingsForm.pushNotifications}
+                        onChange={(e) => setSettingsForm({ ...settingsForm, pushNotifications: e.target.checked })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-neutral-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-600"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preferences */}
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Preferences</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Language
+                    </label>
+                    <select
+                      value={settingsForm.language}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, language: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="en">English</option>
+                      <option value="yo">Yoruba</option>
+                      <option value="ig">Igbo</option>
+                      <option value="ha">Hausa</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Timezone
+                    </label>
+                    <select
+                      value={settingsForm.timezone}
+                      onChange={(e) => setSettingsForm({ ...settingsForm, timezone: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    >
+                      <option value="Africa/Lagos">Lagos (WAT)</option>
+                      <option value="Africa/Abuja">Abuja (WAT)</option>
+                      <option value="Africa/Port_Harcourt">Port Harcourt (WAT)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="rounded-lg bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {savingSettings ? 'Saving...' : 'Save Settings'}
+                </button>
+              </div>
             </div>
           </div>
         )}

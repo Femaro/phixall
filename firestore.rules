@@ -1,0 +1,184 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Helper function to check if user is the owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user is client
+    function isClient() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'client';
+    }
+    
+    // Helper function to check if user is artisan
+    function isArtisan() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'artisan';
+    }
+    
+    // Profiles collection
+    match /profiles/{userId} {
+      // Anyone can create their own profile during signup
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Users can read their own profile, admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can update their own profile (except role field)
+      // Admins can update any profile including role
+      allow update: if (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])) 
+                    || isAdmin();
+      
+      // Only admins can delete profiles
+      allow delete: if isAdmin();
+    }
+    
+    // Jobs collection
+    match /jobs/{jobId} {
+      // Clients can create jobs, admins can create on behalf of anyone
+      allow create: if isClient() || isAdmin();
+      
+      // Job owner (client), assigned artisan, and admins can read
+      allow read: if isAdmin() 
+                  || isOwner(resource.data.clientId) 
+                  || (isArtisan() && resource.data.artisanId == request.auth.uid)
+                  || isArtisan(); // Allow artisans to see available jobs
+      
+      // Job owner, assigned artisan, and admins can update
+      allow update: if isAdmin() 
+                    || isOwner(resource.data.clientId)
+                    || (isArtisan() && resource.data.artisanId == request.auth.uid);
+      
+      // Only admins and job owner can delete
+      allow delete: if isAdmin() || isOwner(resource.data.clientId);
+    }
+    
+    // Wallets collection
+    match /wallets/{userId} {
+      // Users can read their own wallet, admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can update their own wallet, admins can update any
+      allow create, update: if isOwner(userId) || isAdmin();
+      
+      // Only admins can delete wallets
+      allow delete: if isAdmin();
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      // Users can create their own transactions, admins can create any
+      allow create: if isAuthenticated();
+      
+      // Users can read their own transactions, admins can read all
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      
+      // Only admins can update transactions
+      allow update: if isAdmin();
+      
+      // Only admins can delete transactions
+      allow delete: if isAdmin();
+    }
+    
+    // Artisan locations collection (for real-time tracking)
+    match /artisanLocations/{artisanId} {
+      // Artisans can write their own location
+      allow create, update: if isOwner(artisanId) || isAdmin();
+      
+      // Clients with active jobs and admins can read locations
+      allow read: if isAdmin() || isAuthenticated();
+      
+      // Only artisans and admins can delete
+      allow delete: if isOwner(artisanId) || isAdmin();
+    }
+    
+    // Resources collection
+    match /resources/{resourceId} {
+      // Only admins can create resources
+      allow create: if isAdmin();
+      
+      // Admins and authenticated users can read resources
+      allow read: if isAuthenticated();
+      
+      // Only admins can update resources
+      allow update: if isAdmin();
+      
+      // Only admins can delete resources
+      allow delete: if isAdmin();
+    }
+    
+    // Bills collection
+    match /bills/{billId} {
+      // Admins can create bills
+      allow create: if isAdmin();
+      
+      // Bill recipient and admins can read
+      allow read: if isAdmin() || isOwner(resource.data.recipientId);
+      
+      // Recipients can update (for approval), admins can update any
+      allow update: if isAdmin() || isOwner(resource.data.recipientId);
+      
+      // Only admins can delete bills
+      allow delete: if isAdmin();
+    }
+    
+    // Subscriptions collection
+    match /subscriptions/{subscriptionId} {
+      // Clients can create subscriptions
+      allow create: if isClient();
+      
+      // Subscription owner and admins can read
+      allow read: if isAdmin() || isOwner(resource.data.clientId);
+      
+      // Only admins can update subscriptions (for status changes, renewals)
+      allow update: if isAdmin();
+      
+      // Only admins can delete subscriptions
+      allow delete: if isAdmin();
+    }
+    
+    // Subscription plans collection (tier definitions)
+    match /subscription_plans/{planId} {
+      // Everyone can read plans
+      allow read: if true;
+      
+      // Only admins can create/update/delete plans
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Subscription usage tracking
+    match /subscription_usage/{usageId} {
+      // Clients can create usage records
+      allow create: if isAuthenticated();
+      
+      // Usage owner and admins can read
+      allow read: if isAdmin() || isOwner(resource.data.clientId);
+      
+      // Only admins can update usage
+      allow update: if isAdmin();
+      
+      // Only admins can delete usage records
+      allow delete: if isAdmin();
+    }
+    
+    // Default: deny all access to other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

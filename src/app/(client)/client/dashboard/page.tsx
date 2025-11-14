@@ -412,6 +412,11 @@ function ClientDashboardContent() {
   }
 
   async function handlePayForJob(jobId: string, amount: number) {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to pay for a job.', type: 'error' });
+      return;
+    }
+
     if (wallet.balance < amount) {
       setMessage({ text: 'Insufficient balance. Please deposit funds.', type: 'error' });
       return;

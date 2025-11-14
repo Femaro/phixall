@@ -969,7 +969,7 @@ export default function AdminDashboardPage() {
                     <div key={txn.id} className="flex items-center justify-between rounded-lg border border-neutral-200 p-3">
                       <div>
                         <p className="text-sm font-medium text-neutral-900">{txn.type}</p>
-                        <p className="text-xs text-neutral-500">{txn.createdAt?.toDate().toLocaleDateString()}</p>
+                      <p className="text-xs text-neutral-500">{formatTimestamp(txn.createdAt)}</p>
                       </div>
                       <p className="font-semibold text-neutral-900">₦{Math.abs(txn.amount).toLocaleString()}</p>
                     </div>

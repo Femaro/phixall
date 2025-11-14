@@ -675,11 +675,18 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const formatTimestamp = (value: TimestampLike | { toDate?: () => Date } | string | undefined) => {
+  const formatTimestamp = (
+    value: TimestampLike | { toDate?: () => Date } | { seconds?: number } | string | undefined
+  ) => {
     if (!value) return '—';
+    if (value instanceof Date) return value.toLocaleString();
     if (typeof value === 'string') return new Date(value).toLocaleString();
-    if (value.toDate) return value.toDate().toLocaleString();
-    if (value.seconds) return new Date(value.seconds * 1000).toLocaleString();
+    if ('toDate' in value && typeof value.toDate === 'function') {
+      return value.toDate().toLocaleString();
+    }
+    if ('seconds' in value && typeof value.seconds === 'number') {
+      return new Date(value.seconds * 1000).toLocaleString();
+    }
     return '—';
   };
 

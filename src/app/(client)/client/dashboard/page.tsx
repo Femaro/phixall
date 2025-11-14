@@ -1,6 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
 import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc } from 'firebase/firestore';
@@ -39,6 +39,14 @@ interface Wallet {
 }
 
 export default function ClientDashboardPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-sm text-neutral-600">Loading dashboard…</div>}>
+      <ClientDashboardContent />
+    </Suspense>
+  );
+}
+
+function ClientDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionIdFromQuery = searchParams.get('session_id');

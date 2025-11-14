@@ -131,7 +131,7 @@ function ClientDashboardContent() {
         setUserProfile(profile);
         setProfileForm({
           name: profile.name || '',
-          email: profile.email || user.email,
+          email: profile.email || user?.email || '',
           phone: profile.phone || '',
           address: profile.address || '',
           company: profile.company || ''

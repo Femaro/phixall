@@ -8,8 +8,6 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { User as FirebaseUser } from 'firebase/auth';
 
-type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
-
 interface ClientProfile {
   name?: string;
   email?: string;

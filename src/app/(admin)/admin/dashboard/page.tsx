@@ -19,7 +19,7 @@ type AdminProfile = {
   [key: string]: unknown;
 };
 
-type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string };
+type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string; email?: string };
 
 type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings';
 

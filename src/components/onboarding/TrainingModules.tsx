@@ -534,7 +534,7 @@ export default function TrainingModules({ user, onboarding, setOnboarding }: Pro
                     <button
                       onClick={() => {
                         if (confirm('Are you sure you want to go back? Your answers will be lost.')) {
-                          setTakingAssessment(false);
+                          persistProgress({ takingAssessment: false });
                           setAssessmentAnswers([]);
                         }
                       }}

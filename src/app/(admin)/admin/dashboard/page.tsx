@@ -1441,7 +1441,7 @@ export default function AdminDashboardPage() {
                             <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
                               <h4 className="text-sm font-semibold text-neutral-900 mb-3">Professional References</h4>
                               <div className="space-y-3 text-sm">
-                                {application.additionalInfo.references.map((ref, idx) => (
+                                {(application.additionalInfo?.references ?? []).map((ref, idx) => (
                                   <div key={`${ref.name}-${idx}`} className="rounded-lg bg-neutral-50 p-3">
                                     <p className="font-medium text-neutral-900">{ref.name || 'Reference'}</p>
                                     <p className="text-neutral-600">{ref.relationship || ref.companyName || '—'}</p>

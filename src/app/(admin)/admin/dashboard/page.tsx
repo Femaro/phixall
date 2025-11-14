@@ -1276,6 +1276,7 @@ export default function AdminDashboardPage() {
                   const currentStep = application.currentStep ?? 1;
                   const totalSteps = 3;
                   const isOpen = openApplicationId === application.id;
+                  const trainingProgressState = application.trainingProgress;
 
                   return (
                     <div key={application.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
@@ -1464,15 +1465,15 @@ export default function AdminDashboardPage() {
                                     : 'In progress'}
                                 </p>
                               </div>
-                              {application.trainingProgress?.activeModuleId && (
+                              {trainingProgressState?.activeModuleId && (
                                 <div className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
                                   <p className="font-semibold">
                                     Last activity:{' '}
-                                    {trainingModules.find((m) => m.id === application.trainingProgress.activeModuleId)?.title || 'Current module'}
+                                    {trainingModules.find((m) => m.id === trainingProgressState.activeModuleId)?.title || 'Current module'}
                                   </p>
                                   <p>
-                                    Page {application.trainingProgress.currentPage + 1}{' '}
-                                    {application.trainingProgress.takingAssessment ? '(assessment in progress)' : ''}
+                                    Page {(trainingProgressState.currentPage ?? 0) + 1}{' '}
+                                    {trainingProgressState.takingAssessment ? '(assessment in progress)' : ''}
                                   </p>
                                 </div>
                               )}

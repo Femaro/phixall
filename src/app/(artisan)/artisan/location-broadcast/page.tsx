@@ -54,7 +54,7 @@ function LocationBroadcastContent() {
       return;
     }
     const id = navigator.geolocation.watchPosition(async (pos) => {
-      const payload = { lat: pos.coords.latitude, lng: pos.coords.longitude, updatedAt: serverTimestamp() } as any;
+      const payload = { lat: pos.coords.latitude, lng: pos.coords.longitude, updatedAt: serverTimestamp() };
       try {
         await setDoc(doc(db, 'jobLocations', jobId), {
           [`artisans.${uid}`]: payload,

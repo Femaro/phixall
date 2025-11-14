@@ -13,7 +13,6 @@ const config = {
 };
 
 if (!config.apiKey) {
-  // eslint-disable-next-line no-console
   console.warn('Missing Firebase env vars. Set NEXT_PUBLIC_FIREBASE_*');
 }
 

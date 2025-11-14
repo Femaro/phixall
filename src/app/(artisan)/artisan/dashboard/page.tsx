@@ -2,8 +2,35 @@
 export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
+import type { User as FirebaseUser } from 'firebase/auth';
+
+type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
+
+interface ArtisanProfile {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  skills?: string;
+  experience?: string;
+  available?: boolean;
+  bankAccount?: {
+    accountNumber?: string;
+    bankName?: string;
+    accountName?: string;
+  };
+  emailNotifications?: boolean;
+  smsNotifications?: boolean;
+  pushNotifications?: boolean;
+  language?: string;
+  timezone?: string;
+  [key: string]: unknown;
+}
+
+type ArtisanTab = 'overview' | 'available' | 'my-jobs' | 'wallet' | 'profile' | 'settings';
 
 interface Job {
   id: string;
@@ -14,8 +41,8 @@ interface Job {
   clientId: string;
   clientName?: string;
   artisanId?: string;
-  scheduledAt?: any;
-  createdAt: any;
+  scheduledAt?: TimestampLike;
+  createdAt?: TimestampLike;
   distance_km?: number;
   amount?: number;
 }
@@ -26,7 +53,7 @@ interface Transaction {
   amount: number;
   description: string;
   status: 'pending' | 'completed' | 'failed';
-  createdAt: any;
+  createdAt?: TimestampLike;
   jobId?: string;
 }
 
@@ -43,10 +70,10 @@ export default function ArtisanDashboardPage() {
   const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalEarnings: 0, totalCashout: 0, pendingBalance: 0 });
-  const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'available' | 'my-jobs' | 'wallet' | 'profile' | 'settings'>('overview');
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [activeTab, setActiveTab] = useState<ArtisanTab>('overview');
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<ArtisanProfile | null>(null);
   const [cashoutAmount, setCashoutAmount] = useState('');
   const [processingCashout, setProcessingCashout] = useState(false);
   const [bankAccount, setBankAccount] = useState({ accountNumber: '', bankName: '', accountName: '' });
@@ -462,6 +489,15 @@ export default function ArtisanDashboardPage() {
   const broadcastableJob = myJobs.find((job) => ['accepted', 'in-progress'].includes(job.status));
   const broadcastLink = broadcastableJob ? `/artisan/location-broadcast?jobId=${broadcastableJob.id}` : null;
 
+  const tabConfig: Array<{ id: ArtisanTab; label: string; icon: string; badge?: number }> = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'available', label: 'Available Jobs', icon: '🔔', badge: availableJobs.length },
+    { id: 'my-jobs', label: 'My Jobs', icon: '💼', badge: myJobs.length },
+    { id: 'wallet', label: 'Wallet', icon: '💰' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-50">
@@ -481,7 +517,7 @@ export default function ArtisanDashboardPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/">
-                <img src="/logo.png" alt="Phixall" className="h-12" />
+                <Image src="/logo.png" alt="Phixall" width={48} height={48} className="h-12 w-12" priority />
               </Link>
               <div>
                 <h1 className="text-2xl font-bold text-neutral-900">Artisan Dashboard</h1>
@@ -538,17 +574,10 @@ export default function ArtisanDashboardPage() {
       <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex gap-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'available', label: 'Available Jobs', icon: '🔔', badge: availableJobs.length },
-              { id: 'my-jobs', label: 'My Jobs', icon: '💼', badge: myJobs.length },
-              { id: 'wallet', label: 'Wallet', icon: '💰' },
-              { id: 'profile', label: 'Profile', icon: '👤' },
-              { id: 'settings', label: 'Settings', icon: '⚙️' },
-            ].map((tab) => (
+            {tabConfig.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'border-brand-600 text-brand-600'

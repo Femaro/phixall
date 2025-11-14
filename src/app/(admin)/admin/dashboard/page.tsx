@@ -1,10 +1,27 @@
 'use client';
 export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
+import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
-import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
 import { trainingModules } from '@/data/trainingModules';
+import type { User as FirebaseUser } from 'firebase/auth';
+import type { ArtisanOnboarding } from '@/types/onboarding';
+
+type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
+
+type AdminProfile = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  role?: string;
+  [key: string]: unknown;
+};
+
+type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string };
+
+type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings';
 
 interface User {
   id: string;
@@ -14,7 +31,7 @@ interface User {
   status: 'active' | 'suspended';
   phone?: string;
   address?: string;
-  createdAt: any;
+  createdAt?: TimestampLike;
 }
 
 interface Job {
@@ -30,7 +47,7 @@ interface Job {
   amount?: number;
   budget?: number;
   resources?: Resource[];
-  createdAt: any;
+  createdAt?: TimestampLike;
 }
 
 interface Transaction {
@@ -39,7 +56,7 @@ interface Transaction {
   type: string;
   amount: number;
   status: string;
-  createdAt: any;
+  createdAt?: TimestampLike;
 }
 
 interface Resource {
@@ -50,7 +67,7 @@ interface Resource {
   unit: string;
   costPerUnit: number;
   category: string;
-  createdAt: any;
+  createdAt?: TimestampLike;
 }
 
 interface Bill {
@@ -63,7 +80,7 @@ interface Bill {
   description: string;
   items: BillItem[];
   status: 'pending' | 'approved' | 'rejected' | 'paid';
-  createdAt: any;
+  createdAt?: TimestampLike;
 }
 
 interface BillItem {
@@ -74,10 +91,10 @@ interface BillItem {
 }
 
 export default function AdminDashboardPage() {
-  const [user, setUser] = useState<any>(null);
-  const [adminProfile, setAdminProfile] = useState<any>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   
   // Data states
   const [clients, setClients] = useState<User[]>([]);
@@ -86,7 +103,7 @@ export default function AdminDashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [applications, setApplications] = useState<ArtisanApplication[]>([]);
   
   // Filter states
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('all');
@@ -96,7 +113,6 @@ export default function AdminDashboardPage() {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [showResourceModal, setShowResourceModal] = useState(false);
   const [showAddResourceModal, setShowAddResourceModal] = useState(false);
   const [showResourceAssignModal, setShowResourceAssignModal] = useState(false);
   const [showBillModal, setShowBillModal] = useState(false);
@@ -162,12 +178,13 @@ export default function AdminDashboardPage() {
             return;
           }
           setUser(currentUser);
-          setAdminProfile(profileDoc.data());
+          const profileData = profileDoc.data() as AdminProfile;
+          setAdminProfile(profileData);
           setProfileForm({
-            name: profileDoc.data().name || '',
-            email: profileDoc.data().email || currentUser.email || '',
-            phone: profileDoc.data().phone || '',
-            address: profileDoc.data().address || ''
+            name: profileData.name || '',
+            email: profileData.email || currentUser.email || '',
+            phone: profileData.phone || '',
+            address: profileData.address || ''
           });
           setLoading(false);
         }
@@ -226,9 +243,9 @@ export default function AdminDashboardPage() {
     // Load artisan applications
     const applicationsQuery = query(collection(db, 'artisan_onboarding'), orderBy('createdAt', 'desc'));
     const unsubApplications = onSnapshot(applicationsQuery, (snapshot) => {
-      const data: any[] = [];
-      snapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
+      const data: ArtisanApplication[] = [];
+      snapshot.forEach((applicationDoc) => {
+        data.push({ id: applicationDoc.id, ...(applicationDoc.data() as ArtisanOnboarding) });
       });
       setApplications(data);
     });
@@ -420,7 +437,7 @@ export default function AdminDashboardPage() {
 
     try {
       const { db } = getFirebase();
-      const jobData: any = {
+      const jobData: Record<string, unknown> = {
         title: newJobForm.title,
         description: newJobForm.description,
         category: newJobForm.category || 'general',
@@ -613,13 +630,25 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const formatTimestamp = (value: any) => {
+  const formatTimestamp = (value: TimestampLike | { toDate?: () => Date } | string | undefined) => {
     if (!value) return '—';
     if (typeof value === 'string') return new Date(value).toLocaleString();
     if (value.toDate) return value.toDate().toLocaleString();
     if (value.seconds) return new Date(value.seconds * 1000).toLocaleString();
     return '—';
   };
+
+  const sidebarTabs: Array<{ id: AdminTab; label: string; icon: string }> = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'users', label: 'User Management', icon: '👥' },
+    { id: 'jobs', label: 'Job Management', icon: '💼' },
+    { id: 'resources', label: 'Resources', icon: '📦' },
+    { id: 'billing', label: 'Billing & Finance', icon: '💰' },
+    { id: 'registration', label: 'Artisan Registration', icon: '📝' },
+    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
 
   if (loading) {
     return (
@@ -639,7 +668,15 @@ export default function AdminDashboardPage() {
         {/* Logo & Title */}
         <div className="border-b border-neutral-200 bg-neutral-900 p-6">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Phixall" className="h-12 w-12 drop-shadow-lg" style={{ filter: 'contrast(1.2) brightness(1.1)' }} />
+            <Image
+              src="/logo.png"
+              alt="Phixall"
+              width={48}
+              height={48}
+              className="h-12 w-12 drop-shadow-lg"
+              style={{ filter: 'contrast(1.2) brightness(1.1)' }}
+              priority
+            />
             <div>
               <h1 className="text-lg font-bold text-white">Admin Panel</h1>
               <p className="text-xs text-neutral-400">Phixall Management</p>
@@ -650,20 +687,10 @@ export default function AdminDashboardPage() {
         {/* Navigation Menu */}
         <nav className="flex flex-1 flex-col overflow-hidden">
           <div className="space-y-1 overflow-y-auto p-4 pr-2 pb-24">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'users', label: 'User Management', icon: '👥' },
-              { id: 'jobs', label: 'Job Management', icon: '💼' },
-              { id: 'resources', label: 'Resources', icon: '📦' },
-              { id: 'billing', label: 'Billing & Finance', icon: '💰' },
-              { id: 'registration', label: 'Artisan Registration', icon: '📝' },
-              { id: 'analytics', label: 'Analytics', icon: '📈' },
-              { id: 'profile', label: 'Profile', icon: '👤' },
-              { id: 'settings', label: 'Settings', icon: '⚙️' },
-            ].map((tab) => (
+            {sidebarTabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                   activeTab === tab.id
                     ? 'bg-neutral-900 text-white shadow-sm'
@@ -1329,7 +1356,7 @@ export default function AdminDashboardPage() {
                                         </a>
                                       </div>
                                     )}
-                                    {application.additionalInfo.certifications?.map((cert: any, idx: number) => (
+                                    {application.additionalInfo.certifications?.map((cert, idx) => (
                                       <div
                                         key={`${cert.name}-${idx}`}
                                         className="flex flex-col gap-1 rounded-lg bg-neutral-50 px-3 py-2"
@@ -1362,7 +1389,7 @@ export default function AdminDashboardPage() {
                             <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
                               <h4 className="text-sm font-semibold text-neutral-900 mb-3">Professional References</h4>
                               <div className="space-y-3 text-sm">
-                                {application.additionalInfo.references.map((ref: any, idx: number) => (
+                                {application.additionalInfo.references.map((ref, idx) => (
                                   <div key={`${ref.name}-${idx}`} className="rounded-lg bg-neutral-50 p-3">
                                     <p className="font-medium text-neutral-900">{ref.name || 'Reference'}</p>
                                     <p className="text-neutral-600">{ref.relationship || ref.companyName || '—'}</p>

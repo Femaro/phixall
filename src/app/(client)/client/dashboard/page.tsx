@@ -6,6 +6,20 @@ import { getFirebase } from '@/lib/firebaseClient';
 import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
+import type { User as FirebaseUser } from 'firebase/auth';
+
+type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
+
+interface ClientProfile {
+  name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  company?: string;
+  [key: string]: unknown;
+}
+
+type ClientTab = 'overview' | 'request' | 'jobs' | 'wallet' | 'profile' | 'settings';
 
 interface Job {
   id: string;
@@ -13,8 +27,8 @@ interface Job {
   description: string;
   serviceCategory?: string;
   status: 'requested' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
-  scheduledAt: any;
-  createdAt: any;
+  scheduledAt: TimestampLike;
+  createdAt?: TimestampLike;
   artisanId?: string;
   artisanName?: string;
   clientId: string;
@@ -28,7 +42,7 @@ interface Transaction {
   amount: number;
   description: string;
   status: 'pending' | 'completed' | 'failed';
-  createdAt: any;
+  createdAt?: TimestampLike;
   jobId?: string;
 }
 
@@ -61,9 +75,9 @@ function ClientDashboardContent() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalDeposits: 0, totalSpent: 0 });
-  const [user, setUser] = useState<any>(null);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'request' | 'jobs' | 'wallet' | 'profile' | 'settings'>('overview');
+  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [userProfile, setUserProfile] = useState<ClientProfile | null>(null);
+  const [activeTab, setActiveTab] = useState<ClientTab>('overview');
   const [loading, setLoading] = useState(true);
   const [depositAmount, setDepositAmount] = useState('');
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -113,7 +127,7 @@ function ClientDashboardContent() {
     
     const unsubscribe = onSnapshot(profileRef, (doc) => {
       if (doc.exists()) {
-        const profile = doc.data();
+        const profile = doc.data() as ClientProfile;
         setUserProfile(profile);
         setProfileForm({
           name: profile.name || '',
@@ -328,6 +342,13 @@ function ClientDashboardContent() {
     }
   }, [router]);
 
+  useEffect(() => {
+    if (!sessionIdFromQuery || verifyingSessionId || processedSessionId === sessionIdFromQuery) {
+      return;
+    }
+    confirmStripeSession(sessionIdFromQuery);
+  }, [sessionIdFromQuery, verifyingSessionId, processedSessionId, confirmStripeSession]);
+
   async function handleSaveProfile() {
     setSavingProfile(true);
     try {
@@ -454,6 +475,15 @@ function ClientDashboardContent() {
     completed: jobs.filter(j => j.status === 'completed').length,
   };
 
+  const tabConfig: Array<{ id: ClientTab; label: string; icon: string; badge?: number }> = [
+    { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'request', label: 'Request Service', icon: '➕' },
+    { id: 'jobs', label: 'My Jobs', icon: '📋', badge: jobs.length },
+    { id: 'wallet', label: 'Wallet', icon: '💰' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+
   const trackableJob = jobs.find((job) => job.artisanId && ['accepted', 'in-progress'].includes(job.status));
   const trackableJobLink = trackableJob ? `/client/tracking?jobId=${trackableJob.id}&artisanId=${trackableJob.artisanId}` : null;
 
@@ -519,17 +549,10 @@ function ClientDashboardContent() {
       <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex gap-8">
-            {[
-              { id: 'overview', label: 'Overview', icon: '📊' },
-              { id: 'request', label: 'Request Service', icon: '➕' },
-              { id: 'jobs', label: 'My Jobs', icon: '📋', badge: jobs.length },
-              { id: 'wallet', label: 'Wallet', icon: '💰' },
-              { id: 'profile', label: 'Profile', icon: '👤' },
-              { id: 'settings', label: 'Settings', icon: '⚙️' },
-            ].map((tab) => (
+            {tabConfig.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'border-brand-600 text-brand-600'

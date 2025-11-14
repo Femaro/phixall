@@ -22,9 +22,8 @@ function ClientTrackingContent() {
   const artisanId = searchParams.get('artisanId');
 
 	useEffect(() => {
-    	let map: any = null;
-    	let artisanMarker: any = null;
-    	let clientMarker: any = null;
+    	let map: google.maps.Map | null = null;
+    	let artisanMarker: google.maps.Marker | null = null;
     	let ignore = false;
         let unsubscribe: undefined | (() => void);
 
@@ -64,14 +63,15 @@ function ClientTrackingContent() {
 				// Optionally show client location if permitted
 				if (navigator.geolocation) {
 					navigator.geolocation.getCurrentPosition((pos) => {
+            if (!map) return;
 						const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-						clientMarker = new googleObj.maps.Marker({ position: coords, map, label: 'C' });
+						new googleObj.maps.Marker({ position: coords, map, label: 'C' });
 					});
 				}
 
                 unsubscribe = unsub;
                 return;
-			} catch (_e) {
+			} catch {
 				setStatus('Failed to load map');
 			}
 		}
@@ -80,6 +80,8 @@ function ClientTrackingContent() {
 		return () => {
 			ignore = true;
             if (unsubscribe) unsubscribe();
+            artisanMarker?.setMap(null);
+            map = null;
 		};
 	}, [jobId, artisanId]);
 

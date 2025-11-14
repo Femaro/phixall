@@ -292,6 +292,11 @@ export default function ArtisanDashboardPage() {
   }
 
   async function updateJobStatus(jobId: string, newStatus: 'in-progress' | 'completed') {
+    if (!user) {
+      alert('You must be signed in to update job status.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       
@@ -333,6 +338,11 @@ export default function ArtisanDashboardPage() {
   }
 
   async function handleSaveProfile() {
+    if (!user) {
+      alert('You must be signed in to update your profile.');
+      return;
+    }
+
     setSavingProfile(true);
     try {
       const { db } = getFirebase();
@@ -357,6 +367,11 @@ export default function ArtisanDashboardPage() {
   }
 
   async function handleSaveSettings() {
+    if (!user) {
+      alert('You must be signed in to update your settings.');
+      return;
+    }
+
     setSavingSettings(true);
     try {
       const { db } = getFirebase();
@@ -383,6 +398,12 @@ export default function ArtisanDashboardPage() {
   async function handleCashout(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     setProcessingCashout(true);
+
+    if (!user) {
+      alert('You must be signed in to request a cashout.');
+      setProcessingCashout(false);
+      return;
+    }
 
     try {
       const amount = parseFloat(cashoutAmount);
@@ -451,6 +472,11 @@ export default function ArtisanDashboardPage() {
   }
 
   async function saveBankAccount() {
+    if (!user) {
+      alert('You must be signed in to save bank details.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       await updateDoc(doc(db, 'profiles', user.uid), {

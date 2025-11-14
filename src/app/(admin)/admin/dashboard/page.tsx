@@ -1288,7 +1288,7 @@ export default function AdminDashboardPage() {
                             <div>
                               <div className="flex items-center gap-3">
                                 <h3 className="font-semibold text-neutral-900">{applicantName}</h3>
-                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${getApplicationStatusColor(application.status)}`}>
+                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${getApplicationStatusColor(application.status ?? 'pending')}`}>
                                   {application.status || 'pending'}
                                 </span>
                               </div>

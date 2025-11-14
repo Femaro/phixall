@@ -7,7 +7,18 @@ import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import type { User as FirebaseUser } from 'firebase/auth';
 
-type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
+type TimestampLike = Date | { seconds: number; nanoseconds: number } | { toDate: () => Date } | null | undefined;
+const formatTimestamp = (value: TimestampLike) => {
+  if (!value) return '—';
+  if (value instanceof Date) return value.toLocaleString();
+  if ('toDate' in value && typeof value.toDate === 'function') {
+    return value.toDate().toLocaleString();
+  }
+  if ('seconds' in value && typeof value.seconds === 'number') {
+    return new Date(value.seconds * 1000).toLocaleString();
+  }
+  return '—';
+};
 
 interface ArtisanProfile {
   name?: string;
@@ -974,7 +985,7 @@ export default function ArtisanDashboardPage() {
                                 {transaction.status}
                               </span>
                               <p className="text-xs text-neutral-500">
-                                {transaction.createdAt?.toDate().toLocaleDateString()}
+                                {formatTimestamp(transaction.createdAt)}
                               </p>
                             </div>
                           </div>
@@ -1035,10 +1046,10 @@ export default function ArtisanDashboardPage() {
                         <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-neutral-500">
                           {job.clientName && <span>Client: {job.clientName}</span>}
                           {job.scheduledAt && (
-                            <span>Scheduled: {new Date(job.scheduledAt.toDate()).toLocaleString()}</span>
+                            <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
                           )}
                           {job.distance_km && <span>{job.distance_km} km away</span>}
-                          <span>Posted: {job.createdAt?.toDate().toLocaleDateString()}</span>
+                          <span>Posted: {formatTimestamp(job.createdAt)}</span>
                         </div>
                       </div>
 
@@ -1114,10 +1125,10 @@ export default function ArtisanDashboardPage() {
                         )}
 
                         <div className="mt-3 flex items-center gap-4 text-xs text-neutral-500">
-                          {job.scheduledAt && (
-                            <span>Scheduled: {new Date(job.scheduledAt.toDate()).toLocaleString()}</span>
-                          )}
-                          <span>Accepted: {job.createdAt?.toDate().toLocaleDateString()}</span>
+                        {job.scheduledAt && (
+                          <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
+                        )}
+                        <span>Accepted: {formatTimestamp(job.createdAt)}</span>
                         </div>
                       </div>
 

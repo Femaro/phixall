@@ -1272,7 +1272,7 @@ export default function AdminDashboardPage() {
               ) : (
                 applications.map((application) => {
                   const applicantName = application.additionalInfo?.fullName || application.email || application.userId;
-                  const applicantEmail = application.email || application.additionalInfo?.email || '—';
+                  const applicantEmail = application.email || '—';
                   const currentStep = application.currentStep ?? 1;
                   const totalSteps = 3;
                   const isOpen = openApplicationId === application.id;

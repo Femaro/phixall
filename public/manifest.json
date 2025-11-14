@@ -1,0 +1,57 @@
+{
+  "name": "Phixall - Professional Facility Management",
+  "short_name": "Phixall",
+  "description": "Connect with verified artisans for all your facility maintenance needs. Professional services across Nigeria.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7C3AED",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "For Clients",
+      "short_name": "Clients",
+      "description": "Access client dashboard and services",
+      "url": "/clients",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "For Artisans",
+      "short_name": "Artisans",
+      "description": "Access artisan dashboard and jobs",
+      "url": "/artisans",
+      "icons": [
+        {
+          "src": "/icon.svg",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
+
+

@@ -77,42 +77,62 @@ export default function ArtisanDashboardPage() {
 
   useEffect(() => {
     const { auth, db } = getFirebase();
-    import('firebase/auth').then(({ onAuthStateChanged }) => {
+    import('firebase/auth').then(async ({ onAuthStateChanged }) => {
       onAuthStateChanged(auth, async (currentUser) => {
         if (!currentUser) {
           window.location.href = '/login';
-        } else {
-          setUser(currentUser);
-          
-          const profileDoc = await getDocs(query(collection(db, 'profiles'), where('__name__', '==', currentUser.uid), limit(1)));
-          if (!profileDoc.empty) {
-            const profileData = profileDoc.docs[0].data();
-            setProfile(profileData);
-            setAvailable(profileData.available || false);
-            if (profileData.bankAccount) {
-              setBankAccount(profileData.bankAccount);
-            }
-            // Populate profile form
-            setProfileForm({
-              name: profileData.name || '',
-              email: profileData.email || currentUser.email,
-              phone: profileData.phone || '',
-              address: profileData.address || '',
-              skills: profileData.skills || '',
-              experience: profileData.experience || ''
-            });
-            // Populate settings form
-            setSettingsForm({
-              emailNotifications: profileData.emailNotifications ?? true,
-              smsNotifications: profileData.smsNotifications ?? false,
-              pushNotifications: profileData.pushNotifications ?? true,
-              language: profileData.language || 'en',
-              timezone: profileData.timezone || 'Africa/Lagos'
-            });
-          }
-          
-          setLoading(false);
+          return;
         }
+        
+        setUser(currentUser);
+        
+        // Check onboarding status for artisans
+        const onboardingRef = doc(db, 'artisan_onboarding', currentUser.uid);
+        const onboardingDoc = await getDoc(onboardingRef);
+        
+        if (onboardingDoc.exists()) {
+          const onboardingData = onboardingDoc.data();
+          
+          // If not approved, redirect to onboarding
+          if (onboardingData.status !== 'approved') {
+            window.location.href = '/onboarding';
+            return;
+          }
+        } else {
+          // No onboarding record, redirect to start onboarding
+          window.location.href = '/onboarding';
+          return;
+        }
+        
+        // Continue with normal dashboard loading
+        const profileDoc = await getDocs(query(collection(db, 'profiles'), where('__name__', '==', currentUser.uid), limit(1)));
+        if (!profileDoc.empty) {
+          const profileData = profileDoc.docs[0].data();
+          setProfile(profileData);
+          setAvailable(profileData.available || false);
+          if (profileData.bankAccount) {
+            setBankAccount(profileData.bankAccount);
+          }
+          // Populate profile form
+          setProfileForm({
+            name: profileData.name || '',
+            email: profileData.email || currentUser.email,
+            phone: profileData.phone || '',
+            address: profileData.address || '',
+            skills: profileData.skills || '',
+            experience: profileData.experience || ''
+          });
+          // Populate settings form
+          setSettingsForm({
+            emailNotifications: profileData.emailNotifications ?? true,
+            smsNotifications: profileData.smsNotifications ?? false,
+            pushNotifications: profileData.pushNotifications ?? true,
+            language: profileData.language || 'en',
+            timezone: profileData.timezone || 'Africa/Lagos'
+          });
+        }
+        
+        setLoading(false);
       });
     });
   }, []);
@@ -439,6 +459,9 @@ export default function ArtisanDashboardPage() {
     completed: myJobs.filter(j => j.status === 'completed').length,
   };
 
+  const broadcastableJob = myJobs.find((job) => ['accepted', 'in-progress'].includes(job.status));
+  const broadcastLink = broadcastableJob ? `/artisan/location-broadcast?jobId=${broadcastableJob.id}` : null;
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-50">
@@ -707,13 +730,27 @@ export default function ArtisanDashboardPage() {
               <div className="rounded-xl border border-neutral-200 bg-gradient-to-br from-purple-50 to-purple-100 p-6 shadow-soft">
                 <div className="text-3xl mb-3">📍</div>
                 <h3 className="text-lg font-semibold text-neutral-900">Location Broadcast</h3>
-                <p className="mt-2 text-sm text-neutral-600">Share your location for active jobs to enable client tracking</p>
-                <Link
-                  href="/artisan/location-broadcast"
-                  className="mt-4 inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
-                >
-                  Open Broadcast
-                </Link>
+                <p className="mt-2 text-sm text-neutral-600">
+                  {broadcastLink
+                    ? 'Share your live location with clients for this job'
+                    : 'Start or accept a job to enable live location sharing'}
+                </p>
+                {broadcastLink ? (
+                  <Link
+                    href={broadcastLink}
+                    className="mt-4 inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
+                  >
+                    Broadcast for Job
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-4 inline-block w-full rounded-lg border border-purple-200 px-4 py-2 text-sm font-semibold text-purple-300 cursor-not-allowed"
+                  >
+                    No active jobs
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1038,21 +1075,21 @@ export default function ArtisanDashboardPage() {
                             Start Job
                           </button>
                         )}
+                        {['accepted', 'in-progress'].includes(job.status) && (
+                          <Link
+                            href={`/artisan/location-broadcast?jobId=${job.id}`}
+                            className="rounded-lg border border-purple-300 px-4 py-2 text-center text-sm font-medium text-purple-600 hover:bg-purple-50"
+                          >
+                            Broadcast Location
+                          </Link>
+                        )}
                         {job.status === 'in-progress' && (
-                          <>
-                            <Link
-                              href="/artisan/location-broadcast"
-                              className="rounded-lg border border-purple-300 px-4 py-2 text-center text-sm font-medium text-purple-600 hover:bg-purple-50"
-                            >
-                              Broadcast Location
-                            </Link>
-                            <button
-                              onClick={() => updateJobStatus(job.id, 'completed')}
-                              className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
-                            >
-                              Mark Complete
-                            </button>
-                          </>
+                          <button
+                            onClick={() => updateJobStatus(job.id, 'completed')}
+                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                          >
+                            Mark Complete
+                          </button>
                         )}
                         {job.status === 'completed' && (
                           <div className="flex items-center gap-2 text-green-600">

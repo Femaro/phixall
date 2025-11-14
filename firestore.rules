@@ -47,10 +47,25 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
+    // Artisan Onboarding collection
+    match /artisan_onboarding/{userId} {
+      // Any authenticated user can create their own onboarding record
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Users can read and update their own onboarding, admins can access all
+      allow read, update: if isAuthenticated() && 
+                            (request.auth.uid == userId || 
+                             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin');
+      
+      // Only admins can delete onboarding records
+      allow delete: if isAuthenticated() && 
+                       get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin';
+    }
+    
     // Jobs collection
     match /jobs/{jobId} {
       // Clients can create jobs, admins can create on behalf of anyone
-      allow create: if isClient() || isAdmin();
+      allow create: if isClient() || isAdmin() || isOwner(request.resource.data.clientId);
       
       // Job owner (client), assigned artisan, and admins can read
       allow read: if isAdmin() 

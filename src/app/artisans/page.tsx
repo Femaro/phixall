@@ -1,8 +1,49 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
+import { generateBreadcrumbSchema } from '@/lib/structuredData';
+
+export const metadata: Metadata = {
+  title: 'For Artisans - Grow Your Business & Earn More',
+  description: 'Join Nigeria\'s fastest-growing network of verified artisans. Get matched with high-quality jobs, build your reputation, earn competitive rates. Perfect for plumbers, electricians, HVAC technicians, and more.',
+  keywords: [
+    'artisan jobs Nigeria',
+    'skilled technician jobs',
+    'plumber jobs',
+    'electrician jobs',
+    'HVAC technician jobs',
+    'artisan network',
+    'grow artisan business',
+    'earn more as artisan',
+  ],
+  openGraph: {
+    title: 'Phixall for Artisans - Grow Your Business',
+    description: 'Join Nigeria\'s fastest-growing network of verified artisans. Get matched with quality jobs and earn competitive rates.',
+    url: '/artisans',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Phixall Artisan Network',
+      }
+    ],
+  },
+  alternates: {
+    canonical: '/artisans',
+  },
+};
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'For Artisans', url: '/artisans' },
+]);
 
 export default function ArtisansPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <StructuredData data={breadcrumbSchema} />
+      <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -374,5 +415,6 @@ export default function ArtisansPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

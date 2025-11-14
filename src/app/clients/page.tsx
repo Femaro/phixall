@@ -1,8 +1,48 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
+import { generateBreadcrumbSchema } from '@/lib/structuredData';
+
+export const metadata: Metadata = {
+  title: 'For Clients - Facility Management Made Simple',
+  description: 'Streamline facility operations with Phixall. Access vetted artisans on-demand, track jobs in real-time, choose from Bronze, Gold, or Platinum subscription tiers. Trusted by 500+ businesses.',
+  keywords: [
+    'facility management for businesses',
+    'on-demand maintenance services',
+    'facility subscription plans',
+    'vetted artisans',
+    'real-time job tracking',
+    'business maintenance',
+    'facility operations',
+  ],
+  openGraph: {
+    title: 'Phixall for Clients - Streamline Your Facility Operations',
+    description: 'Access vetted artisans on-demand and manage facility maintenance from one dashboard. Choose the subscription tier that fits your needs.',
+    url: '/clients',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Phixall Client Dashboard',
+      }
+    ],
+  },
+  alternates: {
+    canonical: '/clients',
+  },
+};
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'For Clients', url: '/clients' },
+]);
 
 export default function ClientsPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <StructuredData data={breadcrumbSchema} />
+      <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -447,5 +487,6 @@ export default function ClientsPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

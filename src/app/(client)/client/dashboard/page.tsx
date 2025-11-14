@@ -1,10 +1,11 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
-import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Job {
   id: string;
@@ -38,6 +39,10 @@ interface Wallet {
 }
 
 export default function ClientDashboardPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionIdFromQuery = searchParams.get('session_id');
+  const cancelledPayment = searchParams.get('cancelled');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [serviceCategory, setServiceCategory] = useState('');
@@ -54,6 +59,8 @@ export default function ClientDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [depositAmount, setDepositAmount] = useState('');
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [verifyingSessionId, setVerifyingSessionId] = useState<string | null>(null);
+  const [processedSessionId, setProcessedSessionId] = useState<string | null>(null);
   
   // Profile states
   const [profileForm, setProfileForm] = useState({
@@ -188,6 +195,12 @@ export default function ClientDashboardPage() {
     return () => unsubscribe();
   }, [user]);
 
+  useEffect(() => {
+    if (!cancelledPayment) return;
+    setMessage({ text: 'Deposit cancelled.', type: 'error' });
+    router.replace('/client/dashboard');
+  }, [cancelledPayment, router]);
+
   async function handleSubmit(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     setSubmitting(true);
@@ -214,13 +227,18 @@ export default function ClientDashboardPage() {
 
       await addDoc(collection(db, 'jobs'), {
         clientId: currentUser.uid,
-        clientName: currentUser.displayName || currentUser.email,
+        clientName: userProfile?.name || currentUser.displayName || currentUser.email,
+        clientEmail: userProfile?.email || currentUser.email,
+        clientPhone: userProfile?.phone || '',
+        clientCompany: userProfile?.company || '',
         title,
         description,
         serviceCategory,
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
         status: 'requested',
+        createdByRole: 'client',
         attachments: attachmentUrls,
+        artifact: 'service-request',
         createdAt: serverTimestamp(),
       });
 
@@ -245,44 +263,62 @@ export default function ClientDashboardPage() {
     setMessage(null);
 
     try {
-      const amount = parseFloat(depositAmount);
-      if (amount < 100) {
+      if (!user) {
+        setMessage({ text: 'You must be signed in to deposit funds.', type: 'error' });
+        setProcessingPayment(false);
+        return;
+      }
+      const amount = Number(depositAmount);
+      if (!Number.isFinite(amount) || amount < 100) {
         setMessage({ text: 'Minimum deposit is ₦100', type: 'error' });
         setProcessingPayment(false);
         return;
       }
 
-      const { db } = getFirebase();
-      
-      // Create transaction record
-      await addDoc(collection(db, 'transactions'), {
-        userId: user.uid,
-        type: 'deposit',
-        amount: amount,
-        description: `Wallet deposit of ₦${amount.toLocaleString()}`,
-        status: 'completed',
-        createdAt: serverTimestamp(),
+      const response = await fetch('/api/payments/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, userId: user.uid }),
       });
+      const data = await response.json();
+      if (!response.ok || !data?.url) {
+        setMessage({ text: data?.error || 'Failed to start checkout session.', type: 'error' });
+        setProcessingPayment(false);
+        return;
+      }
 
-      // Update wallet balance
-      const walletRef = doc(db, 'wallets', user.uid);
-      const walletDoc = await getDoc(walletRef);
-      const currentWallet = walletDoc.data() as Wallet;
-      
-      await updateDoc(walletRef, {
-        balance: (currentWallet?.balance || 0) + amount,
-        totalDeposits: (currentWallet?.totalDeposits || 0) + amount,
-      });
-
-      setMessage({ text: 'Deposit successful!', type: 'success' });
-      setDepositAmount('');
+      window.location.href = data.url as string;
     } catch (error) {
       console.error('Error processing deposit:', error);
-      setMessage({ text: 'Failed to process deposit. Please try again.', type: 'error' });
-    } finally {
+      setMessage({ text: 'Failed to start deposit. Please try again.', type: 'error' });
       setProcessingPayment(false);
     }
   }
+
+  const confirmStripeSession = useCallback(async (sessionId: string) => {
+    setVerifyingSessionId(sessionId);
+    try {
+      const response = await fetch('/api/payments/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+      const data = await response.json();
+      if (!response.ok || data?.status !== 'success') {
+        setMessage({ text: data?.error || 'Unable to verify payment. Contact support with your receipt.', type: 'error' });
+        return;
+      }
+      setMessage({ text: 'Deposit confirmed! Your wallet will update shortly.', type: 'success' });
+      setProcessedSessionId(sessionId);
+      setDepositAmount('');
+      router.replace('/client/dashboard');
+    } catch (error) {
+      console.error('Error confirming deposit:', error);
+      setMessage({ text: 'Failed to verify payment. Please contact support.', type: 'error' });
+    } finally {
+      setVerifyingSessionId(null);
+    }
+  }, [router]);
 
   async function handleSaveProfile() {
     setSavingProfile(true);
@@ -409,6 +445,9 @@ export default function ClientDashboardPage() {
     active: jobs.filter(j => ['requested', 'accepted', 'in-progress'].includes(j.status)).length,
     completed: jobs.filter(j => j.status === 'completed').length,
   };
+
+  const trackableJob = jobs.find((job) => job.artisanId && ['accepted', 'in-progress'].includes(job.status));
+  const trackableJobLink = trackableJob ? `/client/tracking?jobId=${trackableJob.id}&artisanId=${trackableJob.artisanId}` : null;
 
   if (loading) {
     return (
@@ -655,13 +694,27 @@ export default function ClientDashboardPage() {
               <div className="rounded-xl border border-neutral-200 bg-gradient-to-br from-purple-50 to-purple-100 p-6 shadow-soft">
                 <div className="text-3xl mb-3">📍</div>
                 <h3 className="text-lg font-semibold text-neutral-900">Track Active Jobs</h3>
-                <p className="mt-2 text-sm text-neutral-600">Monitor artisan location and job progress in real-time</p>
-                <Link
-                  href="/client/tracking"
-                  className="mt-4 inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
-                >
-                  Open Tracking
-                </Link>
+                <p className="mt-2 text-sm text-neutral-600">
+                  {trackableJobLink
+                    ? 'Monitor artisan location and job progress in real-time'
+                    : 'Tracking becomes available once an artisan is assigned'}
+                </p>
+                {trackableJobLink ? (
+                  <Link
+                    href={trackableJobLink}
+                    className="mt-4 inline-block rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-700"
+                  >
+                    Open Tracking
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-4 inline-block w-full rounded-lg border border-purple-200 px-4 py-2 text-sm font-semibold text-purple-300 cursor-not-allowed"
+                  >
+                    Waiting for assignment
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -734,10 +787,14 @@ export default function ClientDashboardPage() {
 
                   <button
                     type="submit"
-                    disabled={processingPayment}
+                    disabled={processingPayment || !!verifyingSessionId}
                     className="w-full rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {processingPayment ? 'Processing...' : 'Deposit Funds'}
+                    {processingPayment
+                      ? 'Starting checkout...'
+                      : verifyingSessionId
+                        ? 'Verifying payment...'
+                        : 'Deposit Funds'}
                   </button>
 
                   <p className="text-xs text-center text-neutral-500">
@@ -952,12 +1009,12 @@ export default function ClientDashboardPage() {
                             Cancel
                           </button>
                         )}
-                        {job.status === 'in-progress' && (
+                        {job.artisanId && ['accepted', 'in-progress'].includes(job.status) && (
                           <Link
-                            href="/client/tracking"
+                            href={`/client/tracking?jobId=${job.id}&artisanId=${job.artisanId}`}
                             className="rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-brand-700"
                           >
-                            Track Live
+                            {job.status === 'in-progress' ? 'Track Live' : 'View Tracking'}
                           </Link>
                         )}
                         {job.status === 'completed' && !job.amount && (

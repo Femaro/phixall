@@ -1,8 +1,47 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
+import { organizationSchema, generateBreadcrumbSchema } from '@/lib/structuredData';
+
+export const metadata: Metadata = {
+  title: 'About Us - Our Mission & Leadership Team',
+  description: 'Learn about Phixall\'s mission to revolutionize facility management in Africa. Meet our leadership team: Femi Ajakaiye (CEO), Okon Otoudung (CTO), and Olufemi Babatunde (Head of Operations).',
+  keywords: [
+    'about Phixall',
+    'facility management company',
+    'artisan network Nigeria',
+    'leadership team',
+    'company mission',
+    'maintenance platform',
+  ],
+  openGraph: {
+    title: 'About Phixall - Revolutionizing Facility Management',
+    description: 'Building Africa\'s leading platform for on-demand facility maintenance. Meet our team and learn our story.',
+    url: '/about',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Phixall Leadership Team',
+      }
+    ],
+  },
+  alternates: {
+    canonical: '/about',
+  },
+};
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'About', url: '/about' },
+]);
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <StructuredData data={[organizationSchema, breadcrumbSchema]} />
+      <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -215,5 +254,6 @@ export default function AboutPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

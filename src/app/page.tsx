@@ -1,8 +1,55 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
+import { organizationSchema, servicesSchema } from '@/lib/structuredData';
+
+export const metadata: Metadata = {
+  title: 'Professional Facility Management & Maintenance Services in Nigeria',
+  description: 'Connect with verified, skilled artisans for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
+  keywords: [
+    'facility management Nigeria',
+    'maintenance services Lagos',
+    'professional artisans',
+    'plumbing services',
+    'electrical repairs',
+    'HVAC maintenance',
+    'building maintenance',
+    'skilled technicians',
+    'verified artisans',
+    'facility services',
+  ],
+  openGraph: {
+    title: 'Phixall - Professional Facility Management Made Simple',
+    description: 'Connect with verified artisans for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
+    url: '/',
+    siteName: 'Phixall',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Phixall Facility Management Platform',
+      }
+    ],
+    locale: 'en_NG',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Phixall - Professional Facility Management',
+    description: 'Connect with verified artisans for all your maintenance needs. Trusted by 500+ businesses.',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: '/',
+  },
+};
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <StructuredData data={[organizationSchema, ...servicesSchema]} />
+      <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -649,5 +696,6 @@ export default function Home() {
         </div>
       </section>
     </main>
+    </>
   );
 }

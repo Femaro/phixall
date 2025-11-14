@@ -1,6 +1,13 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import StructuredData from '@/components/seo/StructuredData';
+import { generateBreadcrumbSchema } from '@/lib/structuredData';
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Subscriptions', url: '/subscription' },
+]);
 
 export default function SubscriptionPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
@@ -85,7 +92,9 @@ export default function SubscriptionPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
+    <>
+      <StructuredData data={breadcrumbSchema} />
+      <main className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
       {/* Hero Section */}
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
@@ -345,6 +354,7 @@ export default function SubscriptionPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }
 

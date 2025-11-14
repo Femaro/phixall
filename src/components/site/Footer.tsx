@@ -40,10 +40,26 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-neutral-900">Connect</h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li><a href="#" className="text-neutral-600 transition-colors hover:text-brand-600">Twitter</a></li>
-              <li><a href="#" className="text-neutral-600 transition-colors hover:text-brand-600">LinkedIn</a></li>
-              <li><a href="#" className="text-neutral-600 transition-colors hover:text-brand-600">Instagram</a></li>
-              <li><a href="#" className="text-neutral-600 transition-colors hover:text-brand-600">Facebook</a></li>
+              <li>
+                <a
+                  href="https://www.linkedin.com/company/phixall/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-neutral-600 transition-colors hover:text-brand-600"
+                >
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.facebook.com/phixall"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-neutral-600 transition-colors hover:text-brand-600"
+                >
+                  Facebook
+                </a>
+              </li>
             </ul>
           </div>
         </div>

@@ -1,10 +1,7 @@
-'use client';
-import { usePathname } from 'next/navigation';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/site/Navbar";
-import Footer from "@/components/site/Footer";
-import Topbar from "@/components/site/Topbar";
+import RootLayoutClient from "@/components/layout/RootLayoutClient";
+import { defaultMetadata } from "./metadata";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,28 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata = defaultMetadata;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  
-  // Check if current path is a dashboard route (not marketing pages)
-  const isDashboard = pathname?.startsWith('/client/') || 
-                      pathname?.startsWith('/artisan/') || 
-                      pathname?.startsWith('/admin/') ||
-                      pathname === '/client' ||
-                      pathname === '/artisan' ||
-                      pathname === '/admin';
-
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <meta name="theme-color" content="#7C3AED" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {!isDashboard && <Topbar />}
-        {!isDashboard && <Navbar />}
-        {children}
-        {!isDashboard && <Footer />}
+        <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>
   );

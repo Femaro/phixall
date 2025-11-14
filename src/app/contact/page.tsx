@@ -1,8 +1,46 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import StructuredData from '@/components/seo/StructuredData';
+import { organizationSchema, generateBreadcrumbSchema } from '@/lib/structuredData';
+
+export const metadata: Metadata = {
+  title: 'Contact Us - Get in Touch with Our Team',
+  description: 'Have questions about Phixall facility management services? Contact our support team via phone, email, or visit our office. We\'re available 24/7 for emergency support.',
+  keywords: [
+    'contact Phixall',
+    'facility management support',
+    'customer service',
+    'get help',
+    'support contact',
+  ],
+  openGraph: {
+    title: 'Contact Phixall - We\'re Here to Help',
+    description: 'Have questions? Reach out to our team. We\'re available 24/7 for emergency support.',
+    url: '/contact',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Contact Phixall',
+      }
+    ],
+  },
+  alternates: {
+    canonical: '/contact',
+  },
+};
+
+const breadcrumbSchema = generateBreadcrumbSchema([
+  { name: 'Home', url: '/' },
+  { name: 'Contact', url: '/contact' },
+]);
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen bg-white">
+    <>
+      <StructuredData data={[organizationSchema, breadcrumbSchema]} />
+      <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -277,5 +315,6 @@ export default function ContactPage() {
         </div>
       </section>
     </main>
+    </>
   );
 }

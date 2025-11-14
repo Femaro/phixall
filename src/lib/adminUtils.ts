@@ -1,5 +1,5 @@
 import { getFirebase } from './firebaseClient';
-import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, Timestamp, setDoc, increment } from 'firebase/firestore';
 
 /**
  * Check if a user has admin role
@@ -140,11 +140,18 @@ export async function adminCreateTransaction(
     
     // Update wallet balance
     const walletDoc = doc(db, 'wallets', userId);
-    const increment = type === 'deposit' || type === 'earning' || type === 'refund' ? amount : -amount;
-    
-    await updateDoc(walletDoc, {
-      balance: increment,
-    });
+    const balanceDelta = type === 'deposit' || type === 'earning' || type === 'refund' ? amount : -amount;
+    const walletUpdates: Record<string, unknown> = {
+      balance: increment(balanceDelta),
+    };
+
+    if (type === 'deposit') {
+      walletUpdates.totalDeposits = increment(Math.abs(amount));
+    } else if (type === 'payment') {
+      walletUpdates.totalSpent = increment(Math.abs(amount));
+    }
+
+    await setDoc(walletDoc, walletUpdates, { merge: true });
     
     return { success: true };
   } catch (error) {

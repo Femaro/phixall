@@ -76,7 +76,7 @@ export default function AdminDashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [adminProfile, setAdminProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'analytics' | 'profile' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings'>('overview');
   
   // Data states
   const [clients, setClients] = useState<User[]>([]);
@@ -85,6 +85,7 @@ export default function AdminDashboardPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   
   // Filter states
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('all');
@@ -123,6 +124,7 @@ export default function AdminDashboardPage() {
     description: '',
     items: [{ name: '', quantity: 1, rate: 0, amount: 0 }]
   });
+  const [openApplicationId, setOpenApplicationId] = useState<string | null>(null);
   
   // Create job states
   const [showCreateJobModal, setShowCreateJobModal] = useState(false);
@@ -219,6 +221,16 @@ export default function AdminDashboardPage() {
       console.log('Loaded artisans:', data); // Debug log
       setArtisans(data);
     });
+    
+    // Load artisan applications
+    const applicationsQuery = query(collection(db, 'artisan_onboarding'), orderBy('createdAt', 'desc'));
+    const unsubApplications = onSnapshot(applicationsQuery, (snapshot) => {
+      const data: any[] = [];
+      snapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+      });
+      setApplications(data);
+    });
 
     // Load jobs
     const jobsQuery = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
@@ -267,6 +279,7 @@ export default function AdminDashboardPage() {
       unsubTransactions();
       unsubResources();
       unsubBills();
+      unsubApplications();
     };
   }, [user]);
 
@@ -520,6 +533,21 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function updateApplicationStatus(applicationId: string, status: 'under-review' | 'approved' | 'rejected') {
+    try {
+      const { db } = getFirebase();
+      await updateDoc(doc(db, 'artisan_onboarding', applicationId), {
+        status,
+        reviewedAt: serverTimestamp(),
+        reviewedBy: user?.uid || 'admin',
+      });
+      alert(`Application updated to ${status}.`);
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      alert('Failed to update application status');
+    }
+  }
+
   async function deleteResource(resourceId: string) {
     if (!confirm('Are you sure you want to delete this resource?')) return;
 
@@ -546,6 +574,13 @@ export default function AdminDashboardPage() {
     pendingBills: bills.filter(b => b.status === 'pending').length,
   };
 
+  const applicationStats = {
+    total: applications.length,
+    inProgress: applications.filter(a => ['pending', 'in-progress', 'training'].includes(a.status)).length,
+    underReview: applications.filter(a => a.status === 'under-review').length,
+    approved: applications.filter(a => a.status === 'approved').length,
+  };
+
   const filteredJobs = jobs.filter(job => {
     if (jobStatusFilter === 'all') return true;
     return job.status === jobStatusFilter;
@@ -561,6 +596,30 @@ export default function AdminDashboardPage() {
     artisan.email?.toLowerCase().includes(userSearchTerm.toLowerCase())
   );
 
+  const getApplicationStatusColor = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-green-100 text-green-700 border border-green-200';
+      case 'under-review':
+        return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
+      case 'rejected':
+        return 'bg-red-100 text-red-700 border border-red-200';
+      case 'training':
+      case 'in-progress':
+        return 'bg-purple-100 text-purple-700 border border-purple-200';
+      default:
+        return 'bg-neutral-100 text-neutral-700 border border-neutral-200';
+    }
+  };
+
+  const formatTimestamp = (value: any) => {
+    if (!value) return '—';
+    if (typeof value === 'string') return new Date(value).toLocaleString();
+    if (value.toDate) return value.toDate().toLocaleString();
+    if (value.seconds) return new Date(value.seconds * 1000).toLocaleString();
+    return '—';
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-50">
@@ -573,9 +632,9 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-neutral-50">
+    <div className="flex h-screen overflow-hidden bg-neutral-50">
       {/* Left Sidebar Navigation */}
-      <div className="w-64 border-r border-neutral-200 bg-white">
+      <div className="relative flex h-screen w-64 flex-col border-r border-neutral-200 bg-white">
         {/* Logo & Title */}
         <div className="border-b border-neutral-200 bg-neutral-900 p-6">
           <div className="flex items-center gap-3">
@@ -588,14 +647,15 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4">
-          <div className="space-y-1">
+        <nav className="flex flex-1 flex-col overflow-hidden">
+          <div className="space-y-1 overflow-y-auto p-4 pr-2 pb-24">
             {[
               { id: 'overview', label: 'Overview', icon: '📊' },
               { id: 'users', label: 'User Management', icon: '👥' },
               { id: 'jobs', label: 'Job Management', icon: '💼' },
               { id: 'resources', label: 'Resources', icon: '📦' },
               { id: 'billing', label: 'Billing & Finance', icon: '💰' },
+              { id: 'registration', label: 'Artisan Registration', icon: '📝' },
               { id: 'analytics', label: 'Analytics', icon: '📈' },
               { id: 'profile', label: 'Profile', icon: '👤' },
               { id: 'settings', label: 'Settings', icon: '⚙️' },
@@ -634,7 +694,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
         <div className="border-b border-neutral-200 bg-white px-8 py-4">
           <div className="flex items-center justify-between">
@@ -644,6 +704,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'users' && 'User Management'}
                 {activeTab === 'jobs' && 'Job Management'}
                 {activeTab === 'resources' && 'Resources & Materials'}
+                {activeTab === 'registration' && 'Artisan Registration'}
                 {activeTab === 'billing' && 'Billing & Finance'}
                 {activeTab === 'analytics' && 'Analytics & Reports'}
                 {activeTab === 'profile' && 'Admin Profile'}
@@ -654,6 +715,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'users' && 'Manage clients and artisans'}
                 {activeTab === 'jobs' && 'Assign jobs, set budgets, and track progress'}
                 {activeTab === 'resources' && 'Manage inventory and resources for job allocation'}
+                {activeTab === 'registration' && 'Monitor new artisan signups and capture registration details'}
                 {activeTab === 'billing' && 'Monitor financial transactions and revenue'}
                 {activeTab === 'analytics' && 'Platform performance metrics'}
                 {activeTab === 'profile' && 'Manage your admin account information'}
@@ -678,7 +740,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Content Area with Scroll */}
-        <div className="h-[calc(100vh-5rem)] overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-8">
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div>
@@ -1094,6 +1156,285 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Registration Tab */}
+        {activeTab === 'registration' && (
+          <div>
+            <div className="grid gap-6 sm:grid-cols-4">
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total Applications</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{applicationStats.total}</p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">In Progress</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{applicationStats.inProgress}</p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Under Review</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{applicationStats.underReview}</p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Approved</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900 text-green-600">{applicationStats.approved}</p>
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-4">
+              {applications.length === 0 ? (
+                <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-white p-12 text-center">
+                  <div className="text-5xl mb-4">📭</div>
+                  <h3 className="text-lg font-semibold text-neutral-900">No applications yet</h3>
+                  <p className="mt-2 text-neutral-600">Artisan onboarding submissions will appear here once received.</p>
+                </div>
+              ) : (
+                applications.map((application) => {
+                  const applicantName = application.additionalInfo?.fullName || application.email || application.userId;
+                  const applicantEmail = application.email || application.additionalInfo?.email || '—';
+                  const currentStep = application.currentStep ?? 1;
+                  const totalSteps = 3;
+                  const isOpen = openApplicationId === application.id;
+
+                  return (
+                    <div key={application.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                          <button
+                            onClick={() => setOpenApplicationId(isOpen ? null : application.id)}
+                            className="flex w-full flex-1 items-center justify-between rounded-lg border border-neutral-200 bg-neutral-50 px-4 py-3 text-left transition hover:bg-neutral-100"
+                          >
+                            <div>
+                              <div className="flex items-center gap-3">
+                                <h3 className="font-semibold text-neutral-900">{applicantName}</h3>
+                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${getApplicationStatusColor(application.status)}`}>
+                                  {application.status || 'pending'}
+                                </span>
+                              </div>
+                              <p className="text-sm text-neutral-600">{applicantEmail}</p>
+                            </div>
+                            <svg
+                              className={`h-5 w-5 text-neutral-600 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+
+                          <div className="flex flex-row flex-wrap gap-2 md:flex-col md:items-end">
+                            {application.status !== 'under-review' && application.status !== 'approved' && (
+                              <button
+                                onClick={() => updateApplicationStatus(application.id, 'under-review')}
+                                className="min-w-[150px] rounded-lg border border-amber-500 px-4 py-2 text-sm font-medium text-amber-700 hover:bg-amber-50"
+                              >
+                                Move to Review
+                              </button>
+                            )}
+                            {application.status !== 'approved' && (
+                              <button
+                                onClick={() => updateApplicationStatus(application.id, 'approved')}
+                                className="min-w-[150px] rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                              >
+                                Approve
+                              </button>
+                            )}
+                            {application.status !== 'rejected' && (
+                              <button
+                                onClick={() => updateApplicationStatus(application.id, 'rejected')}
+                                className="min-w-[150px] rounded-lg border border-red-500 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {isOpen && (
+                          <>
+                            <div className="grid gap-4 sm:grid-cols-3 text-sm text-neutral-600">
+                              <div>
+                                <p className="text-xs uppercase tracking-wide text-neutral-500">Current Step</p>
+                                <p className="mt-1 font-semibold text-neutral-900">
+                                  Step {currentStep} of {totalSteps}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs uppercase tracking-wide text-neutral-500">Submitted</p>
+                                <p className="mt-1 font-semibold text-neutral-900">{formatTimestamp(application.createdAt)}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs uppercase tracking-wide text-neutral-500">Last Updated</p>
+                                <p className="mt-1 font-semibold text-neutral-900">{formatTimestamp(application.updatedAt)}</p>
+                              </div>
+                            </div>
+
+                          {application.additionalInfo && (
+                            <>
+                              <div className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">Primary Skill</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.specificSkill || '—'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">Experience</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.yearsOfExperience ?? 0} yrs</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">City</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.city || '—'}</p>
+                                </div>
+                              </div>
+
+                              <div className="mt-4 grid gap-4 sm:grid-cols-3 text-sm">
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">Phone</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.phoneNumber || '—'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">Gender</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.sex || '—'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">State</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.state || '—'}</p>
+                                </div>
+                              </div>
+
+                              {application.additionalInfo.address && (
+                                <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-sm text-neutral-700">
+                                  <p className="text-xs uppercase tracking-wide text-neutral-500">Address</p>
+                                  <p className="mt-1 font-medium text-neutral-900">{application.additionalInfo.address}</p>
+                                </div>
+                              )}
+
+                              {(application.additionalInfo.idFileUrl ||
+                                (application.additionalInfo.certifications && application.additionalInfo.certifications.length > 0)) && (
+                                <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
+                                  <h4 className="text-sm font-semibold text-neutral-900 mb-3">Uploaded Documents</h4>
+                                  <div className="space-y-2 text-sm">
+                                    {application.additionalInfo.idFileUrl && (
+                                      <div className="flex items-center justify-between rounded-lg bg-neutral-50 px-3 py-2">
+                                        <span className="text-neutral-700">Government ID</span>
+                                        <a
+                                          href={application.additionalInfo.idFileUrl}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                                        >
+                                          View
+                                        </a>
+                                      </div>
+                                    )}
+                                    {application.additionalInfo.certifications?.map((cert: any, idx: number) => (
+                                      <div
+                                        key={`${cert.name}-${idx}`}
+                                        className="flex flex-col gap-1 rounded-lg bg-neutral-50 px-3 py-2"
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span className="font-medium text-neutral-900">{cert.name || 'Certification'}</span>
+                                          {cert.fileUrl && (
+                                            <a
+                                              href={cert.fileUrl}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                                            >
+                                              View
+                                            </a>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-neutral-500">
+                                          {cert.issuer || 'Issuer'} · {cert.dateIssued || 'Date not provided'}
+                                        </p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          {application.additionalInfo?.references?.length > 0 && (
+                            <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
+                              <h4 className="text-sm font-semibold text-neutral-900 mb-3">Professional References</h4>
+                              <div className="space-y-3 text-sm">
+                                {application.additionalInfo.references.map((ref: any, idx: number) => (
+                                  <div key={`${ref.name}-${idx}`} className="rounded-lg bg-neutral-50 p-3">
+                                    <p className="font-medium text-neutral-900">{ref.name || 'Reference'}</p>
+                                    <p className="text-neutral-600">{ref.relationship || ref.companyName || '—'}</p>
+                                    <p className="text-xs text-neutral-500">{ref.phoneNumber || 'No phone provided'}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {application.training && (
+                            <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <h4 className="text-sm font-semibold text-neutral-900">Training Progress</h4>
+                                <p className="text-xs font-semibold text-brand-600">
+                                  {application.training.allCompleted
+                                    ? application.training.allPassed
+                                      ? 'All modules completed and passed'
+                                      : 'All modules completed'
+                                    : 'In progress'}
+                                </p>
+                              </div>
+                              {application.trainingProgress?.activeModuleId && (
+                                <div className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
+                                  <p className="font-semibold">
+                                    Last activity:{' '}
+                                    {trainingModules.find((m) => m.id === application.trainingProgress.activeModuleId)?.title || 'Current module'}
+                                  </p>
+                                  <p>
+                                    Page {application.trainingProgress.currentPage + 1}{' '}
+                                    {application.trainingProgress.takingAssessment ? '(assessment in progress)' : ''}
+                                  </p>
+                                </div>
+                              )}
+                              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                                {[
+                                  { label: 'Safety Training', key: 'safetyTraining', icon: '🛡️' },
+                                  { label: 'Residential Training', key: 'residentialTraining', icon: '🏠' },
+                                  { label: 'Corporate Training', key: 'corporateTraining', icon: '🏢' },
+                                  { label: 'Dashboard Training', key: 'dashboardTraining', icon: '📱' },
+                                ].map(({ label, key, icon }) => {
+                                  const moduleStatus = application.training[key] || {};
+                                  return (
+                                    <div key={key} className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-lg">{icon}</span>
+                                        <p className="font-semibold text-neutral-900">{label}</p>
+                                      </div>
+                                      <p className="mt-2 text-xs text-neutral-500">
+                                        {moduleStatus.completed
+                                          ? moduleStatus.passedAssessment
+                                            ? 'Passed'
+                                            : 'Completed - Needs retake'
+                                          : 'Not started'}
+                                      </p>
+                                      {moduleStatus.completed && (
+                                        <p className={`mt-1 text-sm font-semibold ${moduleStatus.passedAssessment ? 'text-green-600' : 'text-red-600'}`}>
+                                          Score: {moduleStatus.assessmentScore ?? 0}%
+                                        </p>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         )}

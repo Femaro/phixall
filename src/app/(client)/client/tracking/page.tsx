@@ -4,10 +4,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
+import { useSearchParams } from 'next/navigation';
 
 export default function ClientTrackingPage() {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	const [status, setStatus] = useState('Loading map…');
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('jobId');
+  const artisanId = searchParams.get('artisanId');
 
 	useEffect(() => {
     	let map: any = null;
@@ -17,6 +21,10 @@ export default function ClientTrackingPage() {
         let unsubscribe: undefined | (() => void);
 
 		async function init() {
+      if (!jobId || !artisanId) {
+        setStatus('Missing job or artisan identifier');
+        return;
+      }
 			try {
                 const loader = new Loader({ apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '', version: 'weekly' });
                 const googleObj = await loader.load();
@@ -26,10 +34,10 @@ export default function ClientTrackingPage() {
 
                 // Firestore live updates for a demo job id
                 const { db } = getFirebase();
-                const unsub = onSnapshot(doc(db, 'jobLocations', 'job-123'), (snap) => {
+                const unsub = onSnapshot(doc(db, 'jobLocations', jobId), (snap) => {
                     if (ignore) return;
                     const data = snap.data() as any;
-                    const loc = data?.artisan;
+                    const loc = data?.artisans?.[artisanId];
                     const lat = loc?.lat;
                     const lng = loc?.lng;
                     if (typeof lat === 'number' && typeof lng === 'number' && map) {
@@ -40,6 +48,8 @@ export default function ClientTrackingPage() {
                         }
                         map.setCenter({ lat, lng });
                         setStatus('Tracking artisan…');
+                    } else {
+                      setStatus('Waiting for artisan updates…');
                     }
                 });
 
@@ -63,7 +73,7 @@ export default function ClientTrackingPage() {
 			ignore = true;
             if (unsubscribe) unsubscribe();
 		};
-	}, []);
+	}, [jobId, artisanId]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 p-4">

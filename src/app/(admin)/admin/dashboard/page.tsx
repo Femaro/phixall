@@ -1559,7 +1559,7 @@ export default function AdminDashboardPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-neutral-900">{txn.type}</p>
-                          <p className="text-xs text-neutral-500">{txn.createdAt?.toDate().toLocaleString()}</p>
+                          <p className="text-xs text-neutral-500">{formatTimestamp(txn.createdAt)}</p>
                         </div>
                       </div>
                       <div className="text-right">

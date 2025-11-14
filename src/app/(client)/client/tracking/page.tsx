@@ -1,12 +1,20 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useSearchParams } from 'next/navigation';
 
 export default function ClientTrackingPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-sm text-neutral-600">Loading tracking...</div>}>
+      <ClientTrackingContent />
+    </Suspense>
+  );
+}
+
+function ClientTrackingContent() {
 	const mapRef = useRef<HTMLDivElement | null>(null);
 	const [status, setStatus] = useState('Loading map…');
   const searchParams = useSearchParams();

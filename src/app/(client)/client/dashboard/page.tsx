@@ -25,6 +25,19 @@ interface ClientProfile {
 }
 
 type ClientTab = 'overview' | 'request' | 'jobs' | 'wallet' | 'profile' | 'settings';
+type TimestampLike = Date | { seconds: number; nanoseconds: number } | { toDate: () => Date } | null | undefined;
+
+const formatTimestamp = (value: TimestampLike) => {
+  if (!value) return '—';
+  if (value instanceof Date) return value.toLocaleString();
+  if ('toDate' in value && typeof value.toDate === 'function') {
+    return value.toDate().toLocaleString();
+  }
+  if ('seconds' in value && typeof value.seconds === 'number') {
+    return new Date(value.seconds * 1000).toLocaleString();
+  }
+  return '—';
+};
 
 interface Job {
   id: string;
@@ -879,7 +892,7 @@ function ClientDashboardContent() {
                           <div>
                             <p className="text-sm font-medium text-neutral-900">{transaction.description}</p>
                             <p className="text-xs text-neutral-500">
-                              {transaction.createdAt?.toDate().toLocaleDateString()} at {transaction.createdAt?.toDate().toLocaleTimeString()}
+                              {formatTimestamp(transaction.createdAt)}
                             </p>
                           </div>
                         </div>
@@ -1044,9 +1057,9 @@ function ClientDashboardContent() {
                         )}
 
                         <div className="mt-3 flex items-center gap-4 text-xs text-neutral-500">
-                          <span>Created: {job.createdAt?.toDate().toLocaleDateString()}</span>
+                          <span>Created: {formatTimestamp(job.createdAt)}</span>
                           {job.scheduledAt && (
-                            <span>Scheduled: {new Date(job.scheduledAt.toDate()).toLocaleString()}</span>
+                            <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
                           )}
                         </div>
                       </div>

@@ -400,6 +400,11 @@ export default function AdminDashboardPage() {
   async function assignResourcesToJob() {
     if (!selectedJob || selectedResources.length === 0) return;
 
+    if (!user) {
+      alert('You must be signed in to assign resources.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       const assignedResources = selectedResources.map(sr => {
@@ -442,6 +447,11 @@ export default function AdminDashboardPage() {
   async function createJob() {
     if (!newJobForm.title || !newJobForm.description || !newJobForm.clientId) {
       alert('Please fill in all required fields (Title, Description, and Client)');
+      return;
+    }
+
+    if (!user) {
+      alert('You must be signed in to create jobs.');
       return;
     }
 
@@ -518,6 +528,11 @@ export default function AdminDashboardPage() {
       return;
     }
 
+    if (!user) {
+      alert('You must be signed in to send bills.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       const recipientUser = billForm.recipientType === 'client' 
@@ -554,6 +569,11 @@ export default function AdminDashboardPage() {
   }
 
   async function updateProfile() {
+    if (!user) {
+      alert('You must be signed in to update the profile.');
+      return;
+    }
+
     if (!user) {
       alert('You must be signed in to update the profile.');
       return;

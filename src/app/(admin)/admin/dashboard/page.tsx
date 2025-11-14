@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
 import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDocs, getDoc, deleteDoc } from 'firebase/firestore';
+import { trainingModules } from '@/data/trainingModules';
 
 interface User {
   id: string;

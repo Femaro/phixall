@@ -73,10 +73,14 @@ service cloud.firestore {
                   || (isArtisan() && resource.data.artisanId == request.auth.uid)
                   || isArtisan(); // Allow artisans to see available jobs
       
-      // Job owner, assigned artisan, and admins can update
+      // Job owner, assigned artisan, and admins can update.
+      // Artisans can claim an unassigned job if they are setting themselves as the artisan.
       allow update: if isAdmin() 
                     || isOwner(resource.data.clientId)
-                    || (isArtisan() && resource.data.artisanId == request.auth.uid);
+                    || (isArtisan() && resource.data.artisanId == request.auth.uid)
+                    || (isArtisan()
+                        && (!('artisanId' in resource.data) || resource.data.artisanId == null || resource.data.artisanId == '')
+                        && request.resource.data.artisanId == request.auth.uid);
       
       // Only admins and job owner can delete
       allow delete: if isAdmin() || isOwner(resource.data.clientId);

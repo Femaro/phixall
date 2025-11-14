@@ -100,6 +100,9 @@ function ClientDashboardContent() {
   const [verifyingSessionId, setVerifyingSessionId] = useState<string | null>(null);
   const [processedSessionId, setProcessedSessionId] = useState<string | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [premiumBillingCycle, setPremiumBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   
   // Profile states
   const [profileForm, setProfileForm] = useState({
@@ -423,6 +426,52 @@ function ClientDashboardContent() {
     }
   }
 
+  async function handlePremiumSubscribe(planTier: PremiumPlan['tier']) {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to subscribe.', type: 'error' });
+      return;
+    }
+
+    const selected = premiumPlans.find((plan) => plan.tier === planTier);
+    if (!selected) {
+      setMessage({ text: 'Plan not found. Please try again.', type: 'error' });
+      return;
+    }
+
+    const amount = premiumBillingCycle === 'monthly' ? selected.price : selected.yearlyPrice;
+    setProcessingPlan(planTier);
+    setMessage(null);
+
+    try {
+      const response = await fetch('/api/payments/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          userId: user.uid,
+          metadata: {
+            type: 'premium-subscription',
+            plan: planTier,
+            billingCycle: premiumBillingCycle,
+          },
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok || !data?.url) {
+        setMessage({ text: data?.error || 'Failed to start subscription checkout.', type: 'error' });
+        return;
+      }
+
+      window.location.href = data.url as string;
+    } catch (error) {
+      console.error('Error starting subscription checkout:', error);
+      setMessage({ text: 'Failed to start subscription checkout. Please try again.', type: 'error' });
+    } finally {
+      setProcessingPlan(null);
+    }
+  }
+
   async function handlePayForJob(jobId: string, amount: number) {
     if (!user) {
       setMessage({ text: 'You must be signed in to pay for a job.', type: 'error' });
@@ -507,6 +556,56 @@ function ClientDashboardContent() {
     completed: jobs.filter(j => j.status === 'completed').length,
   };
 
+  type PremiumPlan = {
+    tier: 'bronze' | 'gold' | 'platinum';
+    name: string;
+    icon: string;
+    color: string;
+    price: number;
+    yearlyPrice: number;
+    servicesIncluded: string[];
+    benefits: string[];
+    popular?: boolean;
+    accent: string;
+  };
+
+  const premiumPlans: PremiumPlan[] = [
+    {
+      tier: 'bronze',
+      name: 'Bronze',
+      icon: '🥉',
+      color: 'from-amber-500 to-amber-600',
+      price: 25000,
+      yearlyPrice: 270000,
+      servicesIncluded: ['Basic plumbing repairs', 'Electrical troubleshooting', 'General maintenance'],
+      benefits: ['2 service calls per month', 'Standard response (24-48 hours)', 'Basic priority support', '5% discount on extra services'],
+      accent: 'text-amber-600 bg-amber-50',
+    },
+    {
+      tier: 'gold',
+      name: 'Gold',
+      icon: '🥇',
+      color: 'from-yellow-500 to-yellow-600',
+      price: 50000,
+      yearlyPrice: 540000,
+      servicesIncluded: ['All Bronze services', 'HVAC maintenance', 'Carpentry & repairs', 'Painting touch-ups'],
+      benefits: ['5 service calls per month', 'Priority response (12-24 hours)', 'Priority artisan assignment', '10% discount on extra services', 'Quarterly facility inspection'],
+      popular: true,
+      accent: 'text-yellow-600 bg-yellow-50',
+    },
+    {
+      tier: 'platinum',
+      name: 'Platinum',
+      icon: '💎',
+      color: 'from-purple-600 to-purple-700',
+      price: 100000,
+      yearlyPrice: 1080000,
+      servicesIncluded: ['All Gold services', 'Roofing inspections & repairs', 'Landscaping & gardening', 'Deep cleaning services', 'Emergency repairs (24/7)'],
+      benefits: ['Unlimited service calls', 'Emergency response (2-4 hours)', 'Dedicated account manager', 'Premium artisan assignment', '20% discount on extra services', 'Monthly facility inspection'],
+      accent: 'text-purple-600 bg-purple-50',
+    },
+  ];
+
   const tabConfig: Array<{ id: ClientTab; label: string; icon: string; badge?: number }> = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'request', label: 'Request Service', icon: '➕' },
@@ -556,6 +655,104 @@ function ClientDashboardContent() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {showPremiumModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+              <div>
+                <p className="text-sm font-medium uppercase tracking-wide text-brand-600">Go Premium</p>
+                <h3 className="text-xl font-bold text-neutral-900">Choose a subscription plan</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPremiumModal(false)}
+                className="rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100"
+                aria-label="Close premium plans modal"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="px-6 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-neutral-600">Select your billing cycle</p>
+                <div className="flex items-center gap-3 rounded-full border border-neutral-200 px-3 py-1">
+                  <span className={`text-sm font-medium ${premiumBillingCycle === 'monthly' ? 'text-neutral-900' : 'text-neutral-400'}`}>Monthly</span>
+                  <button
+                    type="button"
+                    onClick={() => setPremiumBillingCycle(premiumBillingCycle === 'monthly' ? 'yearly' : 'monthly')}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      premiumBillingCycle === 'yearly' ? 'bg-brand-600' : 'bg-neutral-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        premiumBillingCycle === 'yearly' ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  <span className={`text-sm font-medium ${premiumBillingCycle === 'yearly' ? 'text-neutral-900' : 'text-neutral-400'}`}>
+                    Yearly
+                    <span className="ml-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">Save 10%</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-6 md:grid-cols-3">
+                {premiumPlans.map((plan) => {
+                  const displayAmount = premiumBillingCycle === 'monthly' ? plan.price : plan.yearlyPrice;
+                  const priceLabel = premiumBillingCycle === 'monthly' ? 'per month' : 'per year';
+                  return (
+                    <div
+                      key={plan.tier}
+                      className={`rounded-2xl border-2 bg-white p-4 shadow-sm transition-all hover:shadow-lg ${
+                        plan.popular ? 'border-brand-600 ring-2 ring-brand-100' : 'border-neutral-200'
+                      }`}
+                    >
+                      {plan.popular && (
+                        <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+                          ⭐ Most Popular
+                        </span>
+                      )}
+                      <div className="text-4xl">{plan.icon}</div>
+                      <h4 className="mt-2 text-lg font-semibold text-neutral-900">{plan.name}</h4>
+                      <div className="mt-2">
+                        <p className="text-3xl font-bold text-neutral-900">₦{displayAmount.toLocaleString()}</p>
+                        <p className="text-xs uppercase tracking-wide text-neutral-500">{priceLabel}</p>
+                      </div>
+                      <div className={`mt-3 rounded-lg px-3 py-2 text-xs font-semibold ${plan.accent}`}>
+                        {plan.servicesIncluded[0]}
+                      </div>
+                      <ul className="mt-4 space-y-2 text-sm text-neutral-600">
+                        {plan.benefits.slice(0, 3).map((benefit) => (
+                          <li key={benefit} className="flex items-start gap-2">
+                            <svg className="mt-0.5 h-4 w-4 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>{benefit}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => handlePremiumSubscribe(plan.tier)}
+                        disabled={processingPlan === plan.tier}
+                        className={`mt-5 inline-flex w-full items-center justify-center rounded-lg py-2 text-sm font-semibold text-white shadow transition-all ${
+                          plan.popular ? 'bg-brand-600 hover:bg-brand-700' : `bg-gradient-to-r ${plan.color} hover:opacity-90`
+                        } ${processingPlan === plan.tier ? 'cursor-not-allowed opacity-70' : ''}`}
+                      >
+                        {processingPlan === plan.tier ? 'Processing...' : `Subscribe to ${plan.name}`}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Mobile Navigation Drawer */}
       <div
         className={`fixed inset-0 z-40 md:hidden ${mobileNavOpen ? '' : 'pointer-events-none'}`}
@@ -593,7 +790,21 @@ function ClientDashboardContent() {
           <div className="flex-1 overflow-y-auto p-4">
             <div className="space-y-2">{renderTabs(() => setMobileNavOpen(false))}</div>
           </div>
-          <div className="border-t border-neutral-200 p-4">
+          <div className="border-t border-neutral-200 p-4 space-y-4">
+            <div className="rounded-xl border border-brand-200 bg-brand-50 p-4 text-center">
+              <p className="text-sm font-medium text-brand-800">Go Premium</p>
+              <p className="mt-1 text-xs text-brand-700/80">Unlock priority support and bundled maintenance.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  setShowPremiumModal(true);
+                }}
+                className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
+              >
+                View Plans
+              </button>
+            </div>
             <button
               onClick={async () => {
                 const { auth } = getFirebase();
@@ -652,6 +863,16 @@ function ClientDashboardContent() {
                   <p className="font-bold text-brand-700">₦{wallet.balance.toLocaleString()}</p>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowPremiumModal(true)}
+                className="hidden items-center gap-2 rounded-lg border border-brand-200 bg-white px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm transition-colors hover:bg-brand-50 md:flex"
+              >
+                <svg className="h-4 w-4 text-brand-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m6-6H6" />
+                </svg>
+                Go Premium
+              </button>
               <button
                 onClick={async () => {
                   const { auth } = getFirebase();

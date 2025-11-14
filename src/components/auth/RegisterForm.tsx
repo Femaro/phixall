@@ -231,13 +231,13 @@ export default function RegisterForm({
           />
           <label htmlFor="terms" className="ml-2 block text-sm text-neutral-700">
             I agree to the{' '}
-            <a href="#" className="font-medium text-brand-600 hover:text-brand-700">
+            <Link href="/terms" className="font-medium text-brand-600 hover:text-brand-700">
               Terms of Service
-            </a>{' '}
+            </Link>{' '}
             and{' '}
-            <a href="#" className="font-medium text-brand-600 hover:text-brand-700">
+            <Link href="/privacy" className="font-medium text-brand-600 hover:text-brand-700">
               Privacy Policy
-            </a>
+            </Link>
           </label>
         </div>
 

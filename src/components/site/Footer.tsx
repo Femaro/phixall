@@ -12,7 +12,7 @@ export default function Footer() {
               <Image src={Logo} alt="Phixall" width={56} height={56} className="drop-shadow-lg" style={{ filter: 'contrast(1.2) brightness(1.1)' }} />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-neutral-600">
-              Professional facility management connecting clients with skilled artisans nationwide.
+              Professional facility management company connecting clients with skilled artisans nationwide.
             </p>
           </div>
 

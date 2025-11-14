@@ -355,6 +355,11 @@ function ClientDashboardContent() {
   }, [sessionIdFromQuery, verifyingSessionId, processedSessionId, confirmStripeSession]);
 
   async function handleSaveProfile() {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to update your profile.', type: 'error' });
+      return;
+    }
+
     setSavingProfile(true);
     try {
       const { db } = getFirebase();
@@ -378,6 +383,11 @@ function ClientDashboardContent() {
   }
 
   async function handleSaveSettings() {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to update settings.', type: 'error' });
+      return;
+    }
+
     setSavingSettings(true);
     try {
       const { db } = getFirebase();

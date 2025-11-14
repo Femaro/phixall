@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing Stripe session id' }, { status: 400 });
   }
 
-  const stripe = new Stripe(key, { apiVersion: '2024-06-20' });
+  const stripe = new Stripe(key, { apiVersion: '2025-10-29.clover' as Stripe.LatestApiVersion });
 
   let session;
   try {

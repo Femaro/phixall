@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing user identifier.' }, { status: 400 });
   }
 
-	const stripe = new Stripe(key, { apiVersion: '2024-06-20' });
+	const stripe = new Stripe(key, { apiVersion: '2025-10-29.clover' as Stripe.LatestApiVersion });
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   const unitAmount = Math.round(amount * 100);
 	const session = await stripe.checkout.sessions.create({

@@ -1437,7 +1437,7 @@ export default function AdminDashboardPage() {
                             </>
                           )}
 
-                          {application.additionalInfo?.references?.length > 0 && (
+                          {(application.additionalInfo?.references?.length ?? 0) > 0 && (
                             <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
                               <h4 className="text-sm font-semibold text-neutral-900 mb-3">Professional References</h4>
                               <div className="space-y-3 text-sm">

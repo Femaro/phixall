@@ -22,6 +22,7 @@ type AdminProfile = {
 type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string; email?: string };
 
 type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings';
+type TrainingStatusKey = 'safetyTraining' | 'residentialTraining' | 'corporateTraining' | 'dashboardTraining';
 
 interface User {
   id: string;
@@ -1277,6 +1278,7 @@ export default function AdminDashboardPage() {
                   const totalSteps = 3;
                   const isOpen = openApplicationId === application.id;
                   const trainingProgressState = application.trainingProgress;
+                  const trainingState = application.training;
 
                   return (
                     <div key={application.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
@@ -1453,13 +1455,13 @@ export default function AdminDashboardPage() {
                             </div>
                           )}
 
-                          {application.training && (
+                          {trainingState && (
                             <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <h4 className="text-sm font-semibold text-neutral-900">Training Progress</h4>
                                 <p className="text-xs font-semibold text-brand-600">
-                                  {application.training.allCompleted
-                                    ? application.training.allPassed
+                                  {trainingState.allCompleted
+                                    ? trainingState.allPassed
                                       ? 'All modules completed and passed'
                                       : 'All modules completed'
                                     : 'In progress'}
@@ -1478,13 +1480,13 @@ export default function AdminDashboardPage() {
                                 </div>
                               )}
                               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                {[
+                                {([
                                   { label: 'Safety Training', key: 'safetyTraining', icon: '🛡️' },
                                   { label: 'Residential Training', key: 'residentialTraining', icon: '🏠' },
                                   { label: 'Corporate Training', key: 'corporateTraining', icon: '🏢' },
                                   { label: 'Dashboard Training', key: 'dashboardTraining', icon: '📱' },
-                                ].map(({ label, key, icon }) => {
-                                  const moduleStatus = application.training[key] || {};
+                                ] satisfies Array<{ label: string; key: TrainingStatusKey; icon: string }>).map(({ label, key, icon }) => {
+                                  const moduleStatus = trainingState[key];
                                   return (
                                     <div key={key} className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
                                       <div className="flex items-center gap-2">

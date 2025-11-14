@@ -16,6 +16,11 @@ interface ClientProfile {
   phone?: string;
   address?: string;
   company?: string;
+  emailNotifications?: boolean;
+  smsNotifications?: boolean;
+  pushNotifications?: boolean;
+  language?: string;
+  timezone?: string;
   [key: string]: unknown;
 }
 

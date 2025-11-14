@@ -639,7 +639,7 @@ export default function AdminDashboardPage() {
 
   const applicationStats = {
     total: applications.length,
-    inProgress: applications.filter(a => ['pending', 'in-progress', 'training'].includes(a.status)).length,
+    inProgress: applications.filter(a => ['pending', 'in-progress', 'training'].includes(a.status ?? '')).length,
     underReview: applications.filter(a => a.status === 'under-review').length,
     approved: applications.filter(a => a.status === 'approved').length,
   };

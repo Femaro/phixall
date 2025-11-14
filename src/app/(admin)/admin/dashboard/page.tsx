@@ -304,6 +304,11 @@ export default function AdminDashboardPage() {
   async function assignJobToArtisan() {
     if (!selectedJob || !selectedArtisan) return;
 
+    if (!user) {
+      alert('You must be signed in to assign resources.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       await updateDoc(doc(db, 'jobs', selectedJob.id), {
@@ -440,6 +445,11 @@ export default function AdminDashboardPage() {
       return;
     }
 
+    if (!user) {
+      alert('You must be signed in to create jobs.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       const jobData: Record<string, unknown> = {
@@ -503,6 +513,11 @@ export default function AdminDashboardPage() {
 
     const totalAmount = billForm.items.reduce((sum, item) => sum + item.amount, 0);
 
+    if (!user) {
+      alert('You must be signed in to send bills.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       const recipientUser = billForm.recipientType === 'client' 
@@ -539,6 +554,11 @@ export default function AdminDashboardPage() {
   }
 
   async function updateProfile() {
+    if (!user) {
+      alert('You must be signed in to update the profile.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       await updateDoc(doc(db, 'profiles', user.uid), {

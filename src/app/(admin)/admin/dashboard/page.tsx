@@ -363,6 +363,11 @@ export default function AdminDashboardPage() {
       return;
     }
 
+    if (!user) {
+      alert('You must be signed in to add resources.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
       await addDoc(collection(db, 'resources'), {

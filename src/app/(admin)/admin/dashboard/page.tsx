@@ -118,6 +118,7 @@ export default function AdminDashboardPage() {
   const [showResourceAssignModal, setShowResourceAssignModal] = useState(false);
   const [showBillModal, setShowBillModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   
   const [selectedArtisan, setSelectedArtisan] = useState('');
   const [jobBudget, setJobBudget] = useState('');
@@ -703,6 +704,25 @@ export default function AdminDashboardPage() {
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
 
+  const renderSidebarButtons = (onNavigate?: () => void) =>
+    sidebarTabs.map((tab) => (
+      <button
+        key={tab.id}
+        onClick={() => {
+          setActiveTab(tab.id);
+          onNavigate?.();
+        }}
+        className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+          activeTab === tab.id
+            ? 'bg-neutral-900 text-white shadow-sm'
+            : 'text-neutral-700 hover:bg-neutral-50'
+        }`}
+      >
+        <span className="text-lg">{tab.icon}</span>
+        <span>{tab.label}</span>
+      </button>
+    ));
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-neutral-50">
@@ -715,9 +735,62 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-50">
+    <div className="flex min-h-screen flex-col bg-neutral-50 lg:h-screen lg:flex-row lg:overflow-hidden">
+      {/* Mobile Navigation Drawer */}
+      <div
+        className={`fixed inset-0 z-50 lg:hidden ${mobileNavOpen ? '' : 'pointer-events-none'}`}
+        aria-hidden={!mobileNavOpen}
+      >
+        <div
+          className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+            mobileNavOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setMobileNavOpen(false)}
+        />
+        <div
+          className={`absolute inset-y-0 left-0 w-72 max-w-full transform bg-white shadow-2xl transition-transform duration-300 ${
+            mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-neutral-200 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-neutral-500">Phixall Admin</p>
+              <p className="text-base font-semibold text-neutral-900">{adminProfile?.name || 'Admin'}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+              aria-label="Close navigation menu"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            <div className="space-y-2">{renderSidebarButtons(() => setMobileNavOpen(false))}</div>
+          </div>
+          <div className="border-t border-neutral-200 p-4">
+            <button
+              onClick={async () => {
+                const { auth } = getFirebase();
+                const { signOut } = await import('firebase/auth');
+                await signOut(auth);
+                window.location.href = '/login';
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
       {/* Left Sidebar Navigation */}
-      <div className="relative flex h-screen w-64 flex-col border-r border-neutral-200 bg-white">
+      <div className="relative hidden w-full flex-col border-b border-neutral-200 bg-white lg:flex lg:h-screen lg:w-64 lg:border-b-0 lg:border-r">
         {/* Logo & Title */}
         <div className="border-b border-neutral-200 bg-neutral-900 p-6">
           <div className="flex items-center gap-3">
@@ -739,26 +812,13 @@ export default function AdminDashboardPage() {
 
         {/* Navigation Menu */}
         <nav className="flex flex-1 flex-col overflow-hidden">
-          <div className="space-y-1 overflow-y-auto p-4 pr-2 pb-24">
-            {sidebarTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-neutral-900 text-white shadow-sm'
-                    : 'text-neutral-700 hover:bg-neutral-50'
-                }`}
-              >
-                <span className="text-lg">{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
+          <div className="space-y-1 overflow-y-auto p-4 pr-2 lg:pb-24">
+            {renderSidebarButtons()}
           </div>
         </nav>
 
         {/* User Info at Bottom */}
-        <div className="absolute bottom-0 w-64 border-t border-neutral-200 bg-white p-4">
+        <div className="border-t border-neutral-200 bg-white p-4 lg:absolute lg:bottom-0 lg:w-64">
           <button
             onClick={() => setShowProfileModal(true)}
             className="flex w-full items-center gap-3 rounded-lg p-3 transition-colors hover:bg-neutral-50"
@@ -775,12 +835,13 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col lg:overflow-hidden">
         {/* Top Header */}
-        <div className="border-b border-neutral-200 bg-white px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-neutral-900">
+        <div className="border-b border-neutral-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start justify-between gap-4 lg:block">
+              <div>
+                <h2 className="text-2xl font-bold text-neutral-900">
                 {activeTab === 'overview' && 'Dashboard Overview'}
                 {activeTab === 'users' && 'User Management'}
                 {activeTab === 'jobs' && 'Job Management'}
@@ -791,7 +852,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'profile' && 'Admin Profile'}
                 {activeTab === 'settings' && 'Dashboard Settings'}
               </h2>
-              <p className="text-sm text-neutral-600">
+                <p className="text-sm text-neutral-600">
                 {activeTab === 'overview' && 'Monitor all platform activities and metrics'}
                 {activeTab === 'users' && 'Manage clients and artisans'}
                 {activeTab === 'jobs' && 'Assign jobs, set budgets, and track progress'}
@@ -801,7 +862,18 @@ export default function AdminDashboardPage() {
                 {activeTab === 'analytics' && 'Platform performance metrics'}
                 {activeTab === 'profile' && 'Manage your admin account information'}
                 {activeTab === 'settings' && 'Configure your admin dashboard preferences'}
-              </p>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileNavOpen(true)}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 text-neutral-700 hover:bg-neutral-50 lg:hidden"
+                aria-label="Open navigation menu"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h12M4 18h16" />
+                </svg>
+              </button>
             </div>
             <button
               onClick={async () => {
@@ -821,7 +893,7 @@ export default function AdminDashboardPage() {
         </div>
 
         {/* Content Area with Scroll */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div>
@@ -2037,7 +2109,7 @@ export default function AdminDashboardPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700">Quantity</label>
                   <input
@@ -2065,7 +2137,7 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700">Cost per Unit (₦)</label>
                   <input
@@ -2207,7 +2279,7 @@ export default function AdminDashboardPage() {
             <p className="mt-1 text-sm text-neutral-600">For job: {selectedJob.title}</p>
             
             <div className="mt-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700">Recipient Type</label>
                   <select
@@ -2263,11 +2335,11 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="space-y-2">
                   {billForm.items.map((item, index) => (
-                    <div key={index} className="grid grid-cols-4 gap-2">
+                    <div key={index} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
                       <input
                         type="text"
                         placeholder="Item name"
-                        className="col-span-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                        className="rounded-lg border border-neutral-300 px-3 py-2 text-sm sm:col-span-2"
                         value={item.name}
                         onChange={(e) => {
                           const newItems = [...billForm.items];

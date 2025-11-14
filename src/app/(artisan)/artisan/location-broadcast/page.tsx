@@ -1,11 +1,19 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useSearchParams } from 'next/navigation';
 
 export default function LocationBroadcastPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-sm text-neutral-600">Loading broadcast tools...</div>}>
+      <LocationBroadcastContent />
+    </Suspense>
+  );
+}
+
+function LocationBroadcastContent() {
 	const [broadcasting, setBroadcasting] = useState(false);
 	const watchIdRef = useRef<number | null>(null);
   const searchParams = useSearchParams();

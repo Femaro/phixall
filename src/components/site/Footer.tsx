@@ -21,6 +21,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm">
               <li><Link href="/clients" className="text-neutral-600 transition-colors hover:text-brand-600">For Clients</Link></li>
               <li><Link href="/artisans" className="text-neutral-600 transition-colors hover:text-brand-600">For Artisans</Link></li>
+              <li><Link href="/api-docs" className="text-neutral-600 transition-colors hover:text-brand-600">API Documentation</Link></li>
               <li><Link href="/about" className="text-neutral-600 transition-colors hover:text-brand-600">About Us</Link></li>
               <li><Link href="/contact" className="text-neutral-600 transition-colors hover:text-brand-600">Contact</Link></li>
             </ul>
@@ -58,6 +59,16 @@ export default function Footer() {
                   className="text-neutral-600 transition-colors hover:text-brand-600"
                 >
                   Facebook
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/phixalltech/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-neutral-600 transition-colors hover:text-brand-600"
+                >
+                  Instagram
                 </a>
               </li>
             </ul>

@@ -25,7 +25,11 @@ export async function POST(req: Request) {
     const ai = await generateSupportReply({
       role,
       message,
-      history: history ?? [],
+      history: (history ?? []).map((msg) => ({
+        sender: msg.sender,
+        text: msg.text,
+        createdAt: msg.createdAt ?? new Date().toISOString(),
+      })),
     });
 
     return NextResponse.json(ai);

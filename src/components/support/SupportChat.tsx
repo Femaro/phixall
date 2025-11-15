@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
 import { collection, addDoc, doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, setDoc } from 'firebase/firestore';
-import type { FirebaseUser } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 type ChatMessage = {
   id: string;
@@ -13,7 +13,7 @@ type ChatMessage = {
 };
 
 type SupportChatProps = {
-  user: FirebaseUser | null;
+  user: User | null;
   role: 'client' | 'artisan';
 };
 

@@ -32,6 +32,7 @@ interface User {
   status: 'active' | 'suspended';
   phone?: string;
   address?: string;
+  state?: string;
   createdAt?: TimestampLike;
 }
 

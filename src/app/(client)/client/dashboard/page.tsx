@@ -59,6 +59,12 @@ interface Job {
     verifiedAt?: TimestampLike;
     clientName?: string;
   };
+  artisanReview?: {
+    rating?: number;
+    feedback?: string;
+    ratedAt?: TimestampLike;
+    artisanName?: string;
+  };
   serviceAddress?: {
     description?: string;
     placeId?: string;

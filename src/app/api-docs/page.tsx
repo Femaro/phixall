@@ -6,7 +6,29 @@ export const metadata = {
     'Learn how to integrate with the Phixall platform. Discover authentication, endpoints, and best practices for building on top of our facility management services.',
 };
 
-const endpoints = [
+type EndpointField = {
+  field: string;
+  type: string;
+  note: string;
+  required?: boolean;
+};
+
+type EndpointParam = {
+  field: string;
+  type: string;
+  note: string;
+};
+
+type EndpointDefinition = {
+  name: string;
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  path: string;
+  description: string;
+  body?: EndpointField[];
+  params?: EndpointParam[];
+};
+
+const endpoints: EndpointDefinition[] = [
   {
     name: 'Create Service Request',
     method: 'POST',

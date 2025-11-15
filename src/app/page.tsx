@@ -52,7 +52,7 @@ export default function Home() {
       <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
@@ -104,7 +104,7 @@ export default function Home() {
             <div className="relative lg:h-[500px]">
               <div className="relative h-full overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br from-blue-50 via-brand-50 to-purple-50 shadow-glow">
                 {/* Background Pattern */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:20px_20px]" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:20px_20px]" />
                 
                 {/* Platform Illustration */}
                 <div className="relative flex h-full flex-col items-center justify-center gap-6 p-8">
@@ -302,7 +302,7 @@ export default function Home() {
               <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br from-brand-50 to-brand-100 shadow-glow">
                 <div className="relative h-full w-full">
                   {/* Decorative Background Pattern */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
                   
                   {/* Main Visual Content */}
                   <div className="relative flex h-full flex-col items-center justify-center p-8">
@@ -490,7 +490,7 @@ export default function Home() {
               <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-neutral-200 bg-gradient-to-br from-brand-50 via-purple-50 to-amber-50 shadow-glow">
                 <div className="relative h-full w-full">
                   {/* Decorative Background Pattern */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
                   
                   {/* Main Visual Content */}
                   <div className="relative flex h-full flex-col items-center justify-center p-8">

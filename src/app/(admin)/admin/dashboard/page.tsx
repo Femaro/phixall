@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
 import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
 import { trainingModules } from '@/data/trainingModules';
@@ -144,6 +145,7 @@ export default function AdminDashboardPage() {
   const [showBillModal, setShowBillModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [pendingSupportCount, setPendingSupportCount] = useState(0);
   
   const [selectedArtisan, setSelectedArtisan] = useState('');
   const [jobBudget, setJobBudget] = useState('');
@@ -327,6 +329,15 @@ export default function AdminDashboardPage() {
       unsubApplications();
     };
   }, [user]);
+
+  useEffect(() => {
+    const { db } = getFirebase();
+    const pendingQuery = query(collection(db, 'support_sessions'), where('status', '==', 'pending-agent'));
+    const unsubscribe = onSnapshot(pendingQuery, (snapshot) => {
+      setPendingSupportCount(snapshot.size);
+    });
+    return () => unsubscribe();
+  }, []);
 
   async function assignJobToArtisan() {
     if (!selectedJob || !selectedArtisan) return;
@@ -957,20 +968,33 @@ export default function AdminDashboardPage() {
                 </svg>
               </button>
             </div>
-            <button
-              onClick={async () => {
-                const { auth } = getFirebase();
-                const { signOut } = await import('firebase/auth');
-                await signOut(auth);
-                window.location.href = '/login';
-              }}
-              className="flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Sign Out
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/admin/support"
+                className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-sm transition hover:bg-blue-50"
+              >
+                🛟 Support Inbox
+                {pendingSupportCount > 0 && (
+                  <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+                    {pendingSupportCount}
+                  </span>
+                )}
+              </Link>
+              <button
+                onClick={async () => {
+                  const { auth } = getFirebase();
+                  const { signOut } = await import('firebase/auth');
+                  await signOut(auth);
+                  window.location.href = '/login';
+                }}
+                className="flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
 

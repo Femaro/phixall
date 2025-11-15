@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import type { User as FirebaseUser } from 'firebase/auth';
+import { SupportChat } from '@/components/support/SupportChat';
 
 type TimestampLike = Date | { seconds: number; nanoseconds: number } | { toDate: () => Date } | null | undefined;
 const formatTimestamp = (value: TimestampLike) => {
@@ -770,6 +771,7 @@ export default function ArtisanDashboardPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      <SupportChat user={user} role="artisan" />
       {/* Mobile Navigation Drawer */}
       <div
         className={`fixed inset-0 z-40 md:hidden ${mobileNavOpen ? '' : 'pointer-events-none'}`}

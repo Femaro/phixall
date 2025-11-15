@@ -1,6 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
@@ -20,11 +20,38 @@ const formatTimestamp = (value: TimestampLike) => {
   return '—';
 };
 
+const EARTH_RADIUS_KM = 6371;
+
+function toRadians(value: number): number {
+  return (value * Math.PI) / 180;
+}
+
+function calculateDistanceKm(
+  origin: { lat: number; lng: number },
+  destination: { lat: number; lng: number }
+): number {
+  const dLat = toRadians(destination.lat - origin.lat);
+  const dLon = toRadians(destination.lng - origin.lng);
+  const lat1 = toRadians(origin.lat);
+  const lat2 = toRadians(destination.lat);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return EARTH_RADIUS_KM * c;
+}
+
 interface ArtisanProfile {
   name?: string;
   email?: string;
   phone?: string;
   address?: string;
+  state?: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
   skills?: string;
   experience?: string;
   available?: boolean;
@@ -54,8 +81,31 @@ interface Job {
   artisanId?: string;
   scheduledAt?: TimestampLike;
   createdAt?: TimestampLike;
-  distance_km?: number;
   amount?: number;
+  clientVerified?: boolean;
+  clientReview?: {
+    rating?: number;
+    feedback?: string;
+    verifiedAt?: TimestampLike;
+    clientName?: string;
+  };
+  artisanReview?: {
+    rating?: number;
+    feedback?: string;
+    ratedAt?: TimestampLike;
+    artisanName?: string;
+  };
+  serviceAddress?: {
+    description?: string;
+    placeId?: string;
+    lat?: number;
+    lng?: number;
+  };
+  serviceCoordinates?: {
+    lat: number;
+    lng: number;
+  } | null;
+  serviceState?: string;
 }
 
 interface Transaction {
@@ -95,6 +145,7 @@ export default function ArtisanDashboardPage() {
     email: '',
     phone: '',
     address: '',
+  state: '',
     skills: '',
     experience: ''
   });
@@ -110,6 +161,10 @@ export default function ArtisanDashboardPage() {
   });
   const [savingSettings, setSavingSettings] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [clientRatingForms, setClientRatingForms] = useState<Record<string, { rating: number; feedback: string }>>({});
+  const [submittingClientReview, setSubmittingClientReview] = useState<string | null>(null);
+  const [artisanCoords, setArtisanCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [capturingLocation, setCapturingLocation] = useState(false);
 
   const CASHOUT_FEE_PERCENT = 2.5; // 2.5% fee
   const MIN_CASHOUT = 1000; // Minimum ₦1,000
@@ -158,9 +213,13 @@ export default function ArtisanDashboardPage() {
             email: profileData.email || currentUser.email,
             phone: profileData.phone || '',
             address: profileData.address || '',
+            state: profileData.state || '',
             skills: profileData.skills || '',
             experience: profileData.experience || ''
           });
+          if (profileData.coordinates?.lat && profileData.coordinates?.lng) {
+            setArtisanCoords({ lat: profileData.coordinates.lat, lng: profileData.coordinates.lng });
+          }
           // Populate settings form
           setSettingsForm({
             emailNotifications: profileData.emailNotifications ?? true,
@@ -183,9 +242,15 @@ export default function ArtisanDashboardPage() {
     const { db } = getFirebase();
     const walletRef = doc(db, 'wallets', user.uid);
     
-    const unsubscribe = onSnapshot(walletRef, (doc) => {
-      if (doc.exists()) {
-        setWallet(doc.data() as Wallet);
+    const unsubscribe = onSnapshot(walletRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data() as Partial<Wallet> | undefined;
+        setWallet({
+          balance: data?.balance ?? 0,
+          totalEarnings: data?.totalEarnings ?? 0,
+          totalCashout: data?.totalCashout ?? 0,
+          pendingBalance: data?.pendingBalance ?? 0,
+        });
       } else {
         setDoc(walletRef, {
           balance: 0,
@@ -364,6 +429,7 @@ export default function ArtisanDashboardPage() {
         name: profileForm.name,
         phone: profileForm.phone,
         address: profileForm.address,
+        state: profileForm.state,
         skills: profileForm.skills,
         experience: profileForm.experience,
         updatedAt: serverTimestamp(),
@@ -405,6 +471,94 @@ export default function ArtisanDashboardPage() {
     } finally {
       setSavingSettings(false);
     }
+  }
+
+  function handleClientRatingFormChange(jobId: string, field: 'rating' | 'feedback', value: number | string) {
+    setClientRatingForms((prev) => {
+      const current = prev[jobId] ?? { rating: 5, feedback: '' };
+      return {
+        ...prev,
+        [jobId]: {
+          ...current,
+          [field]: value,
+        },
+      };
+    });
+  }
+
+  async function handleSubmitClientReview(jobId: string) {
+    if (!user) {
+      alert('You must be signed in to rate the client.');
+      return;
+    }
+
+    const form = clientRatingForms[jobId] ?? { rating: 5, feedback: '' };
+    if (!(form.rating >= 1 && form.rating <= 5)) {
+      alert('Please select a rating between 1 and 5.');
+      return;
+    }
+
+    setSubmittingClientReview(jobId);
+    try {
+      const { db } = getFirebase();
+      await updateDoc(doc(db, 'jobs', jobId), {
+        artisanReview: {
+          rating: form.rating,
+          feedback: form.feedback,
+          ratedAt: serverTimestamp(),
+          artisanName: profile?.name || user.email || '',
+        },
+      });
+
+      alert('Thanks! Your rating has been submitted.');
+      setClientRatingForms((prev) => {
+        const next = { ...prev };
+        delete next[jobId];
+        return next;
+      });
+    } catch (error) {
+      console.error('Error submitting client review:', error);
+      alert('Failed to submit review. Please try again.');
+    } finally {
+      setSubmittingClientReview(null);
+    }
+  }
+
+  function captureArtisanLocation(persist: boolean) {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported in this browser.');
+      return;
+    }
+    setCapturingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setArtisanCoords(coords);
+        if (persist && user) {
+          try {
+            const { db } = getFirebase();
+            await updateDoc(doc(db, 'profiles', user.uid), {
+              coordinates: coords,
+              updatedAt: serverTimestamp(),
+            });
+            alert('Home location saved successfully!');
+          } catch (error) {
+            console.error('Error saving location:', error);
+            alert('Failed to save location. Please try again.');
+          }
+        }
+        setCapturingLocation(false);
+      },
+      (error) => {
+        console.error('Geolocation error', error);
+        alert('Unable to retrieve location. Please check your browser permissions.');
+        setCapturingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   }
 
   async function handleCashout(e: React.FormEvent): Promise<void> {
@@ -523,13 +677,56 @@ export default function ArtisanDashboardPage() {
     active: myJobs.filter(j => ['accepted', 'in-progress'].includes(j.status)).length,
     completed: myJobs.filter(j => j.status === 'completed').length,
   };
+  const pendingClientRatings = myJobs.filter((job) => job.status === 'completed' && !job.artisanReview?.rating);
+  const artisanRatingStats = myJobs.reduce(
+    (acc, job) => {
+      const rating = job.clientReview?.rating;
+      if (rating) {
+        acc.sum += rating;
+        acc.count += 1;
+      }
+      return acc;
+    },
+    { sum: 0, count: 0 }
+  );
+  const artisanAverageRating = artisanRatingStats.count ? artisanRatingStats.sum / artisanRatingStats.count : null;
+
+  type JobWithDistance = Job & { distanceMiles?: number | null };
+  const visibleAvailableJobs: JobWithDistance[] = useMemo(() => {
+    const artisanState = profile?.state?.toLowerCase().trim();
+    return availableJobs
+      .map((job) => {
+        let distanceMiles: number | null = null;
+        if (artisanCoords && job.serviceCoordinates?.lat && job.serviceCoordinates?.lng) {
+          const km = calculateDistanceKm(artisanCoords, {
+            lat: job.serviceCoordinates.lat,
+            lng: job.serviceCoordinates.lng,
+          });
+          distanceMiles = km / 1.60934;
+        }
+        return { ...job, distanceMiles };
+      })
+      .filter((job) => {
+        const jobState = job.serviceState?.toLowerCase().trim();
+        if (artisanState && jobState && artisanState !== jobState) {
+          return false;
+        }
+        if (artisanCoords && job.distanceMiles != null && job.distanceMiles > 20) {
+          return false;
+        }
+        if (artisanCoords && job.serviceCoordinates && job.distanceMiles == null) {
+          return false;
+        }
+        return true;
+      });
+  }, [availableJobs, artisanCoords, profile?.state]);
 
   const broadcastableJob = myJobs.find((job) => ['accepted', 'in-progress'].includes(job.status));
   const broadcastLink = broadcastableJob ? `/artisan/location-broadcast?jobId=${broadcastableJob.id}` : null;
 
   const tabConfig: Array<{ id: ArtisanTab; label: string; icon: string; badge?: number }> = [
     { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'available', label: 'Available Jobs', icon: '🔔', badge: availableJobs.length },
+    { id: 'available', label: 'Available Jobs', icon: '🔔', badge: visibleAvailableJobs.length },
     { id: 'my-jobs', label: 'My Jobs', icon: '💼', badge: myJobs.length },
     { id: 'wallet', label: 'Wallet', icon: '💰' },
     { id: 'profile', label: 'Profile', icon: '👤' },
@@ -782,6 +979,25 @@ export default function ArtisanDashboardPage() {
                   </div>
                 </div>
               </div>
+
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-2xl">
+                    ⭐
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-neutral-600">Your Rating</p>
+                    {artisanAverageRating ? (
+                      <>
+                        <p className="mt-1 text-2xl font-bold text-neutral-900">{artisanAverageRating.toFixed(1)} / 5</p>
+                        <p className="text-xs text-neutral-500">{artisanRatingStats.count} review(s)</p>
+                      </>
+                    ) : (
+                      <p className="mt-1 text-sm text-neutral-500">No ratings yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Availability Status */}
@@ -807,6 +1023,77 @@ export default function ArtisanDashboardPage() {
                 </button>
               </div>
             </div>
+
+            {pendingClientRatings.length > 0 && (
+              <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-soft">
+                <h3 className="text-lg font-semibold text-blue-900">Rate your clients</h3>
+                <p className="mt-1 text-sm text-blue-800">
+                  Share feedback about recent clients to help us maintain great experiences.
+                </p>
+
+                <div className="mt-6 space-y-6">
+                  {pendingClientRatings.map((job) => {
+                    const form = clientRatingForms[job.id] ?? { rating: 5, feedback: '' };
+                    return (
+                      <div key={job.id} className="rounded-xl border border-white/50 bg-white/80 p-5 shadow-inner">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium text-neutral-500">Client</p>
+                          <p className="text-lg font-semibold text-neutral-900">{job.clientName || 'Client'}</p>
+                          <p className="text-sm text-neutral-600">{job.title}</p>
+                        </div>
+
+                        <div className="mt-4 grid gap-4 md:grid-cols-3">
+                          <div>
+                            <label className="text-sm font-medium text-neutral-700">Client professionalism</label>
+                            <select
+                              value={form.rating}
+                              onChange={(e) => handleClientRatingFormChange(job.id, 'rating', Number(e.target.value))}
+                              className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            >
+                              {[5, 4, 3, 2, 1].map((rating) => {
+                                const labels: Record<number, string> = {
+                                  5: 'Excellent',
+                                  4: 'Very Good',
+                                  3: 'Good',
+                                  2: 'Fair',
+                                  1: 'Poor',
+                                };
+                                return (
+                                  <option key={rating} value={rating}>
+                                    {rating} - {labels[rating]}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="text-sm font-medium text-neutral-700">Comments (optional)</label>
+                            <textarea
+                              value={form.feedback}
+                              onChange={(e) => handleClientRatingFormChange(job.id, 'feedback', e.target.value)}
+                              rows={3}
+                              className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                              placeholder="Share any helpful notes about this client"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleSubmitClientReview(job.id)}
+                            disabled={submittingClientReview === job.id}
+                            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
+                          >
+                            {submittingClientReview === job.id ? 'Submitting...' : 'Submit rating'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Recent Jobs */}
             <div className="mt-8">
@@ -1101,15 +1388,57 @@ export default function ArtisanDashboardPage() {
             <h2 className="text-xl font-bold text-neutral-900">Available Jobs</h2>
             <p className="mt-1 text-neutral-600">Browse and accept job opportunities</p>
 
+            <div className="mt-4 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm">
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-neutral-900">Filtering nearby jobs</p>
+                  <p className="text-xs text-neutral-600">
+                    Showing jobs in {profile?.state || 'your state'} within 20 miles of your location.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => captureArtisanLocation(false)}
+                    className="rounded-lg border border-brand-300 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50"
+                    disabled={capturingLocation}
+                  >
+                    {capturingLocation ? 'Updating location…' : 'Refresh location'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => captureArtisanLocation(true)}
+                    className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                    disabled={capturingLocation}
+                  >
+                    Save as home base
+                  </button>
+                </div>
+              </div>
+              {!profile?.state && (
+                <p className="mt-2 text-xs text-amber-700">
+                  Add your state in the Profile tab to unlock better job matching.
+                </p>
+              )}
+              {!artisanCoords && (
+                <p className="mt-2 text-xs text-amber-700">
+                  Share your current location to filter jobs by distance.
+                </p>
+              )}
+            </div>
+
             <div className="mt-6 space-y-4">
-              {availableJobs.length === 0 ? (
+              {visibleAvailableJobs.length === 0 ? (
                 <div className="rounded-xl border-2 border-dashed border-neutral-300 bg-white p-12 text-center">
-                  <div className="text-5xl mb-4">🔍</div>
-                  <h3 className="text-lg font-semibold text-neutral-900">No available jobs</h3>
-                  <p className="mt-2 text-neutral-600">Check back later for new opportunities</p>
+                  <div className="text-5xl mb-4">📍</div>
+                  <h3 className="text-lg font-semibold text-neutral-900">No jobs nearby</h3>
+                  <p className="mt-2 text-neutral-600">
+                    We couldn’t find jobs that match your state and distance preferences. Try refreshing your
+                    location or updating your state.
+                  </p>
                 </div>
               ) : (
-                availableJobs.map((job) => (
+                visibleAvailableJobs.map((job) => (
                   <div key={job.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft transition-all hover:shadow-glow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -1133,13 +1462,22 @@ export default function ArtisanDashboardPage() {
                         </div>
 
                         <p className="mt-3 text-sm text-neutral-600">{job.description}</p>
+                        {job.serviceAddress?.description && (
+                          <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-neutral-600">
+                            <span>📍 {job.serviceAddress.description}</span>
+                            {job.distanceMiles != null && (
+                              <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-700">
+                                {job.distanceMiles.toFixed(1)} miles away
+                              </span>
+                            )}
+                          </p>
+                        )}
 
                         <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-neutral-500">
                           {job.clientName && <span>Client: {job.clientName}</span>}
                           {job.scheduledAt && (
                             <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
                           )}
-                          {job.distance_km && <span>{job.distance_km} km away</span>}
                           <span>Posted: {formatTimestamp(job.createdAt)}</span>
                         </div>
                       </div>
@@ -1322,6 +1660,28 @@ export default function ArtisanDashboardPage() {
                       className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       placeholder="Enter your address"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      State / Region
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.state}
+                      onChange={(e) => setProfileForm({ ...profileForm, state: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="e.g., Lagos"
+                    />
+                    <p className="mt-1 text-xs text-neutral-500">Used to match you with nearby jobs.</p>
+                    <button
+                      type="button"
+                      onClick={() => captureArtisanLocation(true)}
+                      disabled={capturingLocation}
+                      className="mt-3 rounded-lg border border-brand-300 px-3 py-1.5 text-sm font-medium text-brand-700 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {capturingLocation ? 'Saving location…' : 'Use my current location as home base'}
+                    </button>
                   </div>
 
                   <div>

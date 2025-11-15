@@ -1,18 +1,20 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { Suspense, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
 import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { User as FirebaseUser } from 'firebase/auth';
+import { Loader } from '@googlemaps/js-api-loader';
 
 interface ClientProfile {
   name?: string;
   email?: string;
   phone?: string;
   address?: string;
+  state?: string;
   company?: string;
   emailNotifications?: boolean;
   smsNotifications?: boolean;
@@ -50,7 +52,31 @@ interface Job {
   clientId: string;
   attachments?: string[];
   amount?: number;
+  clientVerified?: boolean;
+  clientReview?: {
+    rating?: number;
+    feedback?: string;
+    verifiedAt?: TimestampLike;
+    clientName?: string;
+  };
+  serviceAddress?: {
+    description?: string;
+    placeId?: string;
+    lat?: number;
+    lng?: number;
+  };
+  serviceCoordinates?: {
+    lat: number;
+    lng: number;
+  } | null;
+  serviceState?: string;
 }
+
+type AddressComponent = {
+  long_name?: string;
+  short_name?: string;
+  types: string[];
+};
 
 interface Transaction {
   id: string;
@@ -86,6 +112,14 @@ function ClientDashboardContent() {
   const [serviceCategory, setServiceCategory] = useState('');
   const [scheduledAt, setScheduledAt] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+    const [useAlternativeAddress, setUseAlternativeAddress] = useState(false);
+  const [serviceAddress, setServiceAddress] = useState<{ placeId?: string; description?: string; lat?: number; lng?: number; state?: string }>({});
+    const [addressQuery, setAddressQuery] = useState('');
+    const [addressSuggestions, setAddressSuggestions] = useState<Array<{ description: string; place_id: string }>>([]);
+    const [fetchingAddressSuggestions, setFetchingAddressSuggestions] = useState(false);
+  const [resolvingAddress, setResolvingAddress] = useState(false);
+  const [gettingCurrentLocation, setGettingCurrentLocation] = useState(false);
+  const [mapsLoaded, setMapsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -110,6 +144,7 @@ function ClientDashboardContent() {
     email: '',
     phone: '',
     address: '',
+    state: '',
     company: ''
   });
   const [savingProfile, setSavingProfile] = useState(false);
@@ -123,6 +158,8 @@ function ClientDashboardContent() {
     timezone: 'Africa/Lagos'
   });
   const [savingSettings, setSavingSettings] = useState(false);
+  const [verificationForms, setVerificationForms] = useState<Record<string, { rating: number; feedback: string }>>({});
+  const [submittingVerification, setSubmittingVerification] = useState<string | null>(null);
 
   useEffect(() => {
     const { auth } = getFirebase();
@@ -154,6 +191,7 @@ function ClientDashboardContent() {
           email: profile.email || user?.email || '',
           phone: profile.phone || '',
           address: profile.address || '',
+          state: profile.state || '',
           company: profile.company || ''
         });
         setSettingsForm({
@@ -176,9 +214,14 @@ function ClientDashboardContent() {
     const { db } = getFirebase();
     const walletRef = doc(db, 'wallets', user.uid);
     
-    const unsubscribe = onSnapshot(walletRef, (doc) => {
-      if (doc.exists()) {
-        setWallet(doc.data() as Wallet);
+    const unsubscribe = onSnapshot(walletRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const data = docSnapshot.data() as Partial<Wallet> | undefined;
+        setWallet({
+          balance: data?.balance ?? 0,
+          totalDeposits: data?.totalDeposits ?? 0,
+          totalSpent: data?.totalSpent ?? 0,
+        });
       } else {
         // Initialize wallet
         setDoc(walletRef, {
@@ -248,6 +291,12 @@ function ClientDashboardContent() {
     setSubmitting(true);
     setMessage(null);
 
+    if (useAlternativeAddress && !serviceAddress.description) {
+      setMessage({ text: 'Please select a service address or use your current location.', type: 'error' });
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const { auth, db, storage } = getFirebase();
       const currentUser = auth.currentUser;
@@ -267,6 +316,14 @@ function ClientDashboardContent() {
         }
       }
 
+      const jobServiceAddress = useAlternativeAddress
+        ? serviceAddress
+        : {
+            description: profileForm.address || userProfile?.address || '',
+            state: profileForm.state || userProfile?.state || '',
+          };
+      const jobServiceState =
+        (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || undefined;
       await addDoc(collection(db, 'jobs'), {
         clientId: currentUser.uid,
         clientName: userProfile?.name || currentUser.displayName || currentUser.email,
@@ -277,6 +334,16 @@ function ClientDashboardContent() {
         description,
         serviceCategory,
         scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        serviceAddress: jobServiceAddress,
+        serviceCoordinates:
+          jobServiceAddress?.lat && jobServiceAddress?.lng
+            ? {
+                lat: jobServiceAddress.lat,
+                lng: jobServiceAddress.lng,
+              }
+            : null,
+        serviceAddressText: jobServiceAddress.description || '',
+        serviceState: jobServiceState,
         status: 'requested',
         createdByRole: 'client',
         attachments: attachmentUrls,
@@ -384,6 +451,7 @@ function ClientDashboardContent() {
         name: profileForm.name,
         phone: profileForm.phone,
         address: profileForm.address,
+        state: profileForm.state,
         company: profileForm.company,
         updatedAt: serverTimestamp(),
       });
@@ -518,6 +586,160 @@ function ClientDashboardContent() {
     }
   }
 
+  function handleAddressInput(value: string) {
+    setAddressQuery(value);
+    if (!addressAutocomplete || value.trim().length < 3) {
+      setAddressSuggestions([]);
+      return;
+    }
+    setFetchingAddressSuggestions(true);
+    addressAutocomplete.getPlacePredictions(
+      {
+        input: value,
+        componentRestrictions: { country: ['ng'] },
+      },
+      (predictions, status) => {
+        if (status !== window.google.maps.places.PlacesServiceStatus.OK || !predictions) {
+          setAddressSuggestions([]);
+        } else {
+          setAddressSuggestions(predictions.map((prediction) => ({ description: prediction.description, place_id: prediction.place_id! })));
+        }
+        setFetchingAddressSuggestions(false);
+      }
+    );
+  }
+
+  function handleSelectAddress(prediction: { place_id: string; description: string }) {
+    if (!mapsLoaded || typeof window === 'undefined') return;
+    setResolvingAddress(true);
+    setAddressQuery(prediction.description);
+    setAddressSuggestions([]);
+
+    const service = new window.google.maps.places.PlacesService(document.createElement('div'));
+    service.getDetails(
+      {
+        placeId: prediction.place_id,
+        fields: ['geometry', 'formatted_address', 'address_components'],
+      },
+      (place, status) => {
+        setResolvingAddress(false);
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && place) {
+          const stateComponent = place.address_components?.find((component: AddressComponent) =>
+            component.types.includes('administrative_area_level_1')
+          );
+          setServiceAddress({
+            placeId: prediction.place_id,
+            description: place.formatted_address || prediction.description,
+            lat: place.geometry?.location?.lat(),
+            lng: place.geometry?.location?.lng(),
+            state: stateComponent?.long_name || stateComponent?.short_name,
+          });
+        }
+      }
+    );
+  }
+
+  function handleUseCurrentLocation() {
+    if (!navigator.geolocation) {
+      setMessage({ text: 'Geolocation not supported in this browser.', type: 'error' });
+      return;
+    }
+    setGettingCurrentLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          let formattedAddress = '';
+          let stateName = '';
+          if (mapsApiKey) {
+            try {
+              const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${mapsApiKey}`
+              );
+              const data = await response.json();
+              const primaryResult = data.results?.[0];
+              formattedAddress = primaryResult?.formatted_address || '';
+              const stateComponent = primaryResult?.address_components?.find((component: AddressComponent) =>
+                component.types.includes('administrative_area_level_1')
+              );
+              stateName = stateComponent?.long_name || stateComponent?.short_name || '';
+            } catch (error) {
+              console.warn('Failed to reverse geocode current location', error);
+            }
+          }
+          setUseAlternativeAddress(true);
+          setServiceAddress({
+            description: formattedAddress || 'Current location',
+            lat: latitude,
+            lng: longitude,
+            state: stateName,
+          });
+          setAddressQuery(formattedAddress);
+        } finally {
+          setGettingCurrentLocation(false);
+        }
+      },
+      (error) => {
+        console.error('Geolocation error', error);
+        setMessage({ text: 'Unable to fetch current location.', type: 'error' });
+        setGettingCurrentLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  function handleVerificationFormChange(jobId: string, field: 'rating' | 'feedback', value: number | string) {
+    setVerificationForms((prev) => {
+      const current = prev[jobId] ?? { rating: 5, feedback: '' };
+      return {
+        ...prev,
+        [jobId]: {
+          ...current,
+          [field]: value,
+        },
+      };
+    });
+  }
+
+  async function handleVerifyJob(jobId: string) {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to verify a job.', type: 'error' });
+      return;
+    }
+
+    const form = verificationForms[jobId] ?? { rating: 5, feedback: '' };
+    if (!(form.rating >= 1 && form.rating <= 5)) {
+      setMessage({ text: 'Please provide a rating between 1 and 5.', type: 'error' });
+      return;
+    }
+
+    setSubmittingVerification(jobId);
+    try {
+      const { db } = getFirebase();
+      await updateDoc(doc(db, 'jobs', jobId), {
+        clientVerified: true,
+        clientReview: {
+          rating: form.rating,
+          feedback: form.feedback,
+          verifiedAt: serverTimestamp(),
+          clientName: userProfile?.name || user.email || '',
+        },
+      });
+
+      setMessage({ text: 'Thanks! Your review was submitted.', type: 'success' });
+      setVerificationForms((prev) => {
+        const next = { ...prev };
+        delete next[jobId];
+        return next;
+      });
+    } catch (error) {
+      console.error('Error verifying job:', error);
+      setMessage({ text: 'Failed to submit review. Please try again.', type: 'error' });
+    } finally {
+      setSubmittingVerification(null);
+    }
+  }
+
   async function handleCancelJob(jobId: string) {
     if (!confirm('Are you sure you want to cancel this job?')) return;
 
@@ -555,6 +777,19 @@ function ClientDashboardContent() {
     active: jobs.filter(j => ['requested', 'accepted', 'in-progress'].includes(j.status)).length,
     completed: jobs.filter(j => j.status === 'completed').length,
   };
+  const pendingVerifications = jobs.filter((job) => job.status === 'completed' && !job.clientVerified);
+  const clientRatingStats = jobs.reduce(
+    (acc, job) => {
+      const rating = job.artisanReview?.rating;
+      if (rating) {
+        acc.sum += rating;
+        acc.count += 1;
+      }
+      return acc;
+    },
+    { sum: 0, count: 0 }
+  );
+  const clientAverageRating = clientRatingStats.count ? clientRatingStats.sum / clientRatingStats.count : null;
 
   type PremiumPlan = {
     tier: 'bronze' | 'gold' | 'platinum';
@@ -614,6 +849,37 @@ function ClientDashboardContent() {
     { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
+
+  const mapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+
+  useEffect(() => {
+    if (!mapsApiKey) return;
+    const loader = new Loader({
+      apiKey: mapsApiKey,
+      libraries: ['places'],
+    });
+    loader
+      .load()
+      .then(() => setMapsLoaded(true))
+      .catch((error) => {
+        console.error('Failed to load Google Maps libraries', error);
+      });
+  }, [mapsApiKey]);
+
+  useEffect(() => {
+    if (!useAlternativeAddress) {
+      setServiceAddress({});
+      setAddressQuery('');
+      setAddressSuggestions([]);
+    }
+  }, [useAlternativeAddress]);
+
+  const addressAutocomplete = useMemo(() => {
+    if (!mapsLoaded || typeof window === 'undefined' || !window.google?.maps?.places) {
+      return null;
+    }
+    return new window.google.maps.places.AutocompleteService();
+  }, [mapsLoaded]);
 
   const renderTabs = (onNavigate?: () => void) =>
     tabConfig.map((tab) => (
@@ -981,7 +1247,99 @@ function ClientDashboardContent() {
                   </div>
                 </div>
               </div>
+
+              <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50 text-2xl">
+                    ⭐
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-neutral-600">Your Rating</p>
+                    {clientAverageRating ? (
+                      <>
+                        <p className="mt-1 text-2xl font-bold text-neutral-900">
+                          {clientAverageRating.toFixed(1)} / 5
+                        </p>
+                        <p className="text-xs text-neutral-500">{clientRatingStats.count} review(s)</p>
+                      </>
+                    ) : (
+                      <p className="mt-1 text-sm text-neutral-500">No ratings yet</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
+
+            {pendingVerifications.length > 0 && (
+              <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-soft">
+                <h3 className="text-lg font-semibold text-amber-900">Confirm completed jobs</h3>
+                <p className="mt-1 text-sm text-amber-800">
+                  Please verify the work and rate your artisan so we can keep quality high.
+                </p>
+
+                <div className="mt-6 space-y-6">
+                  {pendingVerifications.map((job) => {
+                    const form = verificationForms[job.id] ?? { rating: 5, feedback: '' };
+                    return (
+                      <div key={job.id} className="rounded-xl border border-white/40 bg-white/80 p-5 shadow-inner">
+                        <div className="flex flex-col gap-1">
+                          <p className="text-sm font-medium text-neutral-500">Job</p>
+                          <p className="text-lg font-semibold text-neutral-900">{job.title}</p>
+                          <p className="text-sm text-neutral-600">{job.description}</p>
+                        </div>
+
+                        <div className="mt-4 grid gap-4 md:grid-cols-3">
+                          <div>
+                            <label className="text-sm font-medium text-neutral-700">Overall rating</label>
+                            <select
+                              value={form.rating}
+                              onChange={(e) => handleVerificationFormChange(job.id, 'rating', Number(e.target.value))}
+                              className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                            >
+                              {[5, 4, 3, 2, 1].map((rating) => {
+                                const ratingText: Record<number, string> = {
+                                  5: 'Excellent',
+                                  4: 'Very Good',
+                                  3: 'Good',
+                                  2: 'Fair',
+                                  1: 'Poor',
+                                };
+                                return (
+                                <option key={rating} value={rating}>
+                                    {rating} - {ratingText[rating]}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="text-sm font-medium text-neutral-700">Comments (optional)</label>
+                            <textarea
+                              value={form.feedback}
+                              onChange={(e) => handleVerificationFormChange(job.id, 'feedback', e.target.value)}
+                              rows={3}
+                              className="mt-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                              placeholder="Tell us how it went"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleVerifyJob(job.id)}
+                            disabled={submittingVerification === job.id}
+                            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70"
+                          >
+                            {submittingVerification === job.id ? 'Submitting...' : 'Verify & Submit Review'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Recent Jobs */}
             <div className="mt-8">
@@ -1277,6 +1635,86 @@ function ClientDashboardContent() {
                   <p className="mt-1 text-xs text-neutral-500">Leave empty for ASAP service</p>
                 </div>
 
+                <div className="rounded-xl border border-neutral-200 bg-neutral-50/70 p-4">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-neutral-900">Service Location</p>
+                      <p className="text-xs text-neutral-600">
+                        Use your profile address or specify a different location for this job.
+                      </p>
+                    </div>
+                    <label className="inline-flex items-center gap-3 text-sm font-medium text-neutral-700">
+                      <span>Use different address</span>
+                      <input
+                        type="checkbox"
+                        className="h-5 w-5 rounded border border-neutral-300 text-brand-600 focus:ring-brand-500"
+                        checked={useAlternativeAddress}
+                        onChange={(e) => setUseAlternativeAddress(e.target.checked)}
+                      />
+                    </label>
+                  </div>
+
+                  {useAlternativeAddress ? (
+                    <>
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-neutral-700">Search address</label>
+                        <input
+                          type="text"
+                          value={addressQuery}
+                          onChange={(e) => handleAddressInput(e.target.value)}
+                          placeholder="Type part of the service address..."
+                          className="mt-2 w-full rounded-lg border border-neutral-300 px-4 py-3 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                        />
+                        {fetchingAddressSuggestions && (
+                          <p className="mt-2 text-xs text-neutral-500">Searching address suggestions...</p>
+                        )}
+                        {addressSuggestions.length > 0 && (
+                          <div className="mt-2 rounded-lg border border-neutral-200 bg-white shadow-lg">
+                            {addressSuggestions.map((suggestion) => (
+                              <button
+                                key={suggestion.place_id}
+                                type="button"
+                                onClick={() => handleSelectAddress(suggestion)}
+                                className="block w-full px-4 py-2 text-left text-sm text-neutral-700 hover:bg-brand-50"
+                              >
+                                {suggestion.description}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {resolvingAddress && (
+                          <p className="mt-2 text-xs text-neutral-500">Retrieving address details…</p>
+                        )}
+                      </div>
+
+                      {serviceAddress.description && (
+                        <div className="mt-4 rounded-lg border border-brand-100 bg-white/80 p-3 text-sm text-neutral-700">
+                          <p className="font-medium text-neutral-900">Selected address</p>
+                          <p>{serviceAddress.description}</p>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleUseCurrentLocation}
+                        disabled={gettingCurrentLocation}
+                        className="mt-4 inline-flex items-center gap-2 rounded-lg border border-brand-300 bg-white px-4 py-2 text-sm font-medium text-brand-700 shadow-sm transition-colors hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-70"
+                      >
+                        {gettingCurrentLocation ? 'Detecting location...' : 'Use my current location'}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="mt-4 rounded-lg border border-neutral-200 bg-white/80 p-3 text-sm text-neutral-700">
+                      <p>
+                        We’ll use your profile address:{' '}
+                        <span className="font-semibold">
+                          {profileForm.address || userProfile?.address || 'No address on file'}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-neutral-700">Attachments (Photos/Videos)</label>
                   <input
@@ -1459,6 +1897,20 @@ function ClientDashboardContent() {
                       className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       placeholder="Enter your address"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      State / Region
+                    </label>
+                    <input
+                      type="text"
+                      value={profileForm.state}
+                      onChange={(e) => setProfileForm({ ...profileForm, state: e.target.value })}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="e.g., Lagos"
+                    />
+                    <p className="mt-1 text-xs text-neutral-500">Used to match you with local artisans.</p>
                   </div>
 
                   <div>

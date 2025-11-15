@@ -1,6 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
 import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
@@ -49,6 +49,24 @@ interface Job {
   budget?: number;
   resources?: Resource[];
   createdAt?: TimestampLike;
+  clientVerified?: boolean;
+  clientReview?: {
+    rating?: number;
+    feedback?: string;
+    verifiedAt?: TimestampLike;
+    clientName?: string;
+  };
+  serviceAddress?: {
+    description?: string;
+    placeId?: string;
+    lat?: number;
+    lng?: number;
+  };
+  serviceCoordinates?: {
+    lat: number;
+    lng: number;
+  } | null;
+  serviceState?: string;
 }
 
 interface Transaction {
@@ -309,6 +327,14 @@ export default function AdminDashboardPage() {
     if (!user) {
       alert('You must be signed in to assign resources.');
       return;
+    }
+
+    const artisan = artisans.find((a) => a.id === selectedArtisan);
+    if (selectedJob.serviceState && artisan?.state) {
+      if (selectedJob.serviceState.toLowerCase().trim() !== artisan.state.toLowerCase().trim()) {
+        alert('This artisan is not located in the job state. Please choose another artisan.');
+        return;
+      }
     }
 
     try {
@@ -639,6 +665,40 @@ export default function AdminDashboardPage() {
     pendingBills: bills.filter(b => b.status === 'pending').length,
   };
 
+  const artisanRatingSummary = useMemo<Record<string, { average: number; count: number }>>(() => {
+    const summary: Record<string, { sum: number; count: number }> = {};
+    jobs.forEach((job) => {
+      const rating = job.clientReview?.rating;
+      if (rating && job.artisanId) {
+        if (!summary[job.artisanId]) {
+          summary[job.artisanId] = { sum: 0, count: 0 };
+        }
+        summary[job.artisanId].sum += rating;
+        summary[job.artisanId].count += 1;
+      }
+    });
+    return Object.fromEntries(
+      Object.entries(summary).map(([id, { sum, count }]) => [id, { average: sum / count, count }])
+    );
+  }, [jobs]);
+
+  const clientRatingSummary = useMemo<Record<string, { average: number; count: number }>>(() => {
+    const summary: Record<string, { sum: number; count: number }> = {};
+    jobs.forEach((job) => {
+      const rating = job.artisanReview?.rating;
+      if (rating && job.clientId) {
+        if (!summary[job.clientId]) {
+          summary[job.clientId] = { sum: 0, count: 0 };
+        }
+        summary[job.clientId].sum += rating;
+        summary[job.clientId].count += 1;
+      }
+    });
+    return Object.fromEntries(
+      Object.entries(summary).map(([id, { sum, count }]) => [id, { average: sum / count, count }])
+    );
+  }, [jobs]);
+
   const applicationStats = {
     total: applications.length,
     inProgress: applications.filter(a => ['pending', 'in-progress', 'training'].includes(a.status ?? '')).length,
@@ -650,6 +710,21 @@ export default function AdminDashboardPage() {
     if (jobStatusFilter === 'all') return true;
     return job.status === jobStatusFilter;
   });
+
+  const assignableArtisans = useMemo(() => {
+    if (!selectedJob?.serviceState) {
+      return artisans.filter((artisan) => artisan.status === 'active');
+    }
+    const targetState = selectedJob.serviceState.toLowerCase().trim();
+    return artisans.filter((artisan) => {
+      if (artisan.status !== 'active') return false;
+      const profileState = (artisan as { state?: string }).state?.toLowerCase().trim();
+      if (profileState) {
+        return profileState === targetState;
+      }
+      return artisan.address?.toLowerCase().includes(targetState);
+    });
+  }, [artisans, selectedJob]);
 
   const filteredClients = clients.filter(client =>
     client.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
@@ -1085,13 +1160,18 @@ export default function AdminDashboardPage() {
                   ) : (
                     filteredClients.map((client) => (
                       <div key={client.id} className="flex items-center justify-between rounded-lg border border-neutral-200 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-900 font-semibold">
-                            {client.name?.charAt(0) || client.email.charAt(0)}
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-900 font-semibold">
+                          {client.name?.charAt(0) || client.email.charAt(0)}
+                        </div>
                         <div>
                           <p className="font-medium text-neutral-900">{client.name || client.email}</p>
                           <p className="text-xs text-neutral-500">{client.email}</p>
+                          {clientRatingSummary[client.id] && (
+                            <p className="text-xs text-amber-600">
+                              ⭐ {clientRatingSummary[client.id].average.toFixed(1)} ({clientRatingSummary[client.id].count})
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1130,13 +1210,18 @@ export default function AdminDashboardPage() {
                   ) : (
                     filteredArtisans.map((artisan) => (
                       <div key={artisan.id} className="flex items-center justify-between rounded-lg border border-neutral-200 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-900 font-semibold">
-                            {artisan.name?.charAt(0) || artisan.email.charAt(0)}
-                          </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100 text-neutral-900 font-semibold">
+                          {artisan.name?.charAt(0) || artisan.email.charAt(0)}
+                        </div>
                         <div>
                           <p className="font-medium text-neutral-900">{artisan.name || artisan.email}</p>
                           <p className="text-xs text-neutral-500">{artisan.email}</p>
+                          {artisanRatingSummary[artisan.id] && (
+                            <p className="text-xs text-green-700">
+                              ⭐ {artisanRatingSummary[artisan.id].average.toFixed(1)} ({artisanRatingSummary[artisan.id].count})
+                            </p>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1213,7 +1298,22 @@ export default function AdminDashboardPage() {
                         {job.resources && job.resources.length > 0 && (
                           <span className="text-neutral-600"><strong>Resources:</strong> {job.resources.length} items</span>
                         )}
+                        {job.clientReview?.rating && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                            ⭐ {job.clientReview.rating}/5
+                          </span>
+                        )}
                       </div>
+                      {job.clientReview?.feedback && (
+                        <p className="mt-3 rounded-lg border border-amber-100 bg-amber-50/60 p-3 text-sm text-amber-900">
+                          “{job.clientReview.feedback}”
+                        </p>
+                      )}
+                      {job.artisanReview?.rating && (
+                        <p className="mt-3 rounded-lg border border-blue-100 bg-blue-50/60 p-3 text-sm text-blue-900">
+                          Client Rating: {job.artisanReview.rating}/5{job.artisanReview.feedback ? ` – “${job.artisanReview.feedback}”` : ''}
+                        </p>
+                      )}
                     </div>
                     <div className="ml-4 flex flex-col gap-2">
                       {!job.artisanId && (
@@ -1879,12 +1979,18 @@ export default function AdminDashboardPage() {
                 onChange={(e) => setSelectedArtisan(e.target.value)}
               >
                 <option value="">Choose an artisan...</option>
-                {artisans.filter(a => a.status === 'active').map((artisan) => (
+                {assignableArtisans.map((artisan) => (
                   <option key={artisan.id} value={artisan.id}>
                     {artisan.name || artisan.email}
+                    {artisan.state ? ` – ${artisan.state}` : ''}
                   </option>
                 ))}
               </select>
+              {selectedJob?.serviceState && assignableArtisans.length === 0 && (
+                <p className="mt-2 text-xs text-amber-600">
+                  No active artisans found in {selectedJob.serviceState}. Ask an artisan in that state to go available.
+                </p>
+              )}
             </div>
 
             <div className="mt-6 flex gap-3">

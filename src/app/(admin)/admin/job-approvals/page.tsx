@@ -103,7 +103,8 @@ export default function JobApprovalsPage() {
 
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data() as JobCompletion;
-        completionsData.push({ id: docSnap.id, ...data });
+        const { id, ...restData } = data;
+        completionsData.push({ id: docSnap.id, ...restData });
 
         // Fetch job details
         if (data.jobId && !jobsData[data.jobId]) {

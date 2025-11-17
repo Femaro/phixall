@@ -248,6 +248,52 @@ service cloud.firestore {
         allow update, delete: if isAdmin();
       }
     }
+
+    // Job Completions collection
+    match /jobCompletions/{completionId} {
+      // Artisans can create completion forms for jobs they're assigned to
+      allow create: if isArtisan() 
+        && request.resource.data.artisanId == request.auth.uid
+        && request.resource.data.status == 'pending';
+      
+      // Artisans can read their own completions, clients can read completions for their jobs, admins can read all
+      allow read: if isAdmin() 
+        || (isArtisan() && resource.data.artisanId == request.auth.uid)
+        || (isClient() && resource.data.clientId == request.auth.uid);
+      
+      // Only admins can update completion forms (for approval/rejection)
+      allow update: if isAdmin();
+      
+      // Only admins can delete completion forms
+      allow delete: if isAdmin();
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      // Anyone authenticated can create notifications
+      allow create: if isAuthenticated();
+      
+      // Users can read their own notifications, admins can read all
+      allow read: if isAdmin() || isOwner(resource.data.userId);
+      
+      // Users can update their own notifications (mark as read), admins can update any
+      allow update: if isAdmin() || isOwner(resource.data.userId);
+      
+      // Users can delete their own notifications, admins can delete any
+      allow delete: if isAdmin() || isOwner(resource.data.userId);
+    }
+
+    // Job Locations collection (for real-time artisan tracking)
+    match /jobLocations/{jobId} {
+      // Artisans can create/update location data for jobs they're assigned to
+      allow create, update: if isArtisan() || isAdmin();
+      
+      // Clients with active jobs and admins can read locations
+      allow read: if isAdmin() || isAuthenticated();
+      
+      // Only artisans and admins can delete
+      allow delete: if isAdmin() || isArtisan();
+    }
     
     // Default: deny all access to other collections
     match /{document=**} {

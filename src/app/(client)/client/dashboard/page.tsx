@@ -312,11 +312,12 @@ function ClientDashboardContent() {
         return;
       }
 
+      const jobRef = doc(collection(db, 'jobs'));
       const attachmentUrls: string[] = [];
 
       if (files && files.length > 0) {
         for (const file of Array.from(files)) {
-          const fileRef = ref(storage, `job-attachments/${Date.now()}-${file.name}`);
+          const fileRef = ref(storage, `jobs/${jobRef.id}/${Date.now()}-${file.name}`);
           await uploadBytes(fileRef, file);
           const url = await getDownloadURL(fileRef);
           attachmentUrls.push(url);
@@ -331,7 +332,7 @@ function ClientDashboardContent() {
           };
       const jobServiceState =
         (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || undefined;
-      await addDoc(collection(db, 'jobs'), {
+      await setDoc(jobRef, {
         clientId: currentUser.uid,
         clientName: userProfile?.name || currentUser.displayName || currentUser.email,
         clientEmail: userProfile?.email || currentUser.email,

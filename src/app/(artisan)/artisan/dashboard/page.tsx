@@ -76,7 +76,7 @@ interface Job {
   title: string;
   description: string;
   serviceCategory?: string;
-  status: 'requested' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
+  status: 'requested' | 'accepted' | 'in-progress' | 'pending-completion' | 'completed' | 'cancelled';
   clientId: string;
   clientName?: string;
   artisanId?: string;
@@ -664,6 +664,8 @@ export default function ArtisanDashboardPage() {
         return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'in-progress':
         return 'bg-purple-100 text-purple-700 border-purple-200';
+      case 'pending-completion':
+        return 'bg-amber-100 text-amber-700 border-amber-200';
       case 'completed':
         return 'bg-green-100 text-green-700 border-green-200';
       case 'cancelled':
@@ -1581,12 +1583,20 @@ export default function ArtisanDashboardPage() {
                           </Link>
                         )}
                         {job.status === 'in-progress' && (
-                          <button
-                            onClick={() => updateJobStatus(job.id, 'completed')}
-                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                          <Link
+                            href={`/artisan/job-completion/${job.id}`}
+                            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 text-center"
                           >
-                            Mark Complete
-                          </button>
+                            Complete Job
+                          </Link>
+                        )}
+                        {job.status === 'pending-completion' && (
+                          <div className="flex items-center gap-2 text-amber-600">
+                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                            </svg>
+                            <span className="text-sm font-medium">Pending Approval</span>
+                          </div>
                         )}
                         {job.status === 'completed' && (
                           <div className="flex items-center gap-2 text-green-600">

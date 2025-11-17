@@ -42,7 +42,7 @@ interface Job {
   title: string;
   description: string;
   serviceCategory?: string;
-  status: 'requested' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
+  status: 'requested' | 'accepted' | 'in-progress' | 'pending-completion' | 'completed' | 'cancelled';
   clientId: string;
   clientName?: string;
   artisanId?: string;
@@ -146,6 +146,7 @@ export default function AdminDashboardPage() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [pendingSupportCount, setPendingSupportCount] = useState(0);
+  const [pendingCompletionsCount, setPendingCompletionsCount] = useState(0);
   
   const [selectedArtisan, setSelectedArtisan] = useState('');
   const [jobBudget, setJobBudget] = useState('');
@@ -338,6 +339,16 @@ export default function AdminDashboardPage() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const { db } = getFirebase();
+    const completionsQuery = query(collection(db, 'jobCompletions'), where('status', '==', 'pending'));
+    const unsubscribe = onSnapshot(completionsQuery, (snapshot) => {
+      setPendingCompletionsCount(snapshot.size);
+    });
+    return () => unsubscribe();
+  }, [user]);
 
   async function assignJobToArtisan() {
     if (!selectedJob || !selectedArtisan) return;
@@ -1117,6 +1128,31 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Quick Actions */}
+            {pendingCompletionsCount > 0 && (
+              <div className="mt-8 rounded-xl border-2 border-amber-200 bg-gradient-to-r from-amber-50 to-amber-100 p-6 shadow-soft">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500 text-2xl">
+                      ⏳
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Job Completion Approvals</h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {pendingCompletionsCount} job completion form{pendingCompletionsCount !== 1 ? 's' : ''} pending review
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href="/admin/job-approvals"
+                    className="rounded-lg bg-amber-600 px-6 py-3 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                  >
+                    Review Now →
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Recent Activity */}
             <div className="mt-8 grid gap-6 lg:grid-cols-2">

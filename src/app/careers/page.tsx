@@ -75,36 +75,36 @@ export default function CareersPage() {
   };
 
   const jobPostingSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'JobPosting',
+    '@context': 'https://schema.org' as const,
+    '@type': 'JobPosting' as const,
     title: 'Administrative Staff (Full-Time)',
     description: 'Phixall is looking for a highly organized and proactive Administrative Staff member to support day-to-day operations, ensuring seamless coordination between clients, Phixers, and company leadership.',
     identifier: {
-      '@type': 'PropertyValue',
+      '@type': 'PropertyValue' as const,
       name: 'Phixall',
       value: 'ADMIN-STAFF-001',
     },
     datePosted: '2025-11-24',
-    employmentType: 'FULL_TIME',
+    employmentType: 'FULL_TIME' as const,
     hiringOrganization: {
-      '@type': 'Organization',
+      '@type': 'Organization' as const,
       name: 'Phixall',
       sameAs: 'https://www.phixall.com',
     },
     jobLocation: {
-      '@type': 'Place',
+      '@type': 'Place' as const,
       address: {
-        '@type': 'PostalAddress',
+        '@type': 'PostalAddress' as const,
         addressCountry: 'NG',
         addressLocality: 'Remote/Hybrid',
       },
     },
     baseSalary: {
-      '@type': 'MonetaryAmount',
+      '@type': 'MonetaryAmount' as const,
       currency: 'NGN',
     },
     workHours: 'Full-Time',
-  };
+  } as any;
 
   return (
     <>

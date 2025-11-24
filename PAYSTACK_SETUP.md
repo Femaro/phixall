@@ -239,9 +239,10 @@ const transfer = await initiateTransfer({
 
 ## Next Steps
 
-1. Integrate payment buttons in job creation flow
-2. Add subscription payments for premium features
-3. Implement automatic payouts to Phixers
-4. Add payment analytics dashboard
-5. Set up payment reminders and notifications
+1. Set #1000 as minimum amount in client wallet before service request is sent. This amount (#1000) will be held and will be part of overall bill at job completion.
+2. Integrate payment buttons in job creation flow
+3. Add subscription payments for premium features
+4. Implement automatic payouts to Phixers
+5. Add payment analytics dashboard
+6. Set up payment reminders and notifications
 

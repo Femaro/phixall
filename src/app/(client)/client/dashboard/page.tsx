@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
-import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { User as FirebaseUser } from 'firebase/auth';
@@ -320,6 +320,25 @@ function ClientDashboardContent() {
         return;
       }
 
+      // Check wallet balance - Minimum ₦1000 required
+      const MINIMUM_DEPOSIT = 1000;
+      const walletRef = doc(db, 'wallets', currentUser.uid);
+      const walletSnap = await getDoc(walletRef);
+      const currentBalance = walletSnap.exists() ? (walletSnap.data().balance || 0) : 0;
+
+      if (currentBalance < MINIMUM_DEPOSIT) {
+        setMessage({
+          text: `Insufficient wallet balance. Minimum ₦${MINIMUM_DEPOSIT.toLocaleString()} required to create a service request. Current balance: ₦${currentBalance.toLocaleString()}`,
+          type: 'error',
+        });
+        setSubmitting(false);
+        // Redirect to wallet page after 3 seconds
+        setTimeout(() => {
+          setActiveTab('wallet');
+        }, 3000);
+        return;
+      }
+
       const jobRef = doc(collection(db, 'jobs'));
       const attachmentUrls: string[] = [];
 
@@ -340,6 +359,15 @@ function ClientDashboardContent() {
           };
       const jobServiceState =
         (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || undefined;
+      
+      // Hold deposit in wallet
+      await updateDoc(walletRef, {
+        balance: currentBalance - MINIMUM_DEPOSIT,
+        heldBalance: (walletSnap.data().heldBalance || 0) + MINIMUM_DEPOSIT,
+        updatedAt: serverTimestamp(),
+      });
+
+      // Create job with deposit information
       await setDoc(jobRef, {
         clientId: currentUser.uid,
         clientName: userProfile?.name || currentUser.displayName || currentUser.email,
@@ -364,16 +392,33 @@ function ClientDashboardContent() {
         createdByRole: 'client',
         attachments: attachmentUrls,
         artifact: 'service-request',
+        deposit: MINIMUM_DEPOSIT,
+        depositHeld: true,
+        paymentStatus: 'deposit_held',
         createdAt: serverTimestamp(),
       });
 
-      setMessage({ text: 'Service request submitted successfully!', type: 'success' });
+      // Record deposit transaction
+      await addDoc(collection(db, 'transactions'), {
+        userId: currentUser.uid,
+        jobId: jobRef.id,
+        type: 'deposit_hold',
+        amount: MINIMUM_DEPOSIT,
+        status: 'completed',
+        description: `Deposit held for job: ${title}`,
+        createdAt: serverTimestamp(),
+      });
+
+      setMessage({ text: `Service request submitted successfully! ₦${MINIMUM_DEPOSIT.toLocaleString()} deposit has been held from your wallet and will be part of the final bill.`, type: 'success' });
       setTitle('');
       setDescription('');
       setServiceCategory('');
       setScheduledAt('');
       setFiles(null);
       setActiveTab('jobs');
+      
+      // Refresh wallet balance
+      fetchWallet(currentUser.uid);
     } catch (error) {
       console.error('Error submitting job:', error);
       setMessage({ text: 'Failed to submit request. Please try again.', type: 'error' });
@@ -1744,10 +1789,32 @@ function ClientDashboardContent() {
                   <p className="mt-1 text-xs text-neutral-500">Upload photos or videos to help artisans understand the job</p>
                 </div>
 
+                {/* Wallet Balance Notice */}
+                <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                  <div className="flex gap-3">
+                    <span className="text-2xl">💰</span>
+                    <div className="flex-1">
+                      <p className="font-medium text-yellow-900">Payment Notice</p>
+                      <p className="mt-1 text-sm text-yellow-800">
+                        A deposit of <strong>₦1,000</strong> will be held from your wallet when you submit this request.
+                        This amount will be part of your final bill upon job completion.
+                      </p>
+                      <p className="mt-2 text-sm text-yellow-800">
+                        Current wallet balance: <strong>₦{(wallet?.balance || 0).toLocaleString()}</strong>
+                        {wallet && wallet.balance < 1000 && (
+                          <span className="ml-2 text-red-600 font-medium">
+                            (Insufficient - Please fund your wallet first)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex gap-4 border-t border-neutral-200 pt-6">
                   <button
                     type="submit"
-                    disabled={submitting}
+                    disabled={submitting || (wallet && wallet.balance < 1000)}
                     className="flex-1 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitting ? 'Submitting...' : 'Submit Request'}

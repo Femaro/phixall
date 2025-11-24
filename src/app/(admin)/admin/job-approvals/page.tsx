@@ -144,48 +144,55 @@ export default function JobApprovalsPage() {
     try {
       const { db } = getFirebase();
 
+      // Get job details
+      const jobDoc = await getDoc(doc(db, 'jobs', completion.jobId));
+      const jobData = jobDoc.data();
+
+      // Prompt admin for final amount
+      const finalAmountStr = prompt(
+        `Enter final amount for this job:\n\nJob: ${jobData?.title}\nDeposit held: ₦1,000\n\nEnter total amount (₦):`,
+        jobData?.amount?.toString() || '5000'
+      );
+
+      if (!finalAmountStr) {
+        setProcessing(null);
+        return;
+      }
+
+      const finalAmount = parseFloat(finalAmountStr);
+      if (isNaN(finalAmount) || finalAmount < 1000) {
+        alert('Invalid amount. Must be at least ₦1,000');
+        setProcessing(null);
+        return;
+      }
+
+      // Process payment through job completion API
+      const paymentResponse = await fetch('/api/jobs/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jobId: completion.jobId,
+          finalAmount,
+        }),
+      });
+
+      const paymentResult = await paymentResponse.json();
+
+      if (!paymentResult.success) {
+        alert(`Payment failed: ${paymentResult.error}`);
+        setProcessing(null);
+        return;
+      }
+
       // Update completion form status
       await updateDoc(doc(db, 'jobCompletions', completion.id), {
         status: 'approved',
         approvedAt: serverTimestamp(),
         approvedBy: user.uid,
+        finalAmount,
       });
-
-      // Update job status to completed
-      await updateDoc(doc(db, 'jobs', completion.jobId), {
-        status: 'completed',
-        completedAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-
-      // Get job details for wallet update
-      const jobDoc = await getDoc(doc(db, 'jobs', completion.jobId));
-      const jobData = jobDoc.data();
-
-      // Add earning to Phixer wallet if amount exists
-      const phixerId = getPhixerId(completion);
-      if (jobData?.amount && phixerId) {
-        const walletRef = doc(db, 'wallets', phixerId);
-        const walletDoc = await getDoc(walletRef);
-        const currentWallet = walletDoc.data() || { balance: 0, totalEarnings: 0 };
-
-        await updateDoc(walletRef, {
-          balance: (currentWallet.balance || 0) + jobData.amount,
-          totalEarnings: (currentWallet.totalEarnings || 0) + jobData.amount,
-        });
-
-        // Create earning transaction
-        const { addDoc, collection: col } = await import('firebase/firestore');
-        await addDoc(col(db, 'transactions'), {
-          userId: phixerId,
-          type: 'earning',
-          amount: jobData.amount,
-          description: `Earned from: ${jobData.title}`,
-          status: 'completed',
-          jobId: completion.jobId,
-          createdAt: serverTimestamp(),
-        });
-      }
 
       // Notify Phixer
       if (phixerId) {

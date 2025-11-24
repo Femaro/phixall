@@ -10,7 +10,8 @@
     "inspect": "node scripts/inspect-firebase-data.js",
     "cleanup:dry-run": "node scripts/cleanup-test-data.js --dry-run",
     "cleanup:test-only": "node scripts/cleanup-test-data.js --filter-test-only",
-    "cleanup:all": "node scripts/cleanup-test-data.js"
+    "cleanup:all": "node scripts/cleanup-test-data.js",
+    "setup:test-users": "node scripts/create-test-users.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

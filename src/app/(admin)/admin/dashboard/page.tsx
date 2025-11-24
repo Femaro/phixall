@@ -22,7 +22,7 @@ type AdminProfile = {
 
 type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string; email?: string };
 
-type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'analytics' | 'profile' | 'settings';
+type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'careers' | 'analytics' | 'profile' | 'settings';
 type TrainingStatusKey = 'safetyTraining' | 'residentialTraining' | 'corporateTraining' | 'dashboardTraining';
 
 interface User {
@@ -133,6 +133,7 @@ export default function AdminDashboardPage() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
   const [applications, setApplications] = useState<ArtisanApplication[]>([]);
+  const [careerApplications, setCareerApplications] = useState<any[]>([]);
   
   // Filter states
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('all');
@@ -146,6 +147,8 @@ export default function AdminDashboardPage() {
   const [showResourceAssignModal, setShowResourceAssignModal] = useState(false);
   const [showBillModal, setShowBillModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showCareerAppModal, setShowCareerAppModal] = useState(false);
+  const [selectedCareerApp, setSelectedCareerApp] = useState<any | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [pendingSupportCount, setPendingSupportCount] = useState(0);
   const [pendingCompletionsCount, setPendingCompletionsCount] = useState(0);
@@ -390,6 +393,21 @@ export default function AdminDashboardPage() {
     const completionsQuery = query(collection(db, 'jobCompletions'), where('status', '==', 'pending'));
     const unsubscribe = onSnapshot(completionsQuery, (snapshot) => {
       setPendingCompletionsCount(snapshot.size);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  // Load career applications
+  useEffect(() => {
+    if (!user) return;
+    const { db } = getFirebase();
+    const careerAppsQuery = query(collection(db, 'career_applications'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(careerAppsQuery, (snapshot) => {
+      const apps: any[] = [];
+      snapshot.forEach((doc) => {
+        apps.push({ id: doc.id, ...doc.data() });
+      });
+      setCareerApplications(apps);
     });
     return () => unsubscribe();
   }, [user]);
@@ -717,6 +735,22 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function updateCareerApplicationStatus(applicationId: string, status: 'shortlisted' | 'rejected') {
+    try {
+      const { db } = getFirebase();
+      await updateDoc(doc(db, 'career_applications', applicationId), {
+        status,
+        reviewed: true,
+        reviewedAt: serverTimestamp(),
+        reviewedBy: user?.uid || 'admin',
+      });
+      alert(`Application ${status === 'shortlisted' ? 'shortlisted' : 'rejected'} successfully.`);
+    } catch (error) {
+      console.error('Error updating career application status:', error);
+      alert('Failed to update application status');
+    }
+  }
+
   async function deleteResource(resourceId: string) {
     if (!confirm('Are you sure you want to delete this resource?')) return;
 
@@ -864,6 +898,7 @@ export default function AdminDashboardPage() {
     { id: 'jobs', label: 'Job Management', icon: '💼' },
     { id: 'resources', label: 'Resources', icon: '📦' },
     { id: 'billing', label: 'Billing & Finance', icon: '💰' },
+    { id: 'careers', label: 'Career Applications', icon: '📝' },
     { id: 'registration', label: 'Artisan Registration', icon: '📝' },
     { id: 'analytics', label: 'Analytics', icon: '📈' },
     { id: 'profile', label: 'Profile', icon: '👤' },
@@ -1014,6 +1049,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'resources' && 'Resources & Materials'}
                 {activeTab === 'registration' && 'Artisan Registration'}
                 {activeTab === 'billing' && 'Billing & Finance'}
+                {activeTab === 'careers' && 'Career Applications'}
                 {activeTab === 'analytics' && 'Analytics & Reports'}
                 {activeTab === 'profile' && 'Admin Profile'}
                 {activeTab === 'settings' && 'Dashboard Settings'}
@@ -1025,6 +1061,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'resources' && 'Manage inventory and resources for job allocation'}
                 {activeTab === 'registration' && 'Monitor new artisan signups and capture registration details'}
                 {activeTab === 'billing' && 'Monitor financial transactions and revenue'}
+                {activeTab === 'careers' && 'Review and manage job applications'}
                 {activeTab === 'analytics' && 'Platform performance metrics'}
                 {activeTab === 'profile' && 'Manage your admin account information'}
                 {activeTab === 'settings' && 'Configure your admin dashboard preferences'}
@@ -1908,6 +1945,120 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
+        {/* Careers Tab */}
+        {activeTab === 'careers' && (
+          <div>
+            <div className="grid gap-6 sm:grid-cols-3 mb-6">
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total Applications</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{careerApplications.length}</p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Pending Review</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">
+                  {careerApplications.filter(app => app.status === 'pending' || !app.status).length}
+                </p>
+              </div>
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Reviewed</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">
+                  {careerApplications.filter(app => app.reviewed).length}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-neutral-200 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-neutral-50 border-b border-neutral-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Applicant</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Position</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Experience</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Education</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Applied</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-neutral-700">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-200">
+                    {careerApplications.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-12 text-center text-neutral-500">
+                          No applications yet
+                        </td>
+                      </tr>
+                    ) : (
+                      careerApplications.map((app) => (
+                        <tr key={app.id} className="hover:bg-neutral-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div>
+                              <p className="text-sm font-medium text-neutral-900">{app.firstName} {app.lastName}</p>
+                              <p className="text-xs text-neutral-500">{app.email}</p>
+                              <p className="text-xs text-neutral-500">{app.phone}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <p className="text-sm text-neutral-900">{app.position || 'N/A'}</p>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <p className="text-sm text-neutral-600">{app.experience || 'N/A'}</p>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <p className="text-sm text-neutral-600">{app.education || 'N/A'}</p>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                              app.status === 'shortlisted' ? 'bg-green-100 text-green-700' :
+                              app.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                              app.reviewed ? 'bg-blue-100 text-blue-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {app.status || (app.reviewed ? 'Reviewed' : 'Pending')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-600">
+                            {app.createdAt ? formatTimestamp(app.createdAt) : 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => {
+                                  setSelectedCareerApp(app);
+                                  setShowCareerAppModal(true);
+                                }}
+                                className="text-brand-600 hover:text-brand-700 font-medium"
+                              >
+                                View
+                              </button>
+                              {!app.reviewed && (
+                                <>
+                                  <button
+                                    onClick={() => updateCareerApplicationStatus(app.id, 'shortlisted')}
+                                    className="text-green-600 hover:text-green-700 font-medium"
+                                  >
+                                    Shortlist
+                                  </button>
+                                  <button
+                                    onClick={() => updateCareerApplicationStatus(app.id, 'rejected')}
+                                    className="text-red-600 hover:text-red-700 font-medium"
+                                  >
+                                    Reject
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
           <div>
@@ -2709,6 +2860,150 @@ export default function AdminDashboardPage() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Career Application Detail Modal */}
+      {showCareerAppModal && selectedCareerApp && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto">
+          <div className="max-w-3xl w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-2xl my-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-neutral-900">Application Details</h3>
+              <button
+                onClick={() => {
+                  setShowCareerAppModal(false);
+                  setSelectedCareerApp(null);
+                }}
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+              <div>
+                <h4 className="font-semibold text-neutral-900 mb-3">Personal Information</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-neutral-600 mb-1">Full Name:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.firstName} {selectedCareerApp.lastName}</p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-600 mb-1">Email:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-600 mb-1">Phone:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-600 mb-1">Position Applied:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.position}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-neutral-900 mb-3">Qualifications</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-neutral-600 mb-1">Education Level:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.education}</p>
+                  </div>
+                  <div>
+                    <p className="text-neutral-600 mb-1">Years of Experience:</p>
+                    <p className="font-medium text-neutral-900">{selectedCareerApp.experience}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-neutral-900 mb-3">Cover Letter</h4>
+                <div className="bg-neutral-50 rounded-lg p-4">
+                  <p className="text-sm text-neutral-700 whitespace-pre-wrap leading-relaxed">
+                    {selectedCareerApp.coverLetter}
+                  </p>
+                </div>
+              </div>
+
+              {selectedCareerApp.resumeUrl && (
+                <div>
+                  <h4 className="font-semibold text-neutral-900 mb-3">Resume/CV</h4>
+                  <a
+                    href={selectedCareerApp.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-medium underline"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Resume ({selectedCareerApp.resumeFileName || 'resume.pdf'})
+                  </a>
+                </div>
+              )}
+
+              <div className="pt-4 border-t border-neutral-200">
+                <p className="text-xs text-neutral-500">
+                  Applied: {selectedCareerApp.createdAt ? formatTimestamp(selectedCareerApp.createdAt) : 'N/A'}
+                </p>
+                {selectedCareerApp.reviewed && (
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Reviewed: {selectedCareerApp.reviewedAt ? formatTimestamp(selectedCareerApp.reviewedAt) : 'N/A'}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {!selectedCareerApp.reviewed && (
+              <div className="mt-6 flex gap-3 pt-6 border-t border-neutral-200">
+                <button
+                  onClick={() => {
+                    updateCareerApplicationStatus(selectedCareerApp.id, 'shortlisted');
+                    setShowCareerAppModal(false);
+                    setSelectedCareerApp(null);
+                  }}
+                  className="flex-1 rounded-lg bg-green-600 px-4 py-3 font-semibold text-white hover:bg-green-700"
+                >
+                  Shortlist Candidate
+                </button>
+                <button
+                  onClick={() => {
+                    updateCareerApplicationStatus(selectedCareerApp.id, 'rejected');
+                    setShowCareerAppModal(false);
+                    setSelectedCareerApp(null);
+                  }}
+                  className="flex-1 rounded-lg bg-red-600 px-4 py-3 font-semibold text-white hover:bg-red-700"
+                >
+                  Reject Application
+                </button>
+                <button
+                  onClick={() => {
+                    setShowCareerAppModal(false);
+                    setSelectedCareerApp(null);
+                  }}
+                  className="rounded-lg border border-neutral-300 px-4 py-3 font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+            {selectedCareerApp.reviewed && (
+              <div className="mt-6 pt-6 border-t border-neutral-200">
+                <button
+                  onClick={() => {
+                    setShowCareerAppModal(false);
+                    setSelectedCareerApp(null);
+                  }}
+                  className="w-full rounded-lg border border-neutral-300 px-4 py-3 font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Close
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

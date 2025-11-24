@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirebase } from '@/lib/firebaseClient';
+import { getFirebaseServer } from '@/lib/firebaseServer';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { db, storage } = getFirebase();
+    const { db, storage } = getFirebaseServer();
 
     // Upload resume to Firebase Storage
     const resumeRef = ref(storage, `careers/resumes/${Date.now()}-${resume.name}`);

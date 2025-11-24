@@ -239,7 +239,7 @@ export default function ArtisanDashboardPage() {
 
   // Load wallet data
   useEffect(() => {
-    if (!user) return;
+    if (!user || loading) return;
 
     const { db } = getFirebase();
     const walletRef = doc(db, 'wallets', user.uid);
@@ -265,11 +265,11 @@ export default function ArtisanDashboardPage() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, loading]);
 
   // Load available jobs
   useEffect(() => {
-    if (!user) return;
+    if (!user || loading) return;
 
     const { db } = getFirebase();
     const availableJobsQuery = query(
@@ -287,11 +287,11 @@ export default function ArtisanDashboardPage() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, loading]);
 
   // Load artisan's jobs
   useEffect(() => {
-    if (!user) return;
+    if (!user || loading) return;
 
     const { db } = getFirebase();
     const myJobsQuery = query(
@@ -309,11 +309,11 @@ export default function ArtisanDashboardPage() {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, loading]);
 
   // Load transactions
   useEffect(() => {
-    if (!user) return;
+    if (!user || loading) return;
 
     const { db } = getFirebase();
     const transactionsQuery = query(

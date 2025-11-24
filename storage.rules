@@ -64,6 +64,18 @@ service firebase.storage {
       allow delete: if isAdmin();
     }
     
+    // Career application resumes
+    match /careers/resumes/{filename} {
+      // Anyone can upload resumes (public job applications)
+      allow create: if request.resource.size < 5 * 1024 * 1024; // 5MB limit
+      
+      // Only admins can read resumes
+      allow read: if isAdmin();
+      
+      // Only admins can delete resumes
+      allow delete: if isAdmin();
+    }
+    
     // Default: deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

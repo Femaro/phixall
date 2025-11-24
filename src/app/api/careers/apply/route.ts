@@ -45,10 +45,13 @@ export async function POST(request: NextRequest) {
     const { db, storage } = getFirebaseServer();
 
     // Upload resume to Firebase Storage
-    const resumeRef = ref(storage, `careers/resumes/${Date.now()}-${resume.name}`);
-    const resumeBuffer = await resume.arrayBuffer();
-    await uploadBytes(resumeRef, resumeBuffer, {
-      contentType: resume.type,
+    const resumeRef = ref(storage, `careers/resumes/${Date.now()}-${resume.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`);
+    
+    // Convert File to Blob for upload
+    const resumeBlob = new Blob([await resume.arrayBuffer()], { type: resume.type });
+    
+    await uploadBytes(resumeRef, resumeBlob, {
+      contentType: resume.type || 'application/pdf',
     });
     const resumeUrl = await getDownloadURL(resumeRef);
 
@@ -78,10 +81,18 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error submitting job application:', error);
+    console.error('Error details:', {
+      message: error?.message,
+      code: error?.code,
+      stack: error?.stack,
+    });
     return NextResponse.json(
-      { error: 'Failed to submit application. Please try again or contact us directly.' },
+      { 
+        error: 'Failed to submit application. Please try again or contact us directly.',
+        details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+      },
       { status: 500 }
     );
   }

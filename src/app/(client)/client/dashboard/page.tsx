@@ -933,7 +933,14 @@ function ClientDashboardContent() {
     }
   }, [useAlternativeAddress]);
 
-  // Early return while loading to prevent queries before auth
+  const addressAutocomplete = useMemo(() => {
+    if (!mapsLoaded || typeof window === 'undefined' || !window.google?.maps?.places) {
+      return null;
+    }
+    return new window.google.maps.places.AutocompleteService();
+  }, [mapsLoaded]);
+
+  // Early return while loading to prevent queries before auth - MUST be after all hooks
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
@@ -944,13 +951,6 @@ function ClientDashboardContent() {
       </div>
     );
   }
-
-  const addressAutocomplete = useMemo(() => {
-    if (!mapsLoaded || typeof window === 'undefined' || !window.google?.maps?.places) {
-      return null;
-    }
-    return new window.google.maps.places.AutocompleteService();
-  }, [mapsLoaded]);
 
   const renderTabs = (onNavigate?: () => void) =>
     tabConfig.map((tab) => (

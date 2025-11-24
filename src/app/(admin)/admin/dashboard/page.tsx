@@ -394,18 +394,6 @@ export default function AdminDashboardPage() {
     return () => unsubscribe();
   }, [user]);
 
-  // Early return while loading to prevent queries before auth
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900 mb-4"></div>
-          <p className="text-sm text-neutral-600">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   async function assignJobToArtisan() {
     if (!selectedJob || !selectedArtisan) return;
 
@@ -816,6 +804,18 @@ export default function AdminDashboardPage() {
       return artisan.address?.toLowerCase().includes(targetState);
     });
   }, [artisans, selectedJob]);
+
+  // Early return while loading to prevent queries before auth - MUST be after all hooks
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900 mb-4"></div>
+          <p className="text-sm text-neutral-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const filteredClients = clients.filter(client =>
     client.name?.toLowerCase().includes(userSearchTerm.toLowerCase()) ||

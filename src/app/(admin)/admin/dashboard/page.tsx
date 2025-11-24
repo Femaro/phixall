@@ -194,6 +194,12 @@ export default function AdminDashboardPage() {
     address: ''
   });
 
+  // Refs for merging Phixer and artisan queries (backward compatibility)
+  const phixerDataRef = useRef<User[]>([]);
+  const artisanDataRef = useRef<User[]>([]);
+  const phixerLoadedRef = useRef<boolean>(false);
+  const artisanLoadedRef = useRef<boolean>(false);
+
   useEffect(() => {
     const { auth } = getFirebase();
     import('firebase/auth').then(({ onAuthStateChanged }) => {
@@ -254,12 +260,6 @@ export default function AdminDashboardPage() {
     // Load Phixers (support both 'Phixer' and legacy 'artisan' roles for backward compatibility)
     const phixerQuery = query(collection(db, 'profiles'), where('role', '==', 'Phixer'));
     const artisanQuery = query(collection(db, 'profiles'), where('role', '==', 'artisan'));
-    
-    // Use refs to track data from both queries and merge them
-    const phixerDataRef = useRef<User[]>([]);
-    const artisanDataRef = useRef<User[]>([]);
-    const phixerLoadedRef = useRef<boolean>(false);
-    const artisanLoadedRef = useRef<boolean>(false);
     
     const mergeAndSetArtisans = () => {
       // Only merge if at least one query has loaded (prevents race conditions)

@@ -194,6 +194,9 @@ export default function JobApprovalsPage() {
         finalAmount,
       });
 
+      // Get Phixer ID for notifications
+      const phixerId = getPhixerId(completion);
+
       // Notify Phixer
       if (phixerId) {
         await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${phixerId}`), {

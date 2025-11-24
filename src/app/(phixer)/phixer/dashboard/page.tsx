@@ -200,38 +200,54 @@ export default function ArtisanDashboardPage() {
           return;
         }
         
-        // Continue with normal dashboard loading
-        const profileDoc = await getDocs(query(collection(db, 'profiles'), where('__name__', '==', currentUser.uid), limit(1)));
-        if (!profileDoc.empty) {
-          const profileData = profileDoc.docs[0].data();
-          setProfile(profileData);
-          setAvailable(profileData.available || false);
-          if (profileData.bankAccount) {
-            setBankAccount(profileData.bankAccount);
-          }
-          // Populate profile form
-          setProfileForm({
-            name: profileData.name || '',
-            email: profileData.email || currentUser.email,
-            phone: profileData.phone || '',
-            address: profileData.address || '',
-            state: profileData.state || '',
-            skills: profileData.skills || '',
-            experience: profileData.experience || ''
-          });
-          if (profileData.coordinates?.lat && profileData.coordinates?.lng) {
-            setArtisanCoords({ lat: profileData.coordinates.lat, lng: profileData.coordinates.lng });
-          }
-          // Populate settings form
-          setSettingsForm({
-            emailNotifications: profileData.emailNotifications ?? true,
-            smsNotifications: profileData.smsNotifications ?? false,
-            pushNotifications: profileData.pushNotifications ?? true,
-            language: profileData.language || 'en',
-            timezone: profileData.timezone || 'Africa/Lagos'
-          });
+        // Continue with normal dashboard loading - verify profile exists
+        const profileRef = doc(db, 'profiles', currentUser.uid);
+        const profileDoc = await getDoc(profileRef);
+        
+        if (!profileDoc.exists()) {
+          console.error('Profile not found for user:', currentUser.uid);
+          alert('Your profile is missing. Please contact support.');
+          window.location.href = '/login';
+          return;
         }
         
+        const profileData = profileDoc.data();
+        
+        // Verify user is a Phixer
+        if (profileData.role !== 'Phixer' && profileData.role !== 'phixer' && profileData.role !== 'artisan') {
+          alert('Access denied. Phixer dashboard only.');
+          window.location.href = '/login';
+          return;
+        }
+        
+        setProfile(profileData);
+        setAvailable(profileData.available || false);
+        if (profileData.bankAccount) {
+          setBankAccount(profileData.bankAccount);
+        }
+        // Populate profile form
+        setProfileForm({
+          name: profileData.name || '',
+          email: profileData.email || currentUser.email,
+          phone: profileData.phone || '',
+          address: profileData.address || '',
+          state: profileData.state || '',
+          skills: profileData.skills || '',
+          experience: profileData.experience || ''
+        });
+        if (profileData.coordinates?.lat && profileData.coordinates?.lng) {
+          setArtisanCoords({ lat: profileData.coordinates.lat, lng: profileData.coordinates.lng });
+        }
+        // Populate settings form
+        setSettingsForm({
+          emailNotifications: profileData.emailNotifications ?? true,
+          smsNotifications: profileData.smsNotifications ?? false,
+          pushNotifications: profileData.pushNotifications ?? true,
+          language: profileData.language || 'en',
+          timezone: profileData.timezone || 'Africa/Lagos'
+        });
+        
+        // Only set loading to false after profile is confirmed
         setLoading(false);
       });
     });
@@ -260,8 +276,13 @@ export default function ArtisanDashboardPage() {
           totalCashout: 0,
           pendingBalance: 0,
           createdAt: serverTimestamp(),
+        }).catch((error) => {
+          console.error('Error creating wallet:', error);
         });
       }
+    }, (error) => {
+      console.error('Error loading wallet:', error);
+      // Don't crash the app, just log the error
     });
 
     return () => unsubscribe();
@@ -284,6 +305,9 @@ export default function ArtisanDashboardPage() {
         jobs.push({ id: doc.id, ...doc.data() } as Job);
       });
       setAvailableJobs(jobs);
+    }, (error) => {
+      console.error('Error loading available jobs:', error);
+      // Don't crash the app, just log the error
     });
 
     return () => unsubscribe();
@@ -306,6 +330,9 @@ export default function ArtisanDashboardPage() {
         jobs.push({ id: doc.id, ...doc.data() } as Job);
       });
       setMyJobs(jobs);
+    }, (error) => {
+      console.error('Error loading my jobs:', error);
+      // Don't crash the app, just log the error
     });
 
     return () => unsubscribe();
@@ -328,6 +355,9 @@ export default function ArtisanDashboardPage() {
         transactionsData.push({ id: doc.id, ...doc.data() } as Transaction);
       });
       setTransactions(transactionsData);
+    }, (error) => {
+      console.error('Error loading transactions:', error);
+      // Don't crash the app, just log the error
     });
 
     return () => unsubscribe();

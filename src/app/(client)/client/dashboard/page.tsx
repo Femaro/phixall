@@ -114,7 +114,7 @@ export default function ClientDashboardPage() {
 function ClientDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const sessionIdFromQuery = searchParams.get('session_id');
+  const paystackReference = searchParams.get('reference');
   const cancelledPayment = searchParams.get('cancelled');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -358,7 +358,7 @@ function ClientDashboardContent() {
             state: profileForm.state || userProfile?.state || '',
           };
       const jobServiceState =
-        (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || undefined;
+        (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || null;
       
       // Hold deposit in wallet
       const walletData = walletSnap.data() || { heldBalance: 0 };
@@ -443,19 +443,29 @@ function ClientDashboardContent() {
         return;
       }
 
-      const response = await fetch('/api/payments/create-checkout-session', {
+      // Use Paystack payment initialization
+      const response = await fetch('/api/payments/initialize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, userId: user.uid }),
+        body: JSON.stringify({
+          email: user.email || userProfile?.email,
+          amount: amount * 100, // Convert to kobo (Paystack uses kobo)
+          metadata: {
+            userId: user.uid,
+            type: 'wallet_deposit',
+            userName: userProfile?.name || user.displayName || user.email,
+          },
+        }),
       });
       const data = await response.json();
-      if (!response.ok || !data?.url) {
-        setMessage({ text: data?.error || 'Failed to start checkout session.', type: 'error' });
+      if (!response.ok || !data?.authorization_url) {
+        setMessage({ text: data?.error || 'Failed to initialize payment.', type: 'error' });
         setProcessingPayment(false);
         return;
       }
 
-      window.location.href = data.url as string;
+      // Redirect to Paystack payment page
+      window.location.href = data.authorization_url as string;
     } catch (error) {
       console.error('Error processing deposit:', error);
       setMessage({ text: 'Failed to start deposit. Please try again.', type: 'error' });
@@ -463,25 +473,25 @@ function ClientDashboardContent() {
     }
   }
 
-  const confirmStripeSession = useCallback(async (sessionId: string) => {
-    setVerifyingSessionId(sessionId);
+  const confirmPaystackPayment = useCallback(async (reference: string) => {
+    setVerifyingSessionId(reference);
     try {
-      const response = await fetch('/api/payments/confirm', {
+      const response = await fetch('/api/payments/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId }),
+        body: JSON.stringify({ reference }),
       });
       const data = await response.json();
       if (!response.ok || data?.status !== 'success') {
         setMessage({ text: data?.error || 'Unable to verify payment. Contact support with your receipt.', type: 'error' });
         return;
       }
-      setMessage({ text: 'Deposit confirmed! Your wallet will update shortly.', type: 'success' });
-      setProcessedSessionId(sessionId);
+      setMessage({ text: 'Payment confirmed! Your wallet will update shortly.', type: 'success' });
+      setProcessedSessionId(reference);
       setDepositAmount('');
       router.replace('/client/dashboard');
     } catch (error) {
-      console.error('Error confirming deposit:', error);
+      console.error('Error confirming payment:', error);
       setMessage({ text: 'Failed to verify payment. Please contact support.', type: 'error' });
     } finally {
       setVerifyingSessionId(null);
@@ -489,11 +499,11 @@ function ClientDashboardContent() {
   }, [router]);
 
   useEffect(() => {
-    if (!sessionIdFromQuery || verifyingSessionId || processedSessionId === sessionIdFromQuery) {
+    if (!paystackReference || verifyingSessionId || processedSessionId === paystackReference) {
       return;
     }
-    confirmStripeSession(sessionIdFromQuery);
-  }, [sessionIdFromQuery, verifyingSessionId, processedSessionId, confirmStripeSession]);
+    confirmPaystackPayment(paystackReference);
+  }, [paystackReference, verifyingSessionId, processedSessionId, confirmPaystackPayment]);
 
   async function handleSaveProfile() {
     if (!user) {
@@ -570,27 +580,31 @@ function ClientDashboardContent() {
     setMessage(null);
 
     try {
-      const response = await fetch('/api/payments/create-checkout-session', {
+      // Use Paystack payment initialization
+      const response = await fetch('/api/payments/initialize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount,
-          userId: user.uid,
+          email: user.email || userProfile?.email,
+          amount: amount * 100, // Convert to kobo
           metadata: {
-            type: 'premium-subscription',
+            userId: user.uid,
+            type: 'premium_subscription',
             plan: planTier,
             billingCycle: premiumBillingCycle,
+            userName: userProfile?.name || user.displayName || user.email,
           },
         }),
       });
 
       const data = await response.json();
-      if (!response.ok || !data?.url) {
-        setMessage({ text: data?.error || 'Failed to start subscription checkout.', type: 'error' });
+      if (!response.ok || !data?.authorization_url) {
+        setMessage({ text: data?.error || 'Failed to initialize payment.', type: 'error' });
         return;
       }
 
-      window.location.href = data.url as string;
+      // Redirect to Paystack payment page
+      window.location.href = data.authorization_url as string;
     } catch (error) {
       console.error('Error starting subscription checkout:', error);
       setMessage({ text: 'Failed to start subscription checkout. Please try again.', type: 'error' });

@@ -1,6 +1,6 @@
 'use client';
 export const dynamic = 'force-dynamic';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
@@ -29,7 +29,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'client' | 'artisan';
+  role: 'client' | 'Phixer';
   status: 'active' | 'suspended';
   phone?: string;
   address?: string;
@@ -45,8 +45,10 @@ interface Job {
   status: 'requested' | 'accepted' | 'in-progress' | 'pending-completion' | 'completed' | 'cancelled';
   clientId: string;
   clientName?: string;
-  artisanId?: string;
-  artisanName?: string;
+  artisanId?: string; // Legacy field for backward compatibility
+  artisanName?: string; // Legacy field for backward compatibility
+  phixerId?: string;
+  phixerName?: string;
   amount?: number;
   budget?: number;
   resources?: Resource[];
@@ -249,29 +251,70 @@ export default function AdminDashboardPage() {
       setClients(data);
     });
 
-    // Load artisans
-    const artisansQuery = query(collection(db, 'profiles'), where('role', '==', 'artisan'));
-    const unsubArtisans = onSnapshot(artisansQuery, (snapshot) => {
-      const data: User[] = [];
+    // Load Phixers (support both 'Phixer' and legacy 'artisan' roles for backward compatibility)
+    const phixerQuery = query(collection(db, 'profiles'), where('role', '==', 'Phixer'));
+    const artisanQuery = query(collection(db, 'profiles'), where('role', '==', 'artisan'));
+    
+    // Use refs to track data from both queries and merge them
+    const phixerDataRef = useRef<User[]>([]);
+    const artisanDataRef = useRef<User[]>([]);
+    const phixerLoadedRef = useRef<boolean>(false);
+    const artisanLoadedRef = useRef<boolean>(false);
+    
+    const mergeAndSetArtisans = () => {
+      // Only merge if at least one query has loaded (prevents race conditions)
+      // Both refs will be populated eventually, but we can show partial results
+      // Combine both arrays and deduplicate by ID
+      const combined = [...phixerDataRef.current, ...artisanDataRef.current];
+      const uniqueMap = new Map<string, User>();
+      combined.forEach(user => {
+        if (!uniqueMap.has(user.id)) {
+          uniqueMap.set(user.id, user);
+        }
+      });
+      setArtisans(Array.from(uniqueMap.values()));
+    };
+    
+    const unsubPhixers = onSnapshot(phixerQuery, (snapshot) => {
+      phixerDataRef.current = [];
       snapshot.forEach((doc) => {
         const docData = doc.data();
-        data.push({ 
+        phixerDataRef.current.push({ 
           id: doc.id, 
           name: docData.name || '',
           email: docData.email || '',
-          role: 'artisan',
+          role: 'Phixer',
           status: docData.status || 'active',
           phone: docData.phone || '',
           address: docData.address || '',
           createdAt: docData.createdAt
         } as User);
       });
-      console.log('Loaded artisans:', data); // Debug log
-      setArtisans(data);
+      phixerLoadedRef.current = true;
+      mergeAndSetArtisans();
     });
     
-    // Load artisan applications
-    const applicationsQuery = query(collection(db, 'artisan_onboarding'), orderBy('createdAt', 'desc'));
+    const unsubArtisans = onSnapshot(artisanQuery, (snapshot) => {
+      artisanDataRef.current = [];
+      snapshot.forEach((doc) => {
+        const docData = doc.data();
+        artisanDataRef.current.push({ 
+          id: doc.id, 
+          name: docData.name || '',
+          email: docData.email || '',
+          role: 'Phixer', // Normalize to 'Phixer' for display
+          status: docData.status || 'active',
+          phone: docData.phone || '',
+          address: docData.address || '',
+          createdAt: docData.createdAt
+        } as User);
+      });
+      artisanLoadedRef.current = true;
+      mergeAndSetArtisans();
+    });
+    
+    // Load Phixer applications
+    const applicationsQuery = query(collection(db, 'phixer_onboarding'), orderBy('createdAt', 'desc'));
     const unsubApplications = onSnapshot(applicationsQuery, (snapshot) => {
       const data: ArtisanApplication[] = [];
       snapshot.forEach((applicationDoc) => {
@@ -322,6 +365,7 @@ export default function AdminDashboardPage() {
 
     return () => {
       unsubClients();
+      unsubPhixers();
       unsubArtisans();
       unsubJobs();
       unsubTransactions();
@@ -369,8 +413,11 @@ export default function AdminDashboardPage() {
     try {
       const { db } = getFirebase();
       await updateDoc(doc(db, 'jobs', selectedJob.id), {
+        phixerId: selectedArtisan,
+        phixerName: artisans.find(a => a.id === selectedArtisan)?.name || 'Phixer',
+        // Maintain backward compatibility by also setting legacy fields
         artisanId: selectedArtisan,
-        artisanName: artisans.find(a => a.id === selectedArtisan)?.name || 'Artisan',
+        artisanName: artisans.find(a => a.id === selectedArtisan)?.name || 'Phixer',
         status: 'accepted',
         assignedBy: 'admin',
         assignedAt: serverTimestamp(),
@@ -536,13 +583,15 @@ export default function AdminDashboardPage() {
         jobData.clientName = client.name || client.email;
       }
 
-      // Add optional artisan assignment
+      // Add optional Phixer assignment
       if (newJobForm.artisanId) {
-        jobData.artisanId = newJobForm.artisanId;
+        jobData.phixerId = newJobForm.artisanId;
+        jobData.artisanId = newJobForm.artisanId; // Backward compatibility
         jobData.status = 'accepted';
         const artisan = artisans.find(a => a.id === newJobForm.artisanId);
         if (artisan) {
-          jobData.artisanName = artisan.name || artisan.email;
+          jobData.phixerName = artisan.name || artisan.email;
+          jobData.artisanName = artisan.name || artisan.email; // Backward compatibility
         }
       }
 
@@ -656,7 +705,7 @@ export default function AdminDashboardPage() {
   async function updateApplicationStatus(applicationId: string, status: 'under-review' | 'approved' | 'rejected') {
     try {
       const { db } = getFirebase();
-      await updateDoc(doc(db, 'artisan_onboarding', applicationId), {
+      await updateDoc(doc(db, 'phixer_onboarding', applicationId), {
         status,
         reviewedAt: serverTimestamp(),
         reviewedBy: user?.uid || 'admin',
@@ -698,12 +747,13 @@ export default function AdminDashboardPage() {
     const summary: Record<string, { sum: number; count: number }> = {};
     jobs.forEach((job) => {
       const rating = job.clientReview?.rating;
-      if (rating && job.artisanId) {
-        if (!summary[job.artisanId]) {
-          summary[job.artisanId] = { sum: 0, count: 0 };
+      const phixerId = job.phixerId || job.artisanId; // Support both field names
+      if (rating && phixerId) {
+        if (!summary[phixerId]) {
+          summary[phixerId] = { sum: 0, count: 0 };
         }
-        summary[job.artisanId].sum += rating;
-        summary[job.artisanId].count += 1;
+        summary[phixerId].sum += rating;
+        summary[phixerId].count += 1;
       }
     });
     return Object.fromEntries(

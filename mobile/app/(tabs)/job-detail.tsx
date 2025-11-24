@@ -29,8 +29,10 @@ interface JobDetail {
   clientEmail?: string;
   clientPhone?: string;
   clientCompany?: string;
-  artisanId?: string;
-  artisanName?: string;
+  artisanId?: string; // Legacy field for backward compatibility
+  artisanName?: string; // Legacy field for backward compatibility
+  phixerId?: string;
+  phixerName?: string;
   serviceAddress?: {
     description?: string;
     lat?: number;
@@ -144,7 +146,8 @@ export default function JobDetailScreen() {
 
   const startTracking = () => {
     if (!job) return;
-    router.push(`/(tabs)/tracking?jobId=${job.id}&artisanId=${job.artisanId || user?.uid}`);
+    const phixerId = job.phixerId || job.artisanId || user?.uid;
+    router.push(`/(tabs)/tracking?jobId=${job.id}&phixerId=${phixerId}`);
   };
 
   const startBroadcasting = () => {
@@ -208,7 +211,7 @@ export default function JobDetailScreen() {
   const statusColors = getStatusColor(job.status);
   const isArtisan = userRole === 'artisan';
   const isClient = userRole === 'client';
-  const canTrack = job.artisanId && ['accepted', 'in-progress'].includes(job.status);
+  const canTrack = (job.phixerId || job.artisanId) && ['accepted', 'in-progress'].includes(job.status);
 
   return (
     <ScrollView style={styles.container}>
@@ -317,12 +320,12 @@ export default function JobDetailScreen() {
           </View>
         )}
 
-        {isClient && job.artisanName && (
+        {isClient && (job.phixerName || job.artisanName) && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Assigned Artisan</Text>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Name:</Text>
-              <Text style={styles.detailValue}>{job.artisanName}</Text>
+              <Text style={styles.detailValue}>{job.phixerName || job.artisanName}</Text>
             </View>
           </View>
         )}

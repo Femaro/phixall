@@ -22,8 +22,10 @@ interface Job {
   serviceCategory?: string;
   createdAt: any;
   scheduledAt?: any;
-  artisanName?: string;
-  artisanId?: string;
+  artisanName?: string; // Legacy field for backward compatibility
+  artisanId?: string; // Legacy field for backward compatibility
+  phixerName?: string;
+  phixerId?: string;
   clientName?: string;
   clientEmail?: string;
   clientPhone?: string;
@@ -67,8 +69,8 @@ export default function JobsScreen() {
         const role = profile?.role || 'client';
         setUserRole(role);
 
-        // Get artisan's current location for distance calculation
-        if (role === 'artisan') {
+        // Get Phixer's current location for distance calculation
+        if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
           try {
             const { status: permissionStatus } = await Location.requestForegroundPermissionsAsync();
             if (permissionStatus === 'granted') {
@@ -85,23 +87,64 @@ export default function JobsScreen() {
 
         // Load jobs based on role
         let jobsQuery;
-        if (role === 'artisan') {
-          // Artisans see their assigned jobs
-          jobsQuery = query(
+        if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
+          // Phixers see their assigned jobs (query both phixerId and artisanId for backward compatibility)
+          const phixerJobsQuery = query(
+            collection(db, 'jobs'),
+            where('phixerId', '==', user.uid),
+            orderBy('createdAt', 'desc')
+          );
+          const artisanJobsQuery = query(
             collection(db, 'jobs'),
             where('artisanId', '==', user.uid),
             orderBy('createdAt', 'desc')
           );
+          
+          // Use refs to track data from both queries and merge them
+          const phixerJobsRef = React.useRef<Job[]>([]);
+          const artisanJobsRef = React.useRef<Job[]>([]);
+          
+          const mergeAndSetJobs = () => {
+            const combined = [...phixerJobsRef.current, ...artisanJobsRef.current];
+            const uniqueMap = new Map<string, Job>();
+            combined.forEach(job => {
+              if (!uniqueMap.has(job.id)) {
+                uniqueMap.set(job.id, job);
+              }
+            });
+            setJobs(Array.from(uniqueMap.values()));
+          };
+          
+          const unsubscribePhixer = onSnapshot(phixerJobsQuery, (snapshot) => {
+            phixerJobsRef.current = [];
+            snapshot.forEach((doc) => {
+              phixerJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+            });
+            mergeAndSetJobs();
+          });
+          
+          const unsubscribeArtisan = onSnapshot(artisanJobsQuery, (snapshot) => {
+            artisanJobsRef.current = [];
+            snapshot.forEach((doc) => {
+              artisanJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+            });
+            mergeAndSetJobs();
+          });
+          
+          // Store unsubscribe functions for cleanup
+          unsubscribeRef.current = () => {
+            unsubscribePhixer();
+            unsubscribeArtisan();
+          };
         } else {
           // Clients see their own jobs
-          jobsQuery = query(
+          const jobsQuery = query(
             collection(db, 'jobs'),
             where('clientId', '==', user.uid),
             orderBy('createdAt', 'desc')
           );
-        }
 
-        unsubscribeRef.current = onSnapshot(jobsQuery, (snapshot) => {
+          unsubscribeRef.current = onSnapshot(jobsQuery, (snapshot) => {
           const jobsData: Job[] = [];
           const distances: Record<string, number> = {};
 
@@ -109,8 +152,8 @@ export default function JobsScreen() {
             const jobData = { id: doc.id, ...doc.data() } as Job;
             jobsData.push(jobData);
 
-            // Calculate distance for artisans
-            if (role === 'artisan' && artisanLocation && jobData.serviceAddress?.lat && jobData.serviceAddress?.lng) {
+            // Calculate distance for Phixers
+            if ((role === 'Phixer' || role === 'phixer' || role === 'artisan') && artisanLocation && jobData.serviceAddress?.lat && jobData.serviceAddress?.lng) {
               const dist = calculateDistance(
                 artisanLocation.lat,
                 artisanLocation.lng,
@@ -121,9 +164,10 @@ export default function JobsScreen() {
             }
           });
 
-          setJobs(jobsData);
-          setJobDistances(distances);
-        });
+            setJobs(jobsData);
+            setJobDistances(distances);
+          });
+        }
       } catch (error) {
         console.error('Error fetching role:', error);
         setUserRole('client');
@@ -250,10 +294,10 @@ export default function JobsScreen() {
                 </View>
               )}
 
-              {userRole === 'client' && job.artisanName && (
+              {userRole === 'client' && (job.phixerName || job.artisanName) && (
                 <View style={styles.artisanInfo}>
                   <Text style={styles.artisanLabel}>Assigned Artisan:</Text>
-                  <Text style={styles.artisanName}>{job.artisanName}</Text>
+                  <Text style={styles.artisanName}>{job.phixerName || job.artisanName}</Text>
                 </View>
               )}
 
@@ -296,10 +340,10 @@ export default function JobsScreen() {
                 </TouchableOpacity>
               )}
 
-              {userRole === 'client' && job.artisanId && ['accepted', 'in-progress'].includes(job.status) && (
-                <TouchableOpacity
-                  style={styles.trackButton}
-                  onPress={() => router.push(`/(tabs)/tracking?jobId=${job.id}&artisanId=${job.artisanId}`)}
+              {userRole === 'client' && (job.phixerId || job.artisanId) && ['accepted', 'in-progress'].includes(job.status) && (
+                  <TouchableOpacity
+                    style={styles.trackButton}
+                    onPress={() => router.push(`/(tabs)/tracking?jobId=${job.id}&phixerId=${job.phixerId || job.artisanId}`)}
                 >
                   <Text style={styles.trackButtonText}>📍 Track Artisan</Text>
                 </TouchableOpacity>

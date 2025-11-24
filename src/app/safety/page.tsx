@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 
 export default function SafetyPage() {
   return (
@@ -40,7 +40,7 @@ export default function SafetyPage() {
               {
                 icon: '🔍',
                 title: 'Thorough Vetting',
-                description: 'All artisans undergo identity verification, background checks, skills assessments, and reference checks before joining our platform.',
+                description: 'All Phixers undergo identity verification, background checks, skills assessments, and reference checks before joining our platform.',
               },
               {
                 icon: '✅',
@@ -55,7 +55,7 @@ export default function SafetyPage() {
               {
                 icon: '📍',
                 title: 'Real-Time Tracking',
-                description: 'GPS tracking enables you to monitor artisan location and estimated arrival time for added security.',
+                description: 'GPS tracking enables you to monitor Phixer location and estimated arrival time for added security.',
               },
               {
                 icon: '💬',
@@ -80,7 +80,7 @@ export default function SafetyPage() {
               {
                 icon: '⚖️',
                 title: 'Dispute Resolution',
-                description: 'Fair mediation process for resolving conflicts between clients and artisans.',
+                description: 'Fair mediation process for resolving conflicts between clients and Phixers.',
               },
             ].map((feature) => (
               <div key={feature.title} className="border border-neutral-200 bg-white p-8 shadow-soft">
@@ -104,8 +104,8 @@ export default function SafetyPage() {
               <h3 className="text-xl font-semibold text-neutral-900">Before the Job</h3>
               <ul className="mt-4 space-y-3">
                 {[
-                  'Review artisan profiles, ratings, and reviews thoroughly',
-                  'Verify artisan credentials and insurance coverage',
+                  'Review Phixer profiles, ratings, and reviews thoroughly',
+                  'Verify Phixer credentials and insurance coverage',
                   'Communicate job details clearly through the platform',
                   'Ensure pets are secured and valuable items are stored safely',
                   'Have someone present during the appointment when possible',
@@ -123,7 +123,7 @@ export default function SafetyPage() {
               <h3 className="text-xl font-semibold text-neutral-900">During the Job</h3>
               <ul className="mt-4 space-y-3">
                 {[
-                  'Verify artisan identity upon arrival',
+                  'Verify Phixer identity upon arrival',
                   'Monitor work progress and communicate concerns immediately',
                   'Use in-app messaging for all communication',
                   'Report any safety concerns to our support team',
@@ -162,7 +162,7 @@ export default function SafetyPage() {
               <ul className="mt-4 space-y-3">
                 {[
                   'Always pay through the Phixall platform',
-                  'Never share payment information directly with artisans',
+                  'Never share payment information directly with Phixers',
                   'Review invoices carefully before approving payment',
                   'Report any payment irregularities immediately',
                   'Keep digital receipts for your records',
@@ -180,11 +180,11 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* For Artisans */}
+      {/* For Phixers */}
       <section className="border-t border-neutral-200">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <h2 className="text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">
-            Safety Tips for Artisans
+            Safety Tips for Phixers
           </h2>
           <div className="mt-12 grid gap-8 lg:grid-cols-2">
             <div>
@@ -320,6 +320,8 @@ export default function SafetyPage() {
     </main>
   );
 }
+
+
 
 
 

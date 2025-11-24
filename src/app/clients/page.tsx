@@ -1,23 +1,23 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
 import { generateBreadcrumbSchema } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'For Clients - Facility Management Made Simple',
-  description: 'Streamline facility operations with Phixall. Access vetted artisans on-demand, track jobs in real-time, choose from Bronze, Gold, or Platinum subscription tiers. Trusted by 500+ businesses.',
+  description: 'Streamline facility operations with Phixall. Access vetted Phixers on-demand, track jobs in real-time, choose from Bronze, Gold, or Platinum subscription tiers. Trusted by 500+ businesses.',
   keywords: [
     'facility management for businesses',
     'on-demand maintenance services',
     'facility subscription plans',
-    'vetted artisans',
+    'vetted Phixers',
     'real-time job tracking',
     'business maintenance',
     'facility operations',
   ],
   openGraph: {
     title: 'Phixall for Clients - Streamline Your Facility Operations',
-    description: 'Access vetted artisans on-demand and manage facility maintenance from one dashboard. Choose the subscription tier that fits your needs.',
+    description: 'Access vetted Phixers on-demand and manage facility maintenance from one dashboard. Choose the subscription tier that fits your needs.',
     url: '/clients',
     images: [
       {
@@ -57,7 +57,7 @@ export default function ClientsPage() {
                 <span className="text-gradient"> Facility Operations</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-neutral-600">
-                Access vetted artisans on-demand, track every job in real-time, and manage your entire facility maintenance from one powerful dashboard.
+                Access vetted Phixers on-demand, track every job in real-time, and manage your entire facility maintenance from one powerful dashboard.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -81,7 +81,7 @@ export default function ClientsPage() {
               <div className="space-y-4">
                 {[
                   { icon: '🎯', text: 'Request services in under 2 minutes' },
-                  { icon: '📍', text: 'Track artisan location in real-time' },
+                  { icon: '📍', text: 'Track Phixer location in real-time' },
                   { icon: '💳', text: 'Transparent pricing with digital invoices' },
                   { icon: '📊', text: 'Analytics and reporting dashboard' },
                 ].map((item) => (
@@ -125,7 +125,7 @@ export default function ClientsPage() {
                   </svg>
                 ),
                 title: 'Instant Matching',
-                description: 'Our AI matches you with qualified artisans based on skills, location, availability, and ratings.',
+                description: 'Our AI matches you with qualified Phixers based on skills, location, availability, and ratings.',
               },
               {
                 icon: (
@@ -134,7 +134,7 @@ export default function ClientsPage() {
                   </svg>
                 ),
                 title: 'Live Tracking',
-                description: 'Monitor artisan location with real-time GPS, ETA updates, and arrival notifications.',
+                description: 'Monitor Phixer location with real-time GPS, ETA updates, and arrival notifications.',
               },
               {
                 icon: (
@@ -152,7 +152,7 @@ export default function ClientsPage() {
                   </svg>
                 ),
                 title: 'Analytics Dashboard',
-                description: 'Track spending, job completion rates, artisan performance, and facility health metrics.',
+                description: 'Track spending, job completion rates, Phixer performance, and facility health metrics.',
               },
               {
                 icon: (
@@ -490,3 +490,4 @@ export default function ClientsPage() {
     </>
   );
 }
+

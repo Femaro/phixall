@@ -1,26 +1,26 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
 import { organizationSchema, servicesSchema } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Professional Facility Management & Maintenance Services in Nigeria',
-  description: 'Connect with verified, skilled artisans for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
+  description: 'Connect with verified, skilled Phixers for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
   keywords: [
     'facility management Nigeria',
     'maintenance services Lagos',
-    'professional artisans',
+    'professional Phixers',
     'plumbing services',
     'electrical repairs',
     'HVAC maintenance',
     'building maintenance',
     'skilled technicians',
-    'verified artisans',
+    'verified Phixers',
     'facility services',
   ],
   openGraph: {
     title: 'Phixall - Professional Facility Management Made Simple',
-    description: 'Connect with verified artisans for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
+    description: 'Connect with verified Phixers for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
     url: '/',
     siteName: 'Phixall',
     images: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Phixall - Professional Facility Management',
-    description: 'Connect with verified artisans for all your maintenance needs. Trusted by 500+ businesses.',
+    description: 'Connect with verified Phixers for all your maintenance needs. Trusted by 500+ businesses.',
     images: ['/og-image.png'],
   },
   alternates: {
@@ -67,7 +67,7 @@ export default function Home() {
                 <span className="text-gradient"> simplified</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-neutral-600">
-                Connect with vetted artisans for all your maintenance needs. Request services, track progress in real-time, and manage payments—all from one powerful platform.
+                Connect with vetted Phixers for all your maintenance needs. Request services, track progress in real-time, and manage payments—all from one powerful platform.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -176,7 +176,7 @@ export default function Home() {
                   <div className="flex gap-6">
                     <div className="text-center">
                       <div className="mb-1 text-2xl font-bold text-brand-600">500+</div>
-                      <div className="text-xs text-neutral-600">Active Artisans</div>
+                      <div className="text-xs text-neutral-600">Active Phixers</div>
                     </div>
                     <div className="h-10 w-px bg-neutral-300"></div>
                     <div className="text-center">
@@ -222,7 +222,7 @@ export default function Home() {
               {
                 step: '02',
                 title: 'Get Matched',
-                description: 'Our system connects you with verified artisans nearby. Review profiles, ratings, and accept quotes.',
+                description: 'Our system connects you with verified Phixers nearby. Review profiles, ratings, and accept quotes.',
                 icon: (
                   <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -232,7 +232,7 @@ export default function Home() {
               {
                 step: '03',
                 title: 'Track & Pay',
-                description: 'Monitor artisan location in real-time, review work upon completion, and pay securely online.',
+                description: 'Monitor Phixer location in real-time, review work upon completion, and pay securely online.',
                 icon: (
                   <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -326,7 +326,7 @@ export default function Home() {
                       <h4 className="mb-2 text-lg font-bold text-neutral-900">HVAC Maintenance</h4>
                       <p className="mb-4 text-sm text-neutral-600">Scheduled for today, 2:00 PM</p>
                       <div className="flex items-center gap-3">
-                        <img src="/logo.png" alt="Artisan" className="h-10 w-10 rounded-full border-2 border-brand-200" />
+                        <img src="/logo.png" alt="Phixer" className="h-10 w-10 rounded-full border-2 border-brand-200" />
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-neutral-900">John Adebayo</p>
                           <div className="flex items-center gap-1">
@@ -363,12 +363,12 @@ export default function Home() {
                   {
                     icon: '🔧',
                     title: 'On-Demand Services',
-                    desc: 'Access verified artisans 24/7 for immediate assistance'
+                    desc: 'Access verified Phixers 24/7 for immediate assistance'
                   },
                   {
                     icon: '📍',
                     title: 'Real-Time Tracking',
-                    desc: 'Monitor service progress and artisan location live'
+                    desc: 'Monitor service progress and Phixer location live'
                   },
                   {
                     icon: '💳',
@@ -549,7 +549,7 @@ export default function Home() {
                           <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span>Access to Premium Artisans</span>
+                          <span>Access to Premium Phixers</span>
                         </div>
                       </div>
                     </div>
@@ -569,7 +569,7 @@ export default function Home() {
               Trusted by Facilities Nationwide
             </h2>
             <p className="mt-4 text-lg text-neutral-600">
-              Hear from clients and artisans using Phixall every day
+              Hear from clients and Phixers using Phixall every day
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -587,7 +587,7 @@ export default function Home() {
                 rating: 5,
               },
               {
-                quote: 'Reliable artisans, transparent pricing, and on-time delivery every single time. Highly recommend for any facility needs.',
+                quote: 'Reliable Phixers, transparent pricing, and on-time delivery every single time. Highly recommend for any facility needs.',
                 author: 'Chioma Nwosu',
                 role: 'Operations Lead',
                 rating: 5,
@@ -627,11 +627,11 @@ export default function Home() {
             {[
               {
                 q: 'How quickly can I book a service?',
-                a: 'Most service requests are confirmed within 2-4 hours. We offer same-day and emergency options in all supported areas, with average artisan arrival times of 45-90 minutes.',
+                a: 'Most service requests are confirmed within 2-4 hours. We offer same-day and emergency options in all supported areas, with average Phixer arrival times of 45-90 minutes.',
               },
               {
-                q: 'Are artisans vetted and insured?',
-                a: 'Yes. Every artisan undergoes identity verification, skills assessment, and background checks. We maintain ongoing performance reviews and require valid trade certifications.',
+                q: 'Are Phixers vetted and insured?',
+                a: 'Yes. Every Phixer undergoes identity verification, skills assessment, and background checks. We maintain ongoing performance reviews and require valid trade certifications.',
               },
               {
                 q: 'Do you support corporate and enterprise facilities?',
@@ -647,7 +647,7 @@ export default function Home() {
               },
               {
                 q: 'What if I\'m not satisfied with the work?',
-                a: 'We offer a 100% satisfaction guarantee. If you\'re not happy with the completed work, we\'ll send another artisan at no additional charge or provide a full refund.',
+                a: 'We offer a 100% satisfaction guarantee. If you\'re not happy with the completed work, we\'ll send another Phixer at no additional charge or provide a full refund.',
               },
             ].map((faq, i) => (
               <details key={i} className="group rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
@@ -699,3 +699,4 @@ export default function Home() {
     </>
   );
 }
+

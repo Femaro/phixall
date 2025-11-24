@@ -48,7 +48,7 @@ export default function TrainingModules({ user, onboarding, setOnboarding }: Pro
     setProgressState(nextProgress);
     try {
       const { db } = getFirebase();
-      await updateDoc(doc(db, 'artisan_onboarding', user.uid), {
+      await updateDoc(doc(db, 'phixer_onboarding', user.uid), {
         trainingProgress: nextProgress,
         updatedAt: serverTimestamp(),
       });
@@ -136,7 +136,7 @@ export default function TrainingModules({ user, onboarding, setOnboarding }: Pro
     setSubmitting(true);
     try {
       const { db } = getFirebase();
-      const onboardingRef = doc(db, 'artisan_onboarding', user.uid);
+      const onboardingRef = doc(db, 'phixer_onboarding', user.uid);
 
       const moduleKey = activeModuleId ? moduleKeyMap[activeModuleId] : undefined;
       if (!moduleKey) {

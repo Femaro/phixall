@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import RegisterForm from '@/components/auth/RegisterForm';
 
 export default function RegisterPage() {
@@ -10,12 +9,6 @@ export default function RegisterPage() {
       {/* Left Side - Form */}
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-12">
         <div className="mx-auto w-full max-w-md">
-          <div>
-            <Link href="/" className="inline-block">
-              <img src="/logo.png" alt="Phixall" className="h-16 drop-shadow-lg" style={{ filter: 'contrast(1.2) brightness(1.1)' }} />
-            </Link>
-          </div>
-
           <RegisterForm
             heading="Create your account"
             subheading="Join Phixall to access on-demand facility maintenance services."

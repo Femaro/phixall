@@ -1,4 +1,4 @@
-import { TrainingModule } from '@/types/onboarding';
+﻿import { TrainingModule } from '@/types/onboarding';
 
 export const trainingModules: TrainingModule[] = [
   {
@@ -223,7 +223,7 @@ export const trainingModules: TrainingModule[] = [
             'Share it with friends',
             'Post about it online',
             'Keep it completely confidential',
-            'Discuss it with other artisans'
+            'Discuss it with other Phixers'
           ],
           correctAnswer: 2,
           explanation: 'Always maintain strict confidentiality regarding any information you see or hear at corporate sites.'
@@ -259,7 +259,7 @@ export const trainingModules: TrainingModule[] = [
   {
     id: 'dashboard-training',
     title: 'Phixall Dashboard Training',
-    description: 'How to use the Phixall artisan platform effectively',
+    description: 'How to use the Phixall Phixer platform effectively',
     duration: '20 minutes',
     image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80',
     content: [
@@ -346,5 +346,6 @@ export const trainingModules: TrainingModule[] = [
     }
   }
 ];
+
 
 

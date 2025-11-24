@@ -16,7 +16,7 @@ export const organizationSchema: WithContext<Organization> = {
     addressLocality: 'Lagos',
   },
   sameAs: [
-    'https://twitter.com/phixall',
+    'https://x.com/phixallng',
     'https://www.linkedin.com/company/phixall',
     'https://www.facebook.com/phixall',
     'https://www.instagram.com/phixall',

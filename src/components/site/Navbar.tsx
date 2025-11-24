@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import Logo from '@/app/logo.png';
@@ -80,7 +80,7 @@ export default function Navbar() {
           </div>
           
           <Link href="/clients" className="transition-colors hover:text-brand-600">For Clients</Link>
-          <Link href="/artisans" className="transition-colors hover:text-brand-600">For Artisans</Link>
+          <Link href="/phixers" className="transition-colors hover:text-brand-600">For Phixers</Link>
           <Link href="/contact" className="transition-colors hover:text-brand-600">Contact</Link>
         </nav>
         
@@ -163,7 +163,7 @@ export default function Navbar() {
             </div>
             
             <Link href="/clients" className="rounded-lg px-3 py-2 text-[15px] font-medium text-neutral-700 hover:bg-neutral-100">For Clients</Link>
-            <Link href="/artisans" className="rounded-lg px-3 py-2 text-[15px] font-medium text-neutral-700 hover:bg-neutral-100">For Artisans</Link>
+            <Link href="/phixers" className="rounded-lg px-3 py-2 text-[15px] font-medium text-neutral-700 hover:bg-neutral-100">For Phixers</Link>
             <Link href="/contact" className="rounded-lg px-3 py-2 text-[15px] font-medium text-neutral-700 hover:bg-neutral-100">Contact</Link>
             <Link href="/login" className="rounded-lg px-3 py-2 text-[15px] font-medium text-neutral-700 hover:bg-neutral-100">Sign in</Link>
           </nav>
@@ -172,5 +172,6 @@ export default function Navbar() {
     </header>
   );
 }
+
 
 

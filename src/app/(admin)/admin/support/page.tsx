@@ -22,7 +22,7 @@ import type { User as FirebaseUser } from 'firebase/auth';
 type SupportSession = {
   id: string;
   userId: string;
-  role: 'client' | 'artisan' | 'admin';
+  role: 'client' | 'Phixer' | 'admin';
   status: string;
   updatedAt?: Date;
   createdAt?: Date;
@@ -50,7 +50,7 @@ type ArticleForm = {
   content: string;
   tags: string;
   priority: string;
-  roles: Record<'client' | 'artisan' | 'admin' | 'general', boolean>;
+  roles: Record<'client' | 'Phixer' | 'admin' | 'general', boolean>;
 };
 
 type SupportArticleItem = {
@@ -88,7 +88,7 @@ export default function AdminSupportPage() {
 
   const createRoleTemplate = () => ({
     client: false,
-    artisan: false,
+    Phixer: false,
     admin: false,
     general: true,
   });
@@ -301,7 +301,7 @@ export default function AdminSupportPage() {
 
   const roleOptions: Array<{ id: keyof ArticleForm['roles']; label: string }> = [
     { id: 'client', label: 'Clients' },
-    { id: 'artisan', label: 'Artisans' },
+    { id: 'Phixer', label: 'Phixers' },
     { id: 'admin', label: 'Admins' },
     { id: 'general', label: 'General' },
   ];

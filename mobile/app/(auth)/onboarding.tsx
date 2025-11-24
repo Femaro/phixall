@@ -40,7 +40,7 @@ export default function OnboardingScreen() {
     setLoading(true);
     try {
       const { db } = getFirebase();
-      await setDoc(doc(db, 'artisan_onboarding', user.uid), {
+      await setDoc(doc(db, 'phixer_onboarding', user.uid), {
         trade: formData.trade,
         experience: formData.experience,
         location: formData.location,

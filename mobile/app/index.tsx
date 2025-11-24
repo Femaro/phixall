@@ -84,8 +84,8 @@ export default function Index() {
     );
   }
 
-  if (role === 'artisan') {
-    return <Redirect href="/(tabs)/artisan" />;
+  if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
+    return <Redirect href="/(tabs)/phixer" />;
   }
 
   // Default to client

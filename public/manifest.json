@@ -43,7 +43,7 @@
       "name": "For Artisans",
       "short_name": "Artisans",
       "description": "Access artisan dashboard and jobs",
-      "url": "/artisans",
+      "url": "/phixers",
       "icons": [
         {
           "src": "/icon.svg",

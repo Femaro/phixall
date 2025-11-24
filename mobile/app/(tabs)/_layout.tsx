@@ -81,7 +81,8 @@ export default function TabsLayout() {
     );
   }
 
-  if (role === 'artisan') {
+  // Check for Phixer role (supports both 'Phixer' and legacy 'artisan' for backward compatibility)
+  if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
     return (
       <Tabs
         screenOptions={{
@@ -91,10 +92,17 @@ export default function TabsLayout() {
         }}
       >
         <Tabs.Screen
-          name="artisan"
+          name="phixer"
           options={{
             title: 'Dashboard',
             tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📊</Text>,
+          }}
+        />
+        {/* Hide legacy artisan tab */}
+        <Tabs.Screen
+          name="artisan"
+          options={{
+            href: null,
           }}
         />
         <Tabs.Screen

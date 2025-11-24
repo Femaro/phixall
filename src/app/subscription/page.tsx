@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useState } from 'react';
 import Link from 'next/link';
 import StructuredData from '@/components/seo/StructuredData';
@@ -55,7 +55,7 @@ export default function SubscriptionPage() {
       benefits: [
         '5 service calls per month',
         'Priority response (12-24 hours)',
-        'Priority artisan assignment',
+        'Priority Phixer assignment',
         '10% discount on additional services',
         'Quarterly facility inspection'
       ],
@@ -82,7 +82,7 @@ export default function SubscriptionPage() {
         'Unlimited service calls',
         'Emergency response (2-4 hours)',
         'Dedicated account manager',
-        'Premium artisan assignment',
+        'Premium Phixer assignment',
         '20% discount on additional services',
         'Monthly facility inspection',
         'Preventive maintenance planning'
@@ -357,4 +357,5 @@ export default function SubscriptionPage() {
     </>
   );
 }
+
 

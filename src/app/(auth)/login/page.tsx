@@ -1,36 +1,205 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import {
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  multiFactor,
+  PhoneAuthProvider,
+  PhoneMultiFactorGenerator,
+  RecaptchaVerifier,
+  getMultiFactorResolver,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  type User,
+  type AuthError,
+} from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getFirebase } from '@/lib/firebaseClient';
+
+type MFAState = {
+  showMFA: boolean;
+  phoneNumber: string;
+  verificationId: string | null;
+  verificationCode: string;
+  recaptchaVerifier: RecaptchaVerifier | null;
+};
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [inactivityMessage, setInactivityMessage] = useState(false);
+  const [mfaState, setMfaState] = useState<MFAState>({
+    showMFA: false,
+    phoneNumber: '',
+    verificationId: null,
+    verificationCode: '',
+    recaptchaVerifier: null,
+  });
+  const recaptchaContainerRef = useRef<HTMLDivElement>(null);
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError('');
+  // Check for inactivity redirect
+  useEffect(() => {
+    const reason = searchParams?.get('reason');
+    if (reason === 'inactivity') {
+      setInactivityMessage(true);
+      // Clear the message after 5 seconds
+      setTimeout(() => setInactivityMessage(false), 5000);
+    }
+  }, [searchParams]);
+
+  // Cleanup recaptcha on unmount
+  useEffect(() => {
+    return () => {
+      if (mfaState.recaptchaVerifier) {
+        mfaState.recaptchaVerifier.clear();
+      }
+    };
+  }, [mfaState.recaptchaVerifier]);
+
+  const initializeRecaptcha = async (): Promise<RecaptchaVerifier> => {
+    const { auth } = getFirebase();
+    
+    // Clear existing verifier if any
+    if (mfaState.recaptchaVerifier) {
+      mfaState.recaptchaVerifier.clear();
+    }
+
+    const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      size: 'normal',
+      callback: () => {
+        // reCAPTCHA solved
+      },
+      'expired-callback': () => {
+        setError('reCAPTCHA expired. Please try again.');
+      },
+    });
+
+    await verifier.render();
+    return verifier;
+  };
+
+  const handleMFAFlow = async (error: any) => {
+    try {
+      const { auth } = getFirebase();
+      const resolver = getMultiFactorResolver(auth, error);
+      
+      if (!resolver || !resolver.hints || resolver.hints.length === 0) {
+        setError('Multi-factor authentication is required but no phone number is enrolled.');
+        setLoading(false);
+        return;
+      }
+
+      // Store resolver for later use
+      setMfaResolver(resolver);
+
+      // Get the phone number hint
+      const phoneInfoOptions = {
+        multiFactorHint: resolver.hints[0],
+        session: resolver.session,
+      };
+
+      // Initialize reCAPTCHA
+      const verifier = await initializeRecaptcha();
+      setMfaState((prev) => ({ ...prev, recaptchaVerifier: verifier }));
+
+      // Send SMS code using PhoneAuthProvider for MFA
+      // Create PhoneAuthProvider instance and verify phone number
+      const phoneAuthProvider = new PhoneAuthProvider(auth);
+      const verificationId = await phoneAuthProvider.verifyPhoneNumber(
+        phoneInfoOptions as any,
+        verifier
+      );
+
+      setMfaState((prev) => ({
+        ...prev,
+        showMFA: true,
+        verificationId,
+      }));
+    } catch (err: unknown) {
+      console.error('MFA initialization error:', err);
+      if (err && typeof err === 'object' && 'code' in err) {
+        const errorCode = (err as { code?: string }).code;
+        if (errorCode === 'auth/invalid-phone-number') {
+          setError('Invalid phone number. Please check and try again.');
+        } else {
+          setError(`MFA setup failed: ${errorCode}`);
+        }
+      } else {
+        setError('Failed to initialize multi-factor authentication. Please try again.');
+      }
+      setLoading(false);
+    }
+  };
+
+  const [mfaResolver, setMfaResolver] = useState<any>(null);
+
+  const handleMFAVerification = async () => {
+    if (!mfaState.verificationId || !mfaState.verificationCode || !mfaResolver) {
+      setError('Please enter the verification code');
+      return;
+    }
+
     setLoading(true);
+    setError('');
 
     try {
       const { auth, db } = getFirebase();
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Create phone credential
+      const phoneCredential = PhoneAuthProvider.credential(
+        mfaState.verificationId,
+        mfaState.verificationCode
+      );
+
+      // Resolve the sign-in with the phone credential
+      const multiFactorCredential = PhoneMultiFactorGenerator.assertion(phoneCredential);
+      const userCredential = await mfaResolver.resolveSignIn(multiFactorCredential);
+
+      // Clear MFA state
+      if (mfaState.recaptchaVerifier) {
+        mfaState.recaptchaVerifier.clear();
+      }
+      setMfaState({
+        showMFA: false,
+        phoneNumber: '',
+        verificationId: null,
+        verificationCode: '',
+        recaptchaVerifier: null,
+      });
+      setMfaResolver(null);
+
+      // Check email verification
+      if (!userCredential.user.emailVerified) {
+        setShowEmailVerification(true);
+        setError('Please verify your email address before signing in.');
+        setLoading(false);
+        return;
+      }
+
       const profileRef = doc(db, 'profiles', userCredential.user.uid);
       const profileSnap = await getDoc(profileRef);
 
       if (profileSnap.exists()) {
         const role = profileSnap.data().role;
-        if (role === 'admin') {
+        const normalizedRole = typeof role === 'string' ? role : String(role);
+        if (normalizedRole === 'admin') {
           router.push('/admin/dashboard');
-        } else if (role === 'artisan') {
-          router.push('/artisan/dashboard');
+        } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
+          router.push('/phixer/dashboard');
         } else {
           router.push('/client/dashboard');
         }
@@ -38,8 +207,219 @@ export default function LoginPage() {
         router.push('/client/dashboard');
       }
     } catch (err: unknown) {
-      console.error(err);
-      setError('Invalid email or password. Please try again.');
+      console.error('MFA verification error:', err);
+      if (err && typeof err === 'object' && 'code' in err) {
+        const errorCode = (err as { code?: string }).code;
+        if (errorCode === 'auth/invalid-verification-code') {
+          setError('Invalid verification code. Please try again.');
+        } else {
+          setError(`Verification failed: ${errorCode}`);
+        }
+      } else {
+        setError('Failed to verify code. Please try again.');
+      }
+      setLoading(false);
+    }
+  };
+
+  const handleResendVerificationEmail = async () => {
+    try {
+      const { auth } = getFirebase();
+      const user = auth.currentUser;
+      if (user) {
+        await sendEmailVerification(user);
+        setError('');
+        alert('Verification email sent! Please check your inbox.');
+      }
+    } catch (err) {
+      console.error('Error resending verification email:', err);
+      setError('Failed to resend verification email. Please try again.');
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { auth, db } = getFirebase();
+      
+      // Set persistence based on remember me
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      // Check if profile exists, create if not
+      const profileRef = doc(db, 'profiles', userCredential.user.uid);
+      const profileSnap = await getDoc(profileRef);
+      
+      if (!profileSnap.exists()) {
+        await setDoc(profileRef, {
+          name: userCredential.user.displayName || '',
+          email: userCredential.user.email || '',
+          role: 'client',
+          emailVerified: userCredential.user.emailVerified,
+          createdAt: new Date().toISOString(),
+        });
+      }
+      
+      // Redirect based on role
+      const role = profileSnap.exists() ? profileSnap.data().role : 'client';
+      const normalizedRole = typeof role === 'string' ? role : String(role);
+      if (normalizedRole === 'admin') {
+        router.push('/admin/dashboard');
+      } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
+        router.push('/phixer/dashboard');
+      } else {
+        router.push('/client/dashboard');
+      }
+    } catch (err: unknown) {
+      console.error('Google sign-in error:', err);
+      if (err && typeof err === 'object' && 'code' in err) {
+        const errorCode = (err as { code?: string }).code;
+        if (errorCode === 'auth/popup-closed-by-user') {
+          setError('Sign-in was cancelled.');
+        } else {
+          setError(`Google sign-in failed: ${errorCode}`);
+        }
+      } else {
+        setError('Failed to sign in with Google. Please try again.');
+      }
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { auth, db } = getFirebase();
+      
+      // Set persistence based on remember me
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      
+      const provider = new FacebookAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      // Check if profile exists, create if not
+      const profileRef = doc(db, 'profiles', userCredential.user.uid);
+      const profileSnap = await getDoc(profileRef);
+      
+      if (!profileSnap.exists()) {
+        await setDoc(profileRef, {
+          name: userCredential.user.displayName || '',
+          email: userCredential.user.email || '',
+          role: 'client',
+          emailVerified: userCredential.user.emailVerified,
+          createdAt: new Date().toISOString(),
+        });
+      }
+      
+      // Redirect based on role
+      const role = profileSnap.exists() ? profileSnap.data().role : 'client';
+      const normalizedRole = typeof role === 'string' ? role : String(role);
+      if (normalizedRole === 'admin') {
+        router.push('/admin/dashboard');
+      } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
+        router.push('/phixer/dashboard');
+      } else {
+        router.push('/client/dashboard');
+      }
+    } catch (err: unknown) {
+      console.error('Facebook sign-in error:', err);
+      if (err && typeof err === 'object' && 'code' in err) {
+        const errorCode = (err as { code?: string }).code;
+        if (errorCode === 'auth/popup-closed-by-user') {
+          setError('Sign-in was cancelled.');
+        } else {
+          setError(`Facebook sign-in failed: ${errorCode}`);
+        }
+      } else {
+        setError('Failed to sign in with Facebook. Please try again.');
+      }
+      setLoading(false);
+    }
+  };
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    setShowEmailVerification(false);
+    setLoading(true);
+
+    try {
+      const { auth, db } = getFirebase();
+      
+      // Set persistence based on remember me
+      await setPersistence(auth, rememberMe ? browserLocalPersistence : browserSessionPersistence);
+      
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      // Check email verification
+      if (!userCredential.user.emailVerified) {
+        setShowEmailVerification(true);
+        setError('Please verify your email address before signing in. Check your inbox for the verification link.');
+        setLoading(false);
+        return;
+      }
+
+      // Check if user has MFA enrolled
+      const enrolledFactors = multiFactor(userCredential.user).enrolledFactors;
+      if (enrolledFactors.length > 0) {
+        // User has MFA - this should be handled by the error handler
+        // But if we reach here, MFA was already completed
+      }
+
+      const profileRef = doc(db, 'profiles', userCredential.user.uid);
+      const profileSnap = await getDoc(profileRef);
+
+      if (profileSnap.exists()) {
+        const role = profileSnap.data().role;
+        const normalizedRole = typeof role === 'string' ? role : String(role);
+        if (normalizedRole === 'admin') {
+          router.push('/admin/dashboard');
+        } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
+          router.push('/phixer/dashboard');
+        } else {
+          router.push('/client/dashboard');
+        }
+      } else {
+        router.push('/client/dashboard');
+      }
+    } catch (err: unknown) {
+      console.error('Login error:', err);
+      
+      // Check for MFA required error
+      if (err && typeof err === 'object' && 'code' in err) {
+        const errorCode = (err as { code?: string }).code;
+        
+        if (errorCode === 'auth/multi-factor-auth-required') {
+          // Handle MFA flow
+          await handleMFAFlow(err);
+          return;
+        }
+        
+        switch (errorCode) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            setError('Invalid email or password. Please try again.');
+            break;
+          case 'auth/invalid-email':
+            setError('Please enter a valid email address.');
+            break;
+          case 'auth/user-disabled':
+            setError('This account has been disabled. Please contact support.');
+            break;
+          case 'auth/too-many-requests':
+            setError('Too many failed attempts. Please try again later.');
+            break;
+          default:
+            setError(`Sign in failed: ${errorCode}. Please try again.`);
+        }
+      } else {
+        setError('Invalid email or password. Please try again.');
+      }
       setLoading(false);
     }
   }
@@ -50,10 +430,7 @@ export default function LoginPage() {
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-12">
         <div className="mx-auto w-full max-w-md">
           <div>
-            <Link href="/" className="inline-block">
-              <img src="/logo.png" alt="Phixall" className="h-16 drop-shadow-lg" style={{ filter: 'contrast(1.2) brightness(1.1)' }} />
-            </Link>
-            <h2 className="mt-8 text-3xl font-bold tracking-tight text-neutral-900">
+            <h2 className="text-3xl font-bold tracking-tight text-neutral-900">
               Welcome back
             </h2>
             <p className="mt-2 text-neutral-600">
@@ -62,9 +439,104 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {inactivityMessage && (
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-yellow-800">
+                      Your session expired due to inactivity. Please sign in again to continue.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
             {error && (
               <div className="rounded-lg border border-red-200 bg-red-50 p-4">
                 <p className="text-sm font-medium text-red-800">{error}</p>
+              </div>
+            )}
+
+            {showEmailVerification && (
+              <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-yellow-800">Email Verification Required</h3>
+                    <p className="mt-1 text-sm text-yellow-700">
+                      Please verify your email address before signing in. Check your inbox for the verification link.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendVerificationEmail}
+                      className="mt-2 text-sm font-medium text-yellow-800 underline hover:text-yellow-900"
+                    >
+                      Resend verification email
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mfaState.showMFA && (
+              <div className="rounded-lg border border-brand-200 bg-brand-50 p-4 space-y-4">
+                <h3 className="text-sm font-semibold text-brand-900">Multi-Factor Authentication</h3>
+                <p className="text-sm text-brand-700">
+                  A verification code has been sent to your phone. Please enter it below.
+                </p>
+                
+                <div id="recaptcha-container" ref={recaptchaContainerRef}></div>
+                
+                <div>
+                  <label htmlFor="verificationCode" className="block text-sm font-medium text-neutral-700">
+                    Verification Code
+                  </label>
+                  <input
+                    id="verificationCode"
+                    name="verificationCode"
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    value={mfaState.verificationCode}
+                    onChange={(e) => setMfaState({ ...mfaState, verificationCode: e.target.value })}
+                    className="mt-2 block w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder-neutral-400 shadow-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    placeholder="Enter 6-digit code"
+                    maxLength={6}
+                  />
+                </div>
+                
+                <button
+                  type="button"
+                  onClick={handleMFAVerification}
+                  disabled={loading || !mfaState.verificationCode}
+                  className="flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-3 font-semibold text-white shadow-sm transition-all hover:bg-brand-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {loading ? 'Verifying...' : 'Verify Code'}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (mfaState.recaptchaVerifier) {
+                      mfaState.recaptchaVerifier.clear();
+                    }
+                    setMfaState({
+                      showMFA: false,
+                      phoneNumber: '',
+                      verificationId: null,
+                      verificationCode: '',
+                      recaptchaVerifier: null,
+                    });
+                    setError('');
+                  }}
+                  className="w-full text-sm text-neutral-600 hover:text-neutral-900"
+                >
+                  Cancel
+                </button>
               </div>
             )}
 
@@ -89,17 +561,36 @@ export default function LoginPage() {
               <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-2 block w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder-neutral-400 shadow-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                placeholder="••••••••"
-              />
+              <div className="relative mt-2">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-neutral-300 bg-white px-4 py-3 pr-10 text-neutral-900 placeholder-neutral-400 shadow-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 focus:outline-none"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.29 3.29m0 0A9.97 9.97 0 015.12 5.12m3.29 3.29L12 12m0 0l3.29-3.29m-3.29 3.29L12 12m0 0v.01" />
+                    </svg>
+                  ) : (
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between">
@@ -108,6 +599,8 @@ export default function LoginPage() {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 rounded border-neutral-300 text-brand-600 focus:ring-brand-500"
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-neutral-700">
@@ -116,9 +609,9 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-brand-600 hover:text-brand-700">
+                <Link href="/forgot-password" className="font-medium text-brand-600 hover:text-brand-700">
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
 

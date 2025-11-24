@@ -160,8 +160,11 @@ export default function JobCompletionScreen() {
       const completionFormData = {
         id: completionFormId,
         jobId: jobId,
+        phixerId: user.uid,
+        phixerName: jobData.phixerName || jobData.artisanName || 'Unknown Phixer',
+        // Maintain backward compatibility
         artisanId: user.uid,
-        artisanName: jobData.artisanName || 'Unknown Artisan',
+        artisanName: jobData.phixerName || jobData.artisanName || 'Unknown Phixer',
         clientId: jobData.clientId,
         clientName: jobData.clientName || 'Unknown Client',
         status: 'pending', // pending, approved, rejected

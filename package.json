@@ -6,12 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "inspect": "node scripts/inspect-firebase-data.js",
+    "cleanup:dry-run": "node scripts/cleanup-test-data.js --dry-run",
+    "cleanup:test-only": "node scripts/cleanup-test-data.js --filter-test-only",
+    "cleanup:all": "node scripts/cleanup-test-data.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@googlemaps/js-api-loader": "1.16.6",
     "firebase": "^12.5.0",
+    "firebase-admin": "^13.0.0",
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",

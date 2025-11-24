@@ -39,15 +39,16 @@ export default function OnboardingPage() {
           console.log('Profile exists:', profileDoc.exists());
           console.log('Profile role:', profileDoc.data()?.role);
 
-          if (!profileDoc.exists() || profileDoc.data()?.role !== 'artisan') {
-            console.log('Not an artisan, redirecting to home');
+          const userRole = profileDoc.data()?.role;
+          if (!profileDoc.exists() || (userRole !== 'Phixer' && userRole !== 'phixer' && userRole !== 'artisan')) {
+            console.log('Not a Phixer, redirecting to home');
             router.push('/');
             return;
           }
 
           console.log('Checking onboarding status...');
           // Check onboarding status
-          const onboardingRef = doc(db, 'artisan_onboarding', currentUser.uid);
+          const onboardingRef = doc(db, 'phixer_onboarding', currentUser.uid);
           const onboardingDoc = await getDoc(onboardingRef);
           console.log('Onboarding doc exists:', onboardingDoc.exists());
 
@@ -58,7 +59,7 @@ export default function OnboardingPage() {
             // If already approved, redirect to dashboard
             if (data.status === 'approved') {
               console.log('Already approved, redirecting to dashboard');
-              router.push('/artisan/dashboard');
+              router.push('/phixer/dashboard');
               return;
             }
 

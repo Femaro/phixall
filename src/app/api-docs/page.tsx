@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 
 export const metadata = {
   title: 'API Documentation | Phixall',
@@ -59,10 +59,10 @@ const endpoints: EndpointDefinition[] = [
     name: 'Update Request Status',
     method: 'PATCH',
     path: '/v1/requests/{requestId}',
-    description: 'Update the status of an existing request, assign an artisan, or attach verification data.',
+    description: 'Update the status of an existing request, assign an Phixer, or attach verification data.',
     body: [
       { field: 'status', type: 'string', note: 'accepted | in-progress | completed | cancelled' },
-      { field: 'artisanId', type: 'string', note: 'Optional artisan assignment' },
+      { field: 'phixerId', type: 'string', note: 'Optional Phixer assignment' },
       { field: 'verification', type: 'object', note: '{ completedBy, notes, attachments }' },
     ],
   },
@@ -78,7 +78,7 @@ const environments = [
   {
     label: 'Production',
     baseUrl: 'https://api.phixall.com',
-    description: 'Live environment for real clients and artisans.',
+    description: 'Live environment for real clients and Phixers.',
   },
   {
     label: 'Sandbox',
@@ -98,7 +98,7 @@ export default function ApiDocsPage() {
             Build on the Phixall platform.
           </h1>
           <p className="mt-4 max-w-3xl text-lg text-neutral-600">
-            Use our REST API to create service requests, monitor artisan activity, synchronize wallets, and automate your facility
+            Use our REST API to create service requests, monitor Phixer activity, synchronize wallets, and automate your facility
             operations workflows. This guide covers environments, authentication, and the core endpoints you need to get started.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
@@ -154,7 +154,7 @@ Content-Type: application/json`}
             <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-soft">
               <h2 className="text-lg font-semibold text-neutral-900">Webhooks</h2>
               <p className="mt-3 text-sm text-neutral-600">
-                Receive real-time notifications when a request status changes, an artisan starts a job, or a wallet payout clears.
+                Receive real-time notifications when a request status changes, an Phixer starts a job, or a wallet payout clears.
               </p>
               <ul className="mt-4 space-y-3 text-sm text-neutral-600">
                 <li><span className="font-semibold text-neutral-900">request.updated</span> — Every status update and assignment change.</li>
@@ -246,4 +246,6 @@ Content-Type: application/json`}
     </main>
   );
 }
+
+
 

@@ -1,4 +1,4 @@
-import Container from '@/components/ui/Container';
+﻿import Container from '@/components/ui/Container';
 
 export default function Topbar() {
   return (
@@ -11,12 +11,13 @@ export default function Topbar() {
         </div>
         <div className="hidden gap-4 md:flex">
           <a href="/clients" className="underline-offset-2 hover:underline">Clients</a>
-          <a href="/artisans" className="underline-offset-2 hover:underline">Artisans</a>
+          <a href="/phixers" className="underline-offset-2 hover:underline">Phixers</a>
         </div>
       </Container>
     </div>
   );
 }
+
 
 
 

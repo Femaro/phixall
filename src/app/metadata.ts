@@ -50,7 +50,7 @@ export const defaultMetadata: Metadata = {
     title: 'Phixall - Professional Facility Management',
     description: 'Connect with verified artisans for all your facility maintenance needs.',
     images: ['/og-image.png'],
-    creator: '@phixall',
+    creator: '@phixallng',
   },
   robots: {
     index: true,

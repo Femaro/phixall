@@ -1,4 +1,4 @@
-import { getFirebase } from './firebaseClient';
+﻿import { getFirebase } from './firebaseClient';
 import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, Timestamp, setDoc, increment } from 'firebase/firestore';
 
 /**
@@ -29,7 +29,7 @@ export async function getPlatformStats() {
     
     const [clientsSnap, artisansSnap, jobsSnap, transactionsSnap] = await Promise.all([
       getDocs(query(collection(db, 'profiles'), where('role', '==', 'client'))),
-      getDocs(query(collection(db, 'profiles'), where('role', '==', 'artisan'))),
+      getDocs(query(collection(db, 'profiles'), where('role', '==', 'Phixer'))),
       getDocs(collection(db, 'jobs')),
       getDocs(collection(db, 'transactions')),
     ]);
@@ -57,14 +57,14 @@ export async function getPlatformStats() {
 }
 
 /**
- * Assign a job to an artisan (admin action)
+ * Assign a job to an Phixer (admin action)
  */
-export async function adminAssignJob(jobId: string, artisanId: string, artisanName: string) {
+export async function adminAssignJob(jobId: string, phixerId: string, phixerName: string) {
   try {
     const { db } = getFirebase();
     await updateDoc(doc(db, 'jobs', jobId), {
-      artisanId,
-      artisanName,
+      phixerId,
+      phixerName,
       status: 'accepted',
       assignedBy: 'admin',
       assignedAt: serverTimestamp(),
@@ -184,10 +184,10 @@ export async function getUserDetails(userId: string) {
 /**
  * Get all jobs for a specific user
  */
-export async function getUserJobs(userId: string, role: 'client' | 'artisan') {
+export async function getUserJobs(userId: string, role: 'client' | 'Phixer') {
   try {
     const { db } = getFirebase();
-    const field = role === 'client' ? 'clientId' : 'artisanId';
+    const field = role === 'client' ? 'clientId' : 'phixerId';
     const jobsQuery = query(collection(db, 'jobs'), where(field, '==', userId));
     const jobsDocs = await getDocs(jobsQuery);
     
@@ -304,4 +304,6 @@ export async function generatePlatformReport(startDate: Date, endDate: Date) {
     return null;
   }
 }
+
+
 

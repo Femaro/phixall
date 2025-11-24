@@ -2,16 +2,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     // Artisan documents (IDs, certifications, etc.)
-    match /artisan-documents/{userId}/{filename} {
+    match /phixer-documents/{userId}/{filename} {
       // Only the signed-in user (or admins) can upload their own documents
       allow create: if isAuthenticated()
                     && request.auth.uid == userId
                     && request.resource.size < 10 * 1024 * 1024; // 10MB limit
       
-      // Allow the uploading artisan to read their own files; admins can read everything
+      // Allow the uploading phixer to read their own files; admins can read everything
       allow read: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
       
-      // Allow artisans to delete their own files, admins can delete any
+      // Allow phixers to delete their own files, admins can delete any
       allow delete: if (isAuthenticated() && request.auth.uid == userId) || isAdmin();
     }
     

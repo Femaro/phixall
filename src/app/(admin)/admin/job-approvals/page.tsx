@@ -22,11 +22,18 @@ const formatTimestamp = (value: TimestampLike) => {
   return '—';
 };
 
+// Helper function to get Phixer ID from completion (supports both new and legacy field names)
+const getPhixerId = (completion: JobCompletion): string => {
+  return completion.phixerId || completion.artisanId || '';
+};
+
 interface JobCompletion {
   id: string;
   jobId: string;
-  artisanId: string;
-  artisanName: string;
+  artisanId?: string; // Legacy field for backward compatibility
+  artisanName?: string; // Legacy field for backward compatibility
+  phixerId?: string; // New field name
+  phixerName?: string; // New field name
   clientId: string;
   clientName: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -155,9 +162,10 @@ export default function JobApprovalsPage() {
       const jobDoc = await getDoc(doc(db, 'jobs', completion.jobId));
       const jobData = jobDoc.data();
 
-      // Add earning to artisan wallet if amount exists
-      if (jobData?.amount) {
-        const walletRef = doc(db, 'wallets', completion.artisanId);
+      // Add earning to Phixer wallet if amount exists
+      const phixerId = getPhixerId(completion);
+      if (jobData?.amount && phixerId) {
+        const walletRef = doc(db, 'wallets', phixerId);
         const walletDoc = await getDoc(walletRef);
         const currentWallet = walletDoc.data() || { balance: 0, totalEarnings: 0 };
 
@@ -169,7 +177,7 @@ export default function JobApprovalsPage() {
         // Create earning transaction
         const { addDoc, collection: col } = await import('firebase/firestore');
         await addDoc(col(db, 'transactions'), {
-          userId: completion.artisanId,
+          userId: phixerId,
           type: 'earning',
           amount: jobData.amount,
           description: `Earned from: ${jobData.title}`,
@@ -179,17 +187,19 @@ export default function JobApprovalsPage() {
         });
       }
 
-      // Notify artisan
-      await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${completion.artisanId}`), {
-        userId: completion.artisanId,
-        type: 'completion-approved',
-        title: 'Job Completion Approved',
-        message: `Your completion form for "${jobData?.title || 'job'}" has been approved by admin.`,
-        jobId: completion.jobId,
-        completionFormId: completion.id,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
+      // Notify Phixer
+      if (phixerId) {
+        await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${phixerId}`), {
+          userId: phixerId,
+          type: 'completion-approved',
+          title: 'Job Completion Approved',
+          message: `Your completion form for "${jobData?.title || 'job'}" has been approved by admin.`,
+          jobId: completion.jobId,
+          completionFormId: completion.id,
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      }
 
       // Notify client
       await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${completion.clientId}`), {
@@ -241,17 +251,20 @@ export default function JobApprovalsPage() {
       const jobDoc = await getDoc(doc(db, 'jobs', completion.jobId));
       const jobData = jobDoc.data();
 
-      // Notify artisan
-      await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${completion.artisanId}`), {
-        userId: completion.artisanId,
-        type: 'completion-rejected',
-        title: 'Job Completion Rejected',
-        message: `Your completion form for "${jobData?.title || 'job'}" was rejected. Reason: ${reason}`,
-        jobId: completion.jobId,
-        completionFormId: completion.id,
-        read: false,
-        createdAt: serverTimestamp(),
-      });
+      // Notify Phixer
+      const phixerId = getPhixerId(completion);
+      if (phixerId) {
+        await setDoc(doc(db, 'notifications', `notif-${Date.now()}-${phixerId}`), {
+          userId: phixerId,
+          type: 'completion-rejected',
+          title: 'Job Completion Rejected',
+          message: `Your completion form for "${jobData?.title || 'job'}" was rejected. Reason: ${reason}`,
+          jobId: completion.jobId,
+          completionFormId: completion.id,
+          read: false,
+          createdAt: serverTimestamp(),
+        });
+      }
 
       alert('Job completion rejected. The artisan has been notified.');
       setSelectedCompletion(null);

@@ -71,6 +71,16 @@ export default function Footer() {
                   Instagram
                 </a>
               </li>
+              <li>
+                <a
+                  href="https://x.com/phixallng"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-neutral-600 transition-colors hover:text-brand-600"
+                >
+                  Twitter / X
+                </a>
+              </li>
             </ul>
           </div>
         </div>

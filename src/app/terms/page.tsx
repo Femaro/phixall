@@ -1,4 +1,4 @@
-export default function TermsPage() {
+﻿export default function TermsPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-24">
@@ -19,7 +19,7 @@ export default function TermsPage() {
               <li>You must be at least 18 years old to use our Services</li>
               <li>You must provide accurate, current, and complete information during registration</li>
               <li>You must not have been previously banned from our Services</li>
-              <li>Artisans must possess the necessary licenses, certifications, and insurance as required by law</li>
+              <li>Phixers must possess the necessary licenses, certifications, and insurance as required by law</li>
             </ul>
           </section>
 
@@ -39,19 +39,19 @@ export default function TermsPage() {
             
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">4.1 Nature of Services</h3>
             <p className="mt-4 text-neutral-700">
-              Phixall operates as a technology platform that connects clients seeking facility maintenance services with independent artisans. We do not employ artisans or provide services directly. We are not responsible for the quality, safety, or legality of services provided by artisans.
+              Phixall operates as a technology platform that connects clients seeking facility maintenance services with independent Phixers. We do not employ Phixers or provide services directly. We are not responsible for the quality, safety, or legality of services provided by Phixers.
             </p>
 
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">4.2 Client Obligations</h3>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>Provide accurate descriptions of service requests</li>
-              <li>Ensure safe working conditions for artisans</li>
+              <li>Ensure safe working conditions for Phixers</li>
               <li>Be present or designate a representative during service appointments</li>
               <li>Pay for services in accordance with agreed terms</li>
-              <li>Treat artisans with respect and professionalism</li>
+              <li>Treat Phixers with respect and professionalism</li>
             </ul>
 
-            <h3 className="mt-6 text-xl font-semibold text-neutral-900">4.3 Artisan Obligations</h3>
+            <h3 className="mt-6 text-xl font-semibold text-neutral-900">4.3 Phixer Obligations</h3>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>Provide services in a professional, safe, and timely manner</li>
               <li>Maintain valid licenses, certifications, and insurance</li>
@@ -66,18 +66,18 @@ export default function TermsPage() {
             
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">5.1 Service Fees</h3>
             <p className="mt-4 text-neutral-700">
-              Phixall charges a service fee for facilitating connections between clients and artisans. Current fee structure:
+              Phixall charges a service fee for facilitating connections between clients and Phixers. Current fee structure:
             </p>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>Clients: Free to request services (payment for services rendered)</li>
-              <li>Artisans: 15% service fee on completed jobs</li>
+              <li>Phixers: 15% service fee on completed jobs</li>
             </ul>
 
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">5.2 Payment Processing</h3>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>All payments must be processed through the Phixall platform</li>
               <li>Clients authorize payment upon service completion and approval</li>
-              <li>Artisans receive payment within 5-7 business days after job completion</li>
+              <li>Phixers receive payment within 5-7 business days after job completion</li>
               <li>Off-platform payments are strictly prohibited and may result in account termination</li>
             </ul>
 
@@ -121,9 +121,9 @@ export default function TermsPage() {
               Services are provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind. We do not guarantee that Services will be uninterrupted, error-free, or secure.
             </p>
 
-            <h3 className="mt-6 text-xl font-semibold text-neutral-900">8.2 Artisan Services</h3>
+            <h3 className="mt-6 text-xl font-semibold text-neutral-900">8.2 Phixer Services</h3>
             <p className="mt-4 text-neutral-700">
-              Phixall is not responsible for the quality, safety, timeliness, or legality of services provided by artisans. All interactions and agreements are between clients and artisans.
+              Phixall is not responsible for the quality, safety, timeliness, or legality of services provided by Phixers. All interactions and agreements are between clients and Phixers.
             </p>
 
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">8.3 Limitation of Liability</h3>
@@ -179,6 +179,8 @@ export default function TermsPage() {
     </main>
   );
 }
+
+
 
 
 

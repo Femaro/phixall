@@ -1,10 +1,10 @@
-export type SupportArticle = {
+﻿export type SupportArticle = {
   id: string;
-  role: 'client' | 'artisan' | 'admin' | 'general';
+  role: 'client' | 'Phixer' | 'admin' | 'general';
   tags: string[];
   title: string;
   content: string;
-  roles?: Array<'client' | 'artisan' | 'admin' | 'general'>;
+  roles?: Array<'client' | 'Phixer' | 'admin' | 'general'>;
   priority?: number;
 };
 
@@ -29,21 +29,21 @@ export const supportArticles: SupportArticle[] = [
     id: 'client-verification',
     role: 'client',
     tags: ['rating', 'verification', 'reviews'],
-    title: 'Verifying completed jobs & rating artisans',
+    title: 'Verifying completed jobs & rating Phixers',
     content:
-      'When an artisan marks a job completed, you will see a verification card on the Overview tab. Rate the service from 1–5 stars, leave optional feedback, and submit. Ratings feed into the artisan profile and help the admin team monitor quality.',
+      'When an Phixer marks a job completed, you will see a verification card on the Overview tab. Rate the service from 1–5 stars, leave optional feedback, and submit. Ratings feed into the Phixer profile and help the admin team monitor quality.',
   },
   {
-    id: 'artisan-available',
-    role: 'artisan',
+    id: 'Phixer-available',
+    role: 'Phixer',
     tags: ['availability', 'jobs', 'distance'],
     title: 'Managing availability & nearby jobs',
     content:
       'Toggle availability on the Overview tab. To receive distance-aware jobs, add your state and save your current location as your home base. The Available Jobs tab shows requests within your state and within 20 miles.',
   },
   {
-    id: 'artisan-wallet',
-    role: 'artisan',
+    id: 'Phixer-wallet',
+    role: 'Phixer',
     tags: ['wallet', 'cashout'],
     title: 'Earnings & cash outs',
     content:
@@ -53,9 +53,9 @@ export const supportArticles: SupportArticle[] = [
     id: 'admin-assign',
     role: 'admin',
     tags: ['assignment', 'state', 'jobs'],
-    title: 'Assigning jobs to artisans',
+    title: 'Assigning jobs to Phixers',
     content:
-      'Admins can assign a job from the Job Management tab. The modal filters artisans who are active in the job’s state. Attempting to assign outside the service state will show a warning.',
+      'Admins can assign a job from the Job Management tab. The modal filters Phixers who are active in the job’s state. Attempting to assign outside the service state will show a warning.',
   },
   {
     id: 'general-subscription',
@@ -66,4 +66,5 @@ export const supportArticles: SupportArticle[] = [
       'Phixall offers Bronze, Gold, and Platinum plans with monthly or yearly billing. Each plan bundles a set number of service calls, response times, discounts, and inspections. Clients can subscribe via the Premium modal or the /subscription page.',
   },
 ];
+
 

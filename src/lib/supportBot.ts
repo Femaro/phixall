@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { SupportArticle } from './supportKnowledge';
@@ -23,7 +23,7 @@ function scoreArticle(article: SupportArticle, query: string, role: string) {
   return score;
 }
 
-function retrieveSupportSnippets(articles: SupportArticle[], query: string, role: 'client' | 'artisan' | 'admin') {
+function retrieveSupportSnippets(articles: SupportArticle[], query: string, role: 'client' | 'Phixer' | 'admin') {
   return articles
     .map((article) => ({ article, score: scoreArticle(article, query, role) }))
     .filter((item) => item.score > 0)
@@ -33,7 +33,7 @@ function retrieveSupportSnippets(articles: SupportArticle[], query: string, role
 }
 
 export async function generateSupportReply(params: {
-  role: 'client' | 'artisan' | 'admin';
+  role: 'client' | 'Phixer' | 'admin';
   message: string;
   history: BotMessage[];
 }) {
@@ -44,7 +44,7 @@ export async function generateSupportReply(params: {
 
   const articles = await loadSupportArticles(params.role);
   const snippets = retrieveSupportSnippets(articles, params.message, params.role);
-  const systemPrompt = `You are Phixall's virtual support assistant. Phixall connects clients with artisans for facility maintenance.
+  const systemPrompt = `You are Phixall's virtual support assistant. Phixall connects clients with Phixers for facility maintenance.
 Use the provided knowledge base snippets when possible. Be concise, friendly, and offer step-by-step guidance.
 If the user repeatedly asks for a human or you are unsure, set escalationRecommended=true in your response JSON.`;
 
@@ -95,4 +95,5 @@ Respond in JSON:
     };
   }
 }
+
 

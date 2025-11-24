@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
@@ -14,7 +14,7 @@ type ChatMessage = {
 
 type SupportChatProps = {
   user: User | null;
-  role: 'client' | 'artisan';
+  role: 'client' | 'Phixer';
 };
 
 export function SupportChat({ user, role }: SupportChatProps) {
@@ -297,4 +297,5 @@ export function SupportChat({ user, role }: SupportChatProps) {
     </>
   );
 }
+
 

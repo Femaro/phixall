@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ArtisanOnboarding } from '@/types/onboarding';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ export default function PendingApproval({ onboarding }: Props) {
   const router = useRouter();
 
   if (onboarding.status === 'approved') {
-    router.push('/artisan/dashboard');
+    router.push('/phixer/dashboard');
     return null;
   }
 
@@ -55,7 +55,7 @@ export default function PendingApproval({ onboarding }: Props) {
 
           <h2 className="mb-4 text-2xl font-bold text-neutral-900">Application Under Review</h2>
           <p className="mb-6 text-neutral-600">
-            Thank you for completing your artisan onboarding! Your application is currently being reviewed by our admin team.
+            Thank you for completing your Phixer onboarding! Your application is currently being reviewed by our admin team.
           </p>
 
           <div className="mb-8 rounded-lg bg-brand-50 p-6 text-left">
@@ -75,7 +75,7 @@ export default function PendingApproval({ onboarding }: Props) {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-brand-600">✓</span>
-                <span>Once approved, you'll gain full access to the artisan dashboard</span>
+                <span>Once approved, you'll gain full access to the Phixer dashboard</span>
               </li>
             </ul>
           </div>
@@ -135,5 +135,6 @@ export default function PendingApproval({ onboarding }: Props) {
     </div>
   );
 }
+
 
 

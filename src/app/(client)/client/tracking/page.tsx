@@ -19,7 +19,7 @@ function ClientTrackingContent() {
 	const [status, setStatus] = useState('Loading map…');
   const searchParams = useSearchParams();
   const jobId = searchParams.get('jobId');
-  const artisanId = searchParams.get('artisanId');
+  const phixerId = searchParams.get('phixerId') || searchParams.get('artisanId'); // Support both for backward compatibility
 
 	useEffect(() => {
     	let map: google.maps.Map | null = null;
@@ -28,8 +28,8 @@ function ClientTrackingContent() {
         let unsubscribe: undefined | (() => void);
 
 		async function init() {
-      if (!jobId || !artisanId) {
-        setStatus('Missing job or artisan identifier');
+      if (!jobId || !phixerId) {
+        setStatus('Missing job or Phixer identifier');
         return;
       }
 			try {
@@ -37,14 +37,15 @@ function ClientTrackingContent() {
                 const googleObj = await loader.load();
                 if (!mapRef.current) return;
                 map = new googleObj.maps.Map(mapRef.current, { center: { lat: 6.5244, lng: 3.3792 }, zoom: 11 });
-				setStatus('Listening for artisan location…');
+				setStatus('Listening for Phixer location…');
 
                 // Firestore live updates for a demo job id
                 const { db } = getFirebase();
                 const unsub = onSnapshot(doc(db, 'jobLocations', jobId), (snap) => {
                     if (ignore) return;
                     const data = snap.data() as any;
-                    const loc = data?.artisans?.[artisanId];
+                    // Support both new Phixers field and legacy artisans field for backward compatibility
+                    const loc = data?.Phixers?.[phixerId] || data?.artisans?.[phixerId];
                     const lat = loc?.lat;
                     const lng = loc?.lng;
                     if (typeof lat === 'number' && typeof lng === 'number' && map) {
@@ -54,9 +55,9 @@ function ClientTrackingContent() {
                             artisanMarker.setPosition({ lat, lng });
                         }
                         map.setCenter({ lat, lng });
-                        setStatus('Tracking artisan…');
+                        setStatus('Tracking Phixer…');
                     } else {
-                      setStatus('Waiting for artisan updates…');
+                      setStatus('Waiting for Phixer updates…');
                     }
                 });
 
@@ -83,7 +84,7 @@ function ClientTrackingContent() {
             artisanMarker?.setMap(null);
             map = null;
 		};
-	}, [jobId, artisanId]);
+	}, [jobId, phixerId]);
 
 	return (
 		<div className="min-h-screen bg-gray-50 p-4">

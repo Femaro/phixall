@@ -122,7 +122,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
     setSaving(true);
     try {
       const { db } = getFirebase();
-      const onboardingRef = doc(db, 'artisan_onboarding', user.uid);
+      const onboardingRef = doc(db, 'phixer_onboarding', user.uid);
 
       const updatedOnboarding = {
         ...onboarding,

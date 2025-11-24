@@ -48,8 +48,10 @@ interface Job {
   status: 'requested' | 'accepted' | 'in-progress' | 'completed' | 'cancelled';
   scheduledAt: TimestampLike;
   createdAt?: TimestampLike;
-  artisanId?: string;
-  artisanName?: string;
+  artisanId?: string; // Legacy field for backward compatibility
+  artisanName?: string; // Legacy field for backward compatibility
+  phixerId?: string;
+  phixerName?: string;
   clientId: string;
   attachments?: string[];
   amount?: number;
@@ -170,8 +172,10 @@ function ClientDashboardContent() {
 
   useEffect(() => {
     const { auth } = getFirebase();
+    let unsubscribe: (() => void) | undefined;
+    
     import('firebase/auth').then(({ onAuthStateChanged }) => {
-      onAuthStateChanged(auth, (currentUser) => {
+      unsubscribe = onAuthStateChanged(auth, (currentUser) => {
         if (!currentUser) {
           window.location.href = '/login';
         } else {
@@ -180,6 +184,10 @@ function ClientDashboardContent() {
         }
       });
     });
+    
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   // Load user profile
@@ -913,8 +921,8 @@ function ClientDashboardContent() {
       </button>
     ));
 
-  const trackableJob = jobs.find((job) => job.artisanId && ['accepted', 'in-progress'].includes(job.status));
-  const trackableJobLink = trackableJob ? `/client/tracking?jobId=${trackableJob.id}&artisanId=${trackableJob.artisanId}` : null;
+  const trackableJob = jobs.find((job) => (job.phixerId || job.artisanId) && ['accepted', 'in-progress'].includes(job.status));
+  const trackableJobLink = trackableJob ? `/client/tracking?jobId=${trackableJob.id}&phixerId=${trackableJob.phixerId || trackableJob.artisanId}` : null;
 
   if (loading) {
     return (
@@ -1824,9 +1832,9 @@ function ClientDashboardContent() {
                             Cancel
                           </button>
                         )}
-                        {job.artisanId && ['accepted', 'in-progress'].includes(job.status) && (
+                        {(job.phixerId || job.artisanId) && ['accepted', 'in-progress'].includes(job.status) && (
                           <Link
-                            href={`/client/tracking?jobId=${job.id}&artisanId=${job.artisanId}`}
+                            href={`/client/tracking?jobId=${job.id}&phixerId=${job.phixerId || job.artisanId}`}
                             className="rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-brand-700"
                           >
                             {job.status === 'in-progress' ? 'Track Live' : 'View Tracking'}

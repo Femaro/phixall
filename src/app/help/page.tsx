@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ export default function HelpPage() {
       name: 'For Clients',
       icon: '🏢',
       articles: [
-        { title: 'How to find the right artisan', content: 'Tips for selecting qualified professionals' },
+        { title: 'How to find the right Phixer', content: 'Tips for selecting qualified professionals' },
         { title: 'Tracking your job', content: 'Use real-time GPS tracking to monitor progress' },
         { title: 'Payment and invoicing', content: 'How payments work and accessing invoices' },
         { title: 'Leaving reviews and ratings', content: 'Share your experience to help others' },
@@ -31,10 +31,10 @@ export default function HelpPage() {
       ],
     },
     {
-      name: 'For Artisans',
+      name: 'For Phixers',
       icon: '🔧',
       articles: [
-        { title: 'Applying to become an artisan', content: 'Requirements and application process' },
+        { title: 'Applying to become an Phixer', content: 'Requirements and application process' },
         { title: 'Accepting and completing jobs', content: 'Best practices for job management' },
         { title: 'Setting your rates', content: 'How to price your services competitively' },
         { title: 'Getting paid', content: 'Payment schedule and withdrawal options' },
@@ -68,8 +68,8 @@ export default function HelpPage() {
       name: 'Safety & Trust',
       icon: '🛡️',
       articles: [
-        { title: 'How we verify artisans', content: 'Our vetting and background check process' },
-        { title: 'Staying safe during jobs', content: 'Safety tips for clients and artisans' },
+        { title: 'How we verify Phixers', content: 'Our vetting and background check process' },
+        { title: 'Staying safe during jobs', content: 'Safety tips for clients and Phixers' },
         { title: 'Reporting safety concerns', content: 'How to report issues immediately' },
         { title: 'Insurance and liability', content: 'Understanding coverage and protections' },
         { title: 'Emergency support', content: '24/7 emergency hotline information' },
@@ -262,6 +262,8 @@ export default function HelpPage() {
     </main>
   );
 }
+
+
 
 
 

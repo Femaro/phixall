@@ -42,8 +42,8 @@ export default function LoginScreen() {
       // Navigate based on role
       if (role === 'admin') {
         router.replace('/(tabs)/admin');
-      } else if (role === 'artisan') {
-        router.replace('/(tabs)/artisan');
+      } else if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
+        router.replace('/(tabs)/phixer');
       } else {
         router.replace('/(tabs)/client');
       }

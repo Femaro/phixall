@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { generateSupportReply } from '@/lib/supportBot';
 
 export async function POST(req: Request) {
@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       message,
       history,
     }: {
-      role: 'client' | 'artisan' | 'admin';
+      role: 'client' | 'Phixer' | 'admin';
       message: string;
       history?: Array<{
         sender: 'user' | 'assistant' | 'agent';
@@ -41,4 +41,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
 

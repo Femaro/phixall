@@ -24,10 +24,12 @@ service cloud.firestore {
              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'client';
     }
     
-    // Helper function to check if user is artisan
-    function isArtisan() {
+    // Helper function to check if user is Phixer (supports both 'Phixer' and legacy 'artisan' for backward compatibility)
+    function isPhixer() {
       return isAuthenticated() && 
-             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'artisan';
+             (get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'Phixer' ||
+              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'artisan' ||
+              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'phixer');
     }
     
     // Profiles collection
@@ -47,8 +49,8 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Artisan Onboarding collection
-    match /artisan_onboarding/{userId} {
+    // Phixer Onboarding collection
+    match /phixer_onboarding/{userId} {
       // Any authenticated user can create their own onboarding record
       allow create: if isAuthenticated() && request.auth.uid == userId;
       
@@ -67,20 +69,20 @@ service cloud.firestore {
       // Clients can create jobs, admins can create on behalf of anyone
       allow create: if isClient() || isAdmin() || isOwner(request.resource.data.clientId);
       
-      // Job owner (client), assigned artisan, and admins can read
+      // Job owner (client), assigned Phixer, and admins can read
       allow read: if isAdmin() 
                   || isOwner(resource.data.clientId) 
-                  || (isArtisan() && resource.data.artisanId == request.auth.uid)
-                  || isArtisan(); // Allow artisans to see available jobs
+                  || (isPhixer() && resource.data.phixerId == request.auth.uid)
+                  || isPhixer(); // Allow Phixers to see available jobs
       
-      // Job owner, assigned artisan, and admins can update.
-      // Artisans can claim an unassigned job if they are setting themselves as the artisan.
+      // Job owner, assigned Phixer, and admins can update.
+      // Phixers can claim an unassigned job if they are setting themselves as the Phixer.
       allow update: if isAdmin() 
                     || isOwner(resource.data.clientId)
-                    || (isArtisan() && resource.data.artisanId == request.auth.uid)
-                    || (isArtisan()
-                        && (!('artisanId' in resource.data) || resource.data.artisanId == null || resource.data.artisanId == '')
-                        && request.resource.data.artisanId == request.auth.uid);
+                    || (isPhixer() && resource.data.phixerId == request.auth.uid)
+                    || (isPhixer()
+                        && (!('phixerId' in resource.data) || resource.data.phixerId == null || resource.data.phixerId == '')
+                        && request.resource.data.phixerId == request.auth.uid);
       
       // Only admins and job owner can delete
       allow delete: if isAdmin() || isOwner(resource.data.clientId);
@@ -113,16 +115,16 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     
-    // Artisan locations collection (for real-time tracking)
-    match /artisanLocations/{artisanId} {
-      // Artisans can write their own location
-      allow create, update: if isOwner(artisanId) || isAdmin();
+    // Phixer locations collection (for real-time tracking)
+    match /phixerLocations/{phixerId} {
+      // Phixers can write their own location
+      allow create, update: if isOwner(phixerId) || isAdmin();
       
       // Clients with active jobs and admins can read locations
       allow read: if isAdmin() || isAuthenticated();
       
-      // Only artisans and admins can delete
-      allow delete: if isOwner(artisanId) || isAdmin();
+      // Only Phixers and admins can delete
+      allow delete: if isOwner(phixerId) || isAdmin();
     }
     
     // Resources collection
@@ -251,14 +253,14 @@ service cloud.firestore {
 
     // Job Completions collection
     match /jobCompletions/{completionId} {
-      // Artisans can create completion forms for jobs they're assigned to
-      allow create: if isArtisan() 
-        && request.resource.data.artisanId == request.auth.uid
+      // Phixers can create completion forms for jobs they're assigned to
+      allow create: if isPhixer() 
+        && request.resource.data.phixerId == request.auth.uid
         && request.resource.data.status == 'pending';
       
-      // Artisans can read their own completions, clients can read completions for their jobs, admins can read all
+      // Phixers can read their own completions, clients can read completions for their jobs, admins can read all
       allow read: if isAdmin() 
-        || (isArtisan() && resource.data.artisanId == request.auth.uid)
+        || (isPhixer() && resource.data.phixerId == request.auth.uid)
         || (isClient() && resource.data.clientId == request.auth.uid);
       
       // Only admins can update completion forms (for approval/rejection)
@@ -283,16 +285,16 @@ service cloud.firestore {
       allow delete: if isAdmin() || isOwner(resource.data.userId);
     }
 
-    // Job Locations collection (for real-time artisan tracking)
+    // Job Locations collection (for real-time Phixer tracking)
     match /jobLocations/{jobId} {
-      // Artisans can create/update location data for jobs they're assigned to
-      allow create, update: if isArtisan() || isAdmin();
+      // Phixers can create/update location data for jobs they're assigned to
+      allow create, update: if isPhixer() || isAdmin();
       
       // Clients with active jobs and admins can read locations
       allow read: if isAdmin() || isAuthenticated();
       
-      // Only artisans and admins can delete
-      allow delete: if isAdmin() || isArtisan();
+      // Only Phixers and admins can delete
+      allow delete: if isAdmin() || isPhixer();
     }
     
     // Default: deny all access to other collections

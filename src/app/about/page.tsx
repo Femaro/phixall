@@ -1,29 +1,27 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import StructuredData from '@/components/seo/StructuredData';
-import { organizationSchema, generateBreadcrumbSchema } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
-  title: 'About Us - Our Mission & Leadership Team',
-  description: 'Learn about Phixall\'s mission to revolutionize facility management in Africa. Meet our leadership team: Femi Ajakaiye (CEO), Okon Otoudung (CTO), and Olufemi Babatunde (Head of Operations).',
+  title: 'About Us - Our Mission & What Makes a Phixer',
+  description: "Learn about Phixall's mission to revolutionize facility management in Africa. Discover who our Phixers are - verified, skilled professionals transforming the maintenance industry.",
   keywords: [
     'about Phixall',
     'facility management company',
-    'artisan network Nigeria',
-    'leadership team',
+    'Phixer network Nigeria',
+    'what is a Phixer',
     'company mission',
     'maintenance platform',
   ],
   openGraph: {
     title: 'About Phixall - Revolutionizing Facility Management',
-    description: 'Building Africa\'s leading platform for on-demand facility maintenance. Meet our team and learn our story.',
+    description: "Building Africa's leading platform for on-demand facility maintenance. Meet our team and learn our story.",
     url: '/about',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Phixall Leadership Team',
+        alt: 'Phixall - Meet Our Phixers',
       }
     ],
   },
@@ -32,16 +30,9 @@ export const metadata: Metadata = {
   },
 };
 
-const breadcrumbSchema = generateBreadcrumbSchema([
-  { name: 'Home', url: '/' },
-  { name: 'About', url: '/about' },
-]);
-
 export default function AboutPage() {
   return (
-    <>
-      <StructuredData data={[organizationSchema, breadcrumbSchema]} />
-      <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-neutral-50 via-white to-brand-50/30">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -55,7 +46,7 @@ export default function AboutPage() {
               <span className="text-gradient"> Management</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              We're building Africa's leading platform for on-demand facility maintenance, connecting property owners with verified skilled artisans.
+              We&apos;re building Africa&apos;s leading platform for on-demand facility maintenance, connecting property owners with verified skilled Phixers.
             </p>
           </div>
         </div>
@@ -74,10 +65,10 @@ export default function AboutPage() {
                   Phixall was founded in 2021 with a simple mission: make professional facility maintenance accessible, transparent, and reliable for everyone.
                 </p>
                 <p>
-                  We saw firsthand how difficult it was for facility owners to find trustworthy artisans, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
+                  We saw firsthand how difficult it was for facility owners to find trustworthy Phixers, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
                 </p>
                 <p>
-                  Today, Phixall serves over 500 facilities across Nigeria, completing more than 10,000 jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.
+                  Today, Phixall serves over 500 facilities across Nigeria, completing more than 10,000 jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and Phixers building thriving careers.
                 </p>
               </div>
             </div>
@@ -112,7 +103,7 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Mission</h3>
               <p className="mt-4 text-neutral-600">
-                To empower facilities and artisans across Africa with technology that makes maintenance simple, transparent, and efficient. We're committed to building a platform that creates economic opportunities while delivering world-class service.
+                To empower facilities and Phixers across Africa with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service.
               </p>
             </div>
             <div className="rounded-2xl border border-neutral-200 bg-white p-10 shadow-soft">
@@ -124,14 +115,14 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Vision</h3>
               <p className="mt-4 text-neutral-600">
-                To become the leading facility management platform across Africa, known for connecting world-class artisans with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.
+                To become the leading facility management platform across Africa, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Values */}
+      {/* Core Values */}
       <section className="border-t border-neutral-200">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="text-center">
@@ -157,12 +148,12 @@ export default function AboutPage() {
               {
                 icon: '🎯',
                 title: 'Quality First',
-                description: 'From artisan vetting to customer support, we never compromise on the quality of service.',
+                description: 'From Phixer vetting to customer support, we never compromise on the quality of service.',
               },
               {
                 icon: '🤝',
                 title: 'Community Focus',
-                description: 'We are building a supportive ecosystem where both clients and artisans can thrive together.',
+                description: 'We are building a supportive ecosystem where both clients and Phixers can thrive together.',
               },
               {
                 icon: '🚀',
@@ -185,42 +176,81 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team */}
-      <section className="border-t border-neutral-200 bg-neutral-50">
+      {/* What is a Phixer */}
+      <section className="border-t border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">
-              Leadership Team
+              What is a Phixer?
             </h2>
             <p className="mt-4 text-lg text-neutral-600">
-              Meet the people building the future of facility management
+              The skilled professionals transforming facility management across Africa
             </p>
           </div>
+          
+          <div className="mt-12 rounded-2xl border border-neutral-200 bg-white p-8 shadow-soft lg:p-12">
+            <p className="text-lg leading-relaxed text-neutral-700 text-center">
+              A <span className="font-bold text-brand-600">Phixer</span> is more than just a skilled tradesperson. They are verified, professional service providers who have been thoroughly vetted through our comprehensive onboarding process. Every Phixer on our platform represents excellence, reliability, and expertise in their craft.
+            </p>
+          </div>
+
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: 'Femi Ajakaiye',
-                role: 'CEO',
-                bio: 'Visionary leader driving innovation in facility management',
+                icon: '✅',
+                title: 'Verified Professionals',
+                description: 'All Phixers undergo identity verification, background checks, and skills assessments before joining our platform.',
               },
               {
-                name: 'Okon Otoudung',
-                role: 'CTO',
-                bio: 'Technology expert building scalable solutions',
+                icon: '🎓',
+                title: 'Certified & Trained',
+                description: 'Phixers complete our specialized training modules covering safety protocols, customer service, and industry best practices.',
               },
               {
-                name: 'Olufemi Babatunde',
-                role: 'Head of Operations',
-                bio: 'Operations specialist ensuring excellence across all services',
+                icon: '⭐',
+                title: 'Quality Guaranteed',
+                description: 'Every job is rated by clients, ensuring Phixers maintain high standards and deliver exceptional service.',
               },
-            ].map((member) => (
-              <div key={member.name} className="rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-soft">
-                <div className="mx-auto h-24 w-24 rounded-full bg-gradient-to-br from-brand-400 to-brand-600" />
-                <h3 className="mt-6 text-xl font-bold text-neutral-900">{member.name}</h3>
-                <p className="mt-2 text-sm font-medium text-brand-600">{member.role}</p>
-                <p className="mt-3 text-sm text-neutral-600">{member.bio}</p>
+              {
+                icon: '🛠️',
+                title: 'Multi-Skilled Experts',
+                description: 'From plumbing and electrical to HVAC and carpentry, our Phixers specialize in diverse facility maintenance trades.',
+              },
+              {
+                icon: '📱',
+                title: 'Tech-Enabled',
+                description: 'Phixers use our platform for job management, real-time tracking, and seamless communication with clients.',
+              },
+              {
+                icon: '💼',
+                title: 'Professional Growth',
+                description: 'We support Phixers with steady work opportunities, fair compensation, and tools to build their professional reputation.',
+              },
+            ].map((feature) => (
+              <div key={feature.title} className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-soft transition-all hover:shadow-glow">
+                <div className="text-5xl">{feature.icon}</div>
+                <h3 className="mt-6 text-xl font-bold text-neutral-900">{feature.title}</h3>
+                <p className="mt-3 text-neutral-600">{feature.description}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-16 rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-50 to-purple-50 p-8 shadow-glow lg:p-12">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-neutral-900">Become a Phixer</h3>
+              <p className="mt-4 text-lg text-neutral-600">
+                Join our growing network of skilled professionals and access consistent work, competitive pay, and professional development opportunities.
+              </p>
+              <Link 
+                href="/register/phixer" 
+                className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:bg-brand-700 hover:shadow-xl"
+              >
+                Apply to Become a Phixer
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -232,7 +262,7 @@ export default function AboutPage() {
             Join Us on Our Mission
           </h2>
           <p className="mt-6 text-lg text-brand-100">
-            Whether you're a facility owner or a skilled artisan, there's a place for you on Phixall.
+            Whether you&apos;re a facility owner or a skilled Phixer, there&apos;s a place for you on Phixall.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link 
@@ -254,6 +284,5 @@ export default function AboutPage() {
         </div>
       </section>
     </main>
-    </>
   );
 }

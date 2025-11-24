@@ -1,4 +1,4 @@
-export default function PrivacyPage() {
+﻿export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-24">
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
               <li>Profile Information: Address, payment information, profile photo</li>
               <li>Service Requests: Job descriptions, photos, videos, preferred dates/times</li>
               <li>Communications: Messages, reviews, ratings, feedback</li>
-              <li>Artisan Information: Certifications, licenses, work history, references</li>
+              <li>Phixer Information: Certifications, licenses, work history, references</li>
             </ul>
 
             <h3 className="mt-6 text-xl font-semibold text-neutral-900">2.2 Information Automatically Collected</h3>
@@ -38,11 +38,11 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-neutral-900">3. How We Use Your Information</h2>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>Provide, maintain, and improve our Services</li>
-              <li>Match clients with artisans based on location, availability, and skills</li>
+              <li>Match clients with Phixers based on location, availability, and skills</li>
               <li>Process payments and send transaction confirmations</li>
               <li>Enable real-time job tracking and communication</li>
               <li>Send service updates, notifications, and marketing communications</li>
-              <li>Verify identities and conduct background checks (for artisans)</li>
+              <li>Verify identities and conduct background checks (for Phixers)</li>
               <li>Analyze usage patterns to improve user experience</li>
               <li>Prevent fraud, ensure safety, and enforce our Terms of Service</li>
               <li>Comply with legal obligations and resolve disputes</li>
@@ -148,6 +148,8 @@ export default function PrivacyPage() {
     </main>
   );
 }
+
+
 
 
 

@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 
 import {
   collection,
@@ -17,7 +17,7 @@ type FirestoreArticle = SupportArticle & {
   updatedAt?: { toDate: () => Date };
 };
 
-export async function loadSupportArticles(role: 'client' | 'artisan' | 'admin'): Promise<SupportArticle[]> {
+export async function loadSupportArticles(role: 'client' | 'Phixer' | 'admin'): Promise<SupportArticle[]> {
   try {
     const { db } = getFirebaseServer();
     const articlesRef = collection(db, 'support_articles');
@@ -50,4 +50,5 @@ export async function loadSupportArticles(role: 'client' | 'artisan' | 'admin'):
     return fallbackArticles;
   }
 }
+
 

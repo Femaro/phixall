@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 
 export default function ServicesPage() {
   const services = [
@@ -211,7 +211,7 @@ export default function ServicesPage() {
               <span className="text-gradient"> Maintenance Solutions</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              From routine maintenance to emergency repairs, our vetted artisans provide comprehensive services to keep your facilities running smoothly.
+              From routine maintenance to emergency repairs, our vetted Phixers provide comprehensive services to keep your facilities running smoothly.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Link 
@@ -290,7 +290,7 @@ export default function ServicesPage() {
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: '✓', title: 'Vetted Professionals', desc: 'All artisans are background-checked and certified' },
+              { icon: '✓', title: 'Vetted Professionals', desc: 'All Phixers are background-checked and certified' },
               { icon: '⚡', title: 'Fast Response', desc: 'Same-day service available for most requests' },
               { icon: '💰', title: 'Transparent Pricing', desc: 'Upfront quotes with no hidden fees' },
               { icon: '🛡️', title: 'Quality Guarantee', desc: '100% satisfaction guarantee on all work' },
@@ -335,6 +335,8 @@ export default function ServicesPage() {
     </main>
   );
 }
+
+
 
 
 

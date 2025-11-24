@@ -17,8 +17,8 @@ export default function TrackingScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { user } = useAuthState();
-  const [artisanLocation, setArtisanLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [clientLocation, setClientLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [artisanLocation, setArtisanLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [clientLocation, setClientLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('Loading map...');
   const mapRef = useRef<MapView>(null);
@@ -41,8 +41,8 @@ export default function TrackingScreen() {
         const artisanLoc = data?.artisans?.[artisanId];
         if (artisanLoc?.lat && artisanLoc?.lng) {
           setArtisanLocation({
-            lat: artisanLoc.lat,
-            lng: artisanLoc.lng,
+            latitude: artisanLoc.lat,
+            longitude: artisanLoc.lng,
           });
           setStatus('Tracking artisan...');
           
@@ -71,8 +71,8 @@ export default function TrackingScreen() {
         if (status === 'granted') {
           const location = await Location.getCurrentPositionAsync({});
           setClientLocation({
-            lat: location.coords.latitude,
-            lng: location.coords.longitude,
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
           });
         }
       } catch (error) {

@@ -7,10 +7,15 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // Helper function to get user profile safely
+    function getUserProfile() {
+      return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data;
+    }
+    
     // Helper function to check if user is admin
     function isAdmin() {
       return isAuthenticated() && 
-             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin';
+             getUserProfile().role == 'admin';
     }
     
     // Helper function to check if user is the owner
@@ -21,15 +26,15 @@ service cloud.firestore {
     // Helper function to check if user is client
     function isClient() {
       return isAuthenticated() && 
-             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'client';
+             getUserProfile().role == 'client';
     }
     
     // Helper function to check if user is Phixer (supports both 'Phixer' and legacy 'artisan' for backward compatibility)
     function isPhixer() {
       return isAuthenticated() && 
-             (get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'Phixer' ||
-              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'artisan' ||
-              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'phixer');
+             (getUserProfile().role == 'Phixer' ||
+              getUserProfile().role == 'artisan' ||
+              getUserProfile().role == 'phixer');
     }
     
     // Profiles collection

@@ -361,9 +361,10 @@ function ClientDashboardContent() {
         (useAlternativeAddress ? serviceAddress.state : profileForm.state || userProfile?.state) || undefined;
       
       // Hold deposit in wallet
+      const walletData = walletSnap.data() || { heldBalance: 0 };
       await updateDoc(walletRef, {
         balance: currentBalance - MINIMUM_DEPOSIT,
-        heldBalance: (walletSnap.data().heldBalance || 0) + MINIMUM_DEPOSIT,
+        heldBalance: (walletData.heldBalance || 0) + MINIMUM_DEPOSIT,
         updatedAt: serverTimestamp(),
       });
 

@@ -177,7 +177,7 @@ function ClientDashboardContent() {
     import('firebase/auth').then(({ onAuthStateChanged }) => {
       unsubscribe = onAuthStateChanged(auth, (currentUser) => {
         if (!currentUser) {
-          window.location.href = '/login';
+          router.push('/login');
         } else {
           setUser(currentUser);
           setLoading(false);
@@ -188,7 +188,7 @@ function ClientDashboardContent() {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   // Load user profile
   useEffect(() => {
@@ -932,6 +932,18 @@ function ClientDashboardContent() {
       setAddressSuggestions([]);
     }
   }, [useAlternativeAddress]);
+
+  // Early return while loading to prevent queries before auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900 mb-4"></div>
+          <p className="text-sm text-neutral-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const addressAutocomplete = useMemo(() => {
     if (!mapsLoaded || typeof window === 'undefined' || !window.google?.maps?.places) {

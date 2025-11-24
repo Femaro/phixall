@@ -333,6 +333,18 @@ export default function ArtisanDashboardPage() {
     return () => unsubscribe();
   }, [user]);
 
+  // Early return while loading to prevent queries before auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-neutral-900 mb-4"></div>
+          <p className="text-sm text-neutral-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   async function toggleAvailability(): Promise<void> {
     const next = !available;
     setAvailable(next);

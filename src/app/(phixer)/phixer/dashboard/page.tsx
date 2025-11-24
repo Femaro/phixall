@@ -774,7 +774,7 @@ export default function ArtisanDashboardPage() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <SupportChat user={user} role="artisan" />
+      <SupportChat user={user} role="Phixer" />
       {/* Mobile Navigation Drawer */}
       <div
         className={`fixed inset-0 z-40 md:hidden ${mobileNavOpen ? '' : 'pointer-events-none'}`}

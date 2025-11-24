@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent, useEffect, useRef } from 'react';
+import { useState, FormEvent, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -31,7 +31,7 @@ type MFAState = {
   recaptchaVerifier: RecaptchaVerifier | null;
 };
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -704,5 +704,20 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-brand-600 border-t-transparent"></div>
+          <p className="mt-4 text-neutral-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

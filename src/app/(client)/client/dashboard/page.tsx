@@ -417,9 +417,6 @@ function ClientDashboardContent() {
       setScheduledAt('');
       setFiles(null);
       setActiveTab('jobs');
-      
-      // Refresh wallet balance
-      fetchWallet(currentUser.uid);
     } catch (error) {
       console.error('Error submitting job:', error);
       setMessage({ text: 'Failed to submit request. Please try again.', type: 'error' });

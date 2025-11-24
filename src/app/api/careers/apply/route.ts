@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseServer } from '@/lib/firebaseServer';
+import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,18 +42,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { db, storage } = getFirebaseServer();
+    const { db } = getFirebaseServer();
+    const { storage } = getFirebaseAdmin();
 
-    // Upload resume to Firebase Storage
-    const resumeRef = ref(storage, `careers/resumes/${Date.now()}-${resume.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`);
+    // Upload resume to Firebase Storage using Admin SDK
+    const bucket = storage.bucket();
+    const fileName = `careers/resumes/${Date.now()}-${resume.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const file = bucket.file(fileName);
     
-    // Convert File to Blob for upload
-    const resumeBlob = new Blob([await resume.arrayBuffer()], { type: resume.type });
+    // Convert File to Buffer for upload
+    const resumeBuffer = Buffer.from(await resume.arrayBuffer());
     
-    await uploadBytes(resumeRef, resumeBlob, {
-      contentType: resume.type || 'application/pdf',
+    await file.save(resumeBuffer, {
+      metadata: {
+        contentType: resume.type || 'application/pdf',
+      },
     });
-    const resumeUrl = await getDownloadURL(resumeRef);
+    
+    // Make file publicly readable (or use signed URL)
+    await file.makePublic();
+    const resumeUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
     // Save application to Firestore
     const applicationData = {

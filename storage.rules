@@ -69,8 +69,8 @@ service firebase.storage {
       // Anyone can upload resumes (public job applications)
       allow create: if request.resource.size < 5 * 1024 * 1024; // 5MB limit
       
-      // Only admins can read resumes
-      allow read: if isAdmin();
+      // Allow public read for now (can be changed to admin-only with signed URLs)
+      allow read: if true;
       
       // Only admins can delete resumes
       allow delete: if isAdmin();

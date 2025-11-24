@@ -7,15 +7,17 @@ service cloud.firestore {
       return request.auth != null;
     }
     
-    // Helper function to get user profile safely
-    function getUserProfile() {
-      return get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data;
+    // Helper function to get user profile data safely
+    function getUserProfileData() {
+      let profileDoc = get(/databases/$(database)/documents/profiles/$(request.auth.uid));
+      return profileDoc != null ? profileDoc.data : null;
     }
     
     // Helper function to check if user is admin
     function isAdmin() {
       return isAuthenticated() && 
-             getUserProfile().role == 'admin';
+             getUserProfileData() != null &&
+             getUserProfileData().role == 'admin';
     }
     
     // Helper function to check if user is the owner
@@ -26,15 +28,18 @@ service cloud.firestore {
     // Helper function to check if user is client
     function isClient() {
       return isAuthenticated() && 
-             getUserProfile().role == 'client';
+             getUserProfileData() != null &&
+             getUserProfileData().role == 'client';
     }
     
     // Helper function to check if user is Phixer (supports both 'Phixer' and legacy 'artisan' for backward compatibility)
     function isPhixer() {
+      let profileData = getUserProfileData();
       return isAuthenticated() && 
-             (getUserProfile().role == 'Phixer' ||
-              getUserProfile().role == 'artisan' ||
-              getUserProfile().role == 'phixer');
+             profileData != null &&
+             (profileData.role == 'Phixer' ||
+              profileData.role == 'artisan' ||
+              profileData.role == 'phixer');
     }
     
     // Profiles collection
@@ -300,6 +305,18 @@ service cloud.firestore {
       
       // Only Phixers and admins can delete
       allow delete: if isAdmin() || isPhixer();
+    }
+    
+    // Career Applications collection
+    match /career_applications/{applicationId} {
+      // Anyone can create applications (public job applications)
+      allow create: if true;
+      
+      // Only admins can read applications
+      allow read: if isAdmin();
+      
+      // Only admins can update/delete applications
+      allow update, delete: if isAdmin();
     }
     
     // Default: deny all access to other collections

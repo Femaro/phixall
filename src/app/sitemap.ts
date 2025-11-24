@@ -7,16 +7,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/about',
     '/clients',
-    '/phixers',
+    '/artisans',
     '/contact',
     '/subscription',
+    '/careers',
   ];
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === '' ? 'daily' : 'weekly' as 'daily' | 'weekly',
-    priority: route === '' ? 1.0 : route === '/clients' || route === '/phixers' ? 0.9 : 0.8,
+    priority: route === '' ? 1.0 : route === '/clients' || route === '/artisans' ? 0.9 : 0.8,
   }));
 }
 

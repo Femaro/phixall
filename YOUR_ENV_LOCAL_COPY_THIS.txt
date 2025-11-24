@@ -1,0 +1,61 @@
+# ==========================================
+# COPY THIS ENTIRE FILE CONTENT
+# Create a new file named: .env.local
+# Paste this content and fill in the missing values
+# ==========================================
+
+# ==========================================
+# FIREBASE CONFIGURATION
+# ==========================================
+# TODO: Get these from Firebase Console → Project Settings → General
+NEXT_PUBLIC_FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY_HERE
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=phixall-4c0a2.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=phixall-4c0a2
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=phixall-4c0a2.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID_HERE
+NEXT_PUBLIC_FIREBASE_APP_ID=YOUR_APP_ID_HERE
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=YOUR_MEASUREMENT_ID_HERE
+
+# ==========================================
+# FIREBASE ADMIN SDK (Server-side)
+# ==========================================
+# TODO: Firebase Console → Project Settings → Service Accounts → Generate New Private Key
+# Copy the entire JSON as ONE LINE (remove line breaks)
+FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"phixall-4c0a2","private_key_id":"PASTE_YOUR_KEY_HERE"}
+
+# ==========================================
+# GOOGLE MAPS API
+# ==========================================
+# TODO: Get from Google Cloud Console → APIs & Services → Credentials
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY_HERE
+
+# ==========================================
+# SITE CONFIGURATION
+# ==========================================
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+# ==========================================
+# GEMINI AI (Support Bot)
+# ==========================================
+# TODO: Get from https://makersuite.google.com/app/apikey
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY_HERE
+
+# ==========================================
+# PAYSTACK PAYMENT GATEWAY ✅ CONFIGURED
+# ==========================================
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_d6c5fb257b5883912ca03d6ed4a7e1540643c8f7
+PAYSTACK_SECRET_KEY=sk_test_8e06da6381f45d2d662d58b759635746a7c8f799
+
+# ==========================================
+# INSTRUCTIONS:
+# ==========================================
+# 1. Copy this entire file content
+# 2. Create a new file in the project root: .env.local
+# 3. Paste the content
+# 4. Fill in the TODO values (Firebase, Google Maps, Gemini)
+# 5. Save the file
+# 6. Run: npm run dev
+# 
+# ✅ Paystack is already configured with your test keys!
+# ==========================================
+

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     'about Phixall',
     'facility management company',
     'Phixer network Nigeria',
-    'what is a Phixer',
+    'who is a Phixer',
     'company mission',
     'maintenance platform',
   ],
@@ -46,7 +46,7 @@ export default function AboutPage() {
               <span className="text-gradient"> Management</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              We&apos;re building Africa&apos;s leading platform for on-demand facility maintenance, connecting property owners with verified skilled Phixers.
+              We&apos;re building Africa&apos;s leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers.
             </p>
           </div>
         </div>
@@ -65,10 +65,10 @@ export default function AboutPage() {
                   Phixall was founded in 2021 with a simple mission: make professional facility maintenance accessible, transparent, and reliable for everyone.
                 </p>
                 <p>
-                  We saw firsthand how difficult it was for facility owners to find trustworthy Phixers, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
+                  We saw firsthand how difficult it was for facility owners to find trustworthy artisans, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
                 </p>
                 <p>
-                  Today, Phixall serves over 500 facilities across Nigeria, completing more than 10,000 jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and Phixers building thriving careers.
+                  Today, Phixall serves over 500 facilities across Nigeria, completing more than 10,000 jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.
                 </p>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">
-              What is a Phixer?
+              Who is a Phixer?
             </h2>
             <p className="mt-4 text-lg text-neutral-600">
               The skilled professionals transforming facility management across Africa

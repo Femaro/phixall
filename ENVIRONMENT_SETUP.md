@@ -48,6 +48,15 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 GEMINI_API_KEY=your_gemini_api_key
 
 # ==========================================
+# EMAIL CONFIGURATION (Resend)
+# ==========================================
+# Get this from: https://resend.com/api-keys
+# Required for: Application confirmations, job notifications, payment emails
+RESEND_API_KEY=re_your_resend_api_key
+FROM_EMAIL=noreply@phixall.com
+FROM_NAME=Phixall
+
+# ==========================================
 # PAYSTACK PAYMENT GATEWAY (TEST MODE)
 # ==========================================
 # Your Paystack Test Keys
@@ -198,6 +207,9 @@ For receiving payment notifications:
 | `GEMINI_API_KEY` | ⚠️ Optional | Google AI Studio | AI support bot |
 | `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | ✅ Yes | Paystack Dashboard | Payment UI |
 | `PAYSTACK_SECRET_KEY` | ✅ Yes | Paystack Dashboard | Payment API |
+| `RESEND_API_KEY` | ✅ Yes | Resend Dashboard | Email notifications |
+| `FROM_EMAIL` | ✅ Yes | Your domain | Email sender address |
+| `FROM_NAME` | ⚠️ Optional | Custom | Email sender name |
 | `NEXT_PUBLIC_SITE_URL` | ✅ Yes | Your domain | Callbacks & links |
 
 ## Quick Start Command

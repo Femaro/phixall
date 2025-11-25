@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseServer } from '@/lib/firebaseServer';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { sendTemplateEmail } from '@/lib/emailService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,6 +82,23 @@ export async function POST(request: NextRequest) {
     };
 
     await addDoc(collection(db, 'career_applications'), applicationData);
+
+    // Send confirmation email to applicant
+    try {
+      await sendTemplateEmail('application-received', email, {
+        firstName,
+        lastName,
+        position: position || 'Administrative Staff (Full-Time)',
+        appliedDate: new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+      });
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json(
       { 

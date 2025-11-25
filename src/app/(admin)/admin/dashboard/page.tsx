@@ -22,7 +22,7 @@ type AdminProfile = {
 
 type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string; email?: string };
 
-type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'careers' | 'analytics' | 'profile' | 'settings';
+type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'careers' | 'emails' | 'analytics' | 'profile' | 'settings';
 type TrainingStatusKey = 'safetyTraining' | 'residentialTraining' | 'corporateTraining' | 'dashboardTraining';
 
 interface User {
@@ -134,6 +134,12 @@ export default function AdminDashboardPage() {
   const [bills, setBills] = useState<Bill[]>([]);
   const [applications, setApplications] = useState<ArtisanApplication[]>([]);
   const [careerApplications, setCareerApplications] = useState<any[]>([]);
+  const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
+  const [selectedEmailTemplate, setSelectedEmailTemplate] = useState<string>('');
+  const [emailRecipients, setEmailRecipients] = useState<string>('');
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
   
   // Filter states
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('all');
@@ -738,13 +744,49 @@ export default function AdminDashboardPage() {
   async function updateCareerApplicationStatus(applicationId: string, status: 'shortlisted' | 'rejected') {
     try {
       const { db } = getFirebase();
-      await updateDoc(doc(db, 'career_applications', applicationId), {
+      const applicationRef = doc(db, 'career_applications', applicationId);
+      const applicationSnap = await getDoc(applicationRef);
+      
+      if (!applicationSnap.exists()) {
+        alert('Application not found');
+        return;
+      }
+
+      const applicationData = applicationSnap.data();
+      
+      await updateDoc(applicationRef, {
         status,
         reviewed: true,
         reviewedAt: serverTimestamp(),
         reviewedBy: user?.uid || 'admin',
       });
-      alert(`Application ${status === 'shortlisted' ? 'shortlisted' : 'rejected'} successfully.`);
+
+      // Send email notification
+      try {
+        const emailTemplate = status === 'shortlisted' ? 'application-shortlisted' : 'application-rejected';
+        const response = await fetch('/api/emails/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId: emailTemplate,
+            to: applicationData.email,
+            variables: {
+              firstName: applicationData.firstName,
+              lastName: applicationData.lastName,
+              position: applicationData.position || 'Administrative Staff (Full-Time)',
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Failed to send email notification');
+        }
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        // Don't fail the update if email fails
+      }
+
+      alert(`Application ${status === 'shortlisted' ? 'shortlisted' : 'rejected'} successfully. Email notification sent.`);
     } catch (error) {
       console.error('Error updating career application status:', error);
       alert('Failed to update application status');
@@ -1050,6 +1092,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'registration' && 'Artisan Registration'}
                 {activeTab === 'billing' && 'Billing & Finance'}
                 {activeTab === 'careers' && 'Career Applications'}
+                {activeTab === 'emails' && 'Email Management'}
                 {activeTab === 'analytics' && 'Analytics & Reports'}
                 {activeTab === 'profile' && 'Admin Profile'}
                 {activeTab === 'settings' && 'Dashboard Settings'}
@@ -1062,6 +1105,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'registration' && 'Monitor new artisan signups and capture registration details'}
                 {activeTab === 'billing' && 'Monitor financial transactions and revenue'}
                 {activeTab === 'careers' && 'Review and manage job applications'}
+                {activeTab === 'emails' && 'Manage email templates and send emails to users'}
                 {activeTab === 'analytics' && 'Platform performance metrics'}
                 {activeTab === 'profile' && 'Manage your admin account information'}
                 {activeTab === 'settings' && 'Configure your admin dashboard preferences'}
@@ -2054,6 +2098,209 @@ export default function AdminDashboardPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Email Management Tab */}
+        {activeTab === 'emails' && (
+          <div>
+            <div className="grid gap-6 lg:grid-cols-2">
+              {/* Email Templates */}
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Email Templates</h3>
+                <div className="space-y-3">
+                  <select
+                    value={selectedEmailTemplate}
+                    onChange={(e) => {
+                      setSelectedEmailTemplate(e.target.value);
+                      if (e.target.value) {
+                        fetch('/api/emails/templates')
+                          .then(res => res.json())
+                          .then(data => {
+                            const template = data.templates?.find((t: any) => t.id === e.target.value);
+                            if (template) {
+                              setEmailSubject(template.subject);
+                              setEmailBody(template.body);
+                            }
+                          })
+                          .catch(err => console.error('Error loading template:', err));
+                      }
+                    }}
+                    className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                  >
+                    <option value="">Select a template...</option>
+                    <optgroup label="Application">
+                      <option value="application-received">Application Received</option>
+                      <option value="application-shortlisted">Application Shortlisted</option>
+                      <option value="application-rejected">Application Rejected</option>
+                    </optgroup>
+                    <optgroup label="Job">
+                      <option value="job-assigned">Job Assigned</option>
+                      <option value="job-completed">Job Completed</option>
+                    </optgroup>
+                    <optgroup label="Payment">
+                      <option value="payment-received">Payment Received</option>
+                      <option value="payout-processed">Payout Processed</option>
+                    </optgroup>
+                  </select>
+                  
+                  {selectedEmailTemplate && (
+                    <div className="mt-4 p-4 bg-neutral-50 rounded-lg">
+                      <p className="text-xs text-neutral-500 mb-2">Available Variables:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['firstName', 'lastName', 'position', 'jobTitle', 'clientName', 'phixerName', 'amount', 'date'].map(v => (
+                          <span key={v} className="text-xs bg-white px-2 py-1 rounded border border-neutral-200">
+                            {`{{${v}}}`}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Send Email Form */}
+              <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Send Email</h3>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    setSendingEmail(true);
+                    try {
+                      const recipients = emailRecipients.split(',').map(r => r.trim()).filter(r => r);
+                      const response = await fetch('/api/emails/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          to: recipients,
+                          subject: emailSubject,
+                          html: emailBody.split('\n').map(line => `<p>${line}</p>`).join(''),
+                        }),
+                      });
+
+                      const data = await response.json();
+                      if (response.ok) {
+                        alert('Email sent successfully!');
+                        setEmailRecipients('');
+                        setEmailSubject('');
+                        setEmailBody('');
+                        setSelectedEmailTemplate('');
+                      } else {
+                        alert(`Failed to send email: ${data.error}`);
+                      }
+                    } catch (error) {
+                      alert('Failed to send email. Please try again.');
+                    } finally {
+                      setSendingEmail(false);
+                    }
+                  }}
+                  className="space-y-4"
+                >
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Recipients (comma-separated emails)
+                    </label>
+                    <input
+                      type="text"
+                      value={emailRecipients}
+                      onChange={(e) => setEmailRecipients(e.target.value)}
+                      required
+                      placeholder="user1@example.com, user2@example.com"
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Subject
+                    </label>
+                    <input
+                      type="text"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      required
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Message Body
+                    </label>
+                    <textarea
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      required
+                      rows={8}
+                      className="w-full rounded-lg border border-neutral-300 px-4 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+                      placeholder="Enter your email message. Use {{variableName}} for dynamic content."
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={sendingEmail}
+                    className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {sendingEmail ? 'Sending...' : 'Send Email'}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="mt-6 rounded-lg border border-neutral-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Quick Actions</h3>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <button
+                  onClick={async () => {
+                    const recipients = prompt('Enter recipient email:');
+                    if (!recipients) return;
+                    
+                    try {
+                      const response = await fetch('/api/emails/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          templateId: 'application-received',
+                          to: recipients,
+                          variables: {
+                            firstName: 'User',
+                            lastName: 'Name',
+                            position: 'Position',
+                            appliedDate: new Date().toLocaleDateString(),
+                          },
+                        }),
+                      });
+                      
+                      if (response.ok) {
+                        alert('Test email sent!');
+                      }
+                    } catch (error) {
+                      alert('Failed to send test email');
+                    }
+                  }}
+                  className="rounded-lg border border-neutral-300 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Send Test Email
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setSelectedEmailTemplate('application-received');
+                    setEmailSubject('Thank You for Your Application - Phixall');
+                    setEmailBody(`Dear {{firstName}} {{lastName}},
+
+Thank you for applying for the {{position}} position at Phixall.
+
+We have successfully received your application and our team will review it carefully.`);
+                  }}
+                  className="rounded-lg border border-neutral-300 px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Load Application Template
+                </button>
               </div>
             </div>
           </div>

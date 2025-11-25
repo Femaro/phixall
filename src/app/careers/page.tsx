@@ -266,7 +266,7 @@ export default function CareersPage() {
                   <div className="mb-6">
                     <h5 className="font-semibold text-neutral-900 mb-3">Education & Experience</h5>
                     <ul className="list-disc list-inside space-y-1 text-neutral-700 ml-4">
-                      <li>OND / HND / Bachelor&apos;s Degree in Business Administration, Management, or a related field</li>
+                      <li>Bachelor&apos;s Degree in Business Administration, Management, or a related field</li>
                       <li>1–3 years experience in administrative, operations, or customer/client support roles</li>
                       <li>Experience working with service platforms, field operations, or technician networks is an advantage</li>
                     </ul>
@@ -417,8 +417,6 @@ export default function CareersPage() {
                         className="w-full border-2 border-neutral-300 bg-white px-4 py-3 text-neutral-900 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
                       >
                         <option value="">Select education level</option>
-                        <option value="OND">OND</option>
-                        <option value="HND">HND</option>
                         <option value="Bachelor">Bachelor&apos;s Degree</option>
                         <option value="Master">Master&apos;s Degree</option>
                         <option value="Other">Other</option>

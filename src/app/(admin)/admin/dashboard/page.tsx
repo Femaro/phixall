@@ -8,6 +8,7 @@ import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, 
 import { trainingModules } from '@/data/trainingModules';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { ArtisanOnboarding } from '@/types/onboarding';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
 
@@ -2347,11 +2348,148 @@ We have successfully received your application and our team will review it caref
               </div>
             </div>
 
-            {/* Charts Placeholder */}
+            {/* Revenue Trends Chart */}
             <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
-              <h3 className="text-lg font-semibold text-neutral-900">Revenue Trends</h3>
-              <div className="mt-4 flex h-64 items-center justify-center border-2 border-dashed border-neutral-300 rounded-lg">
-                <p className="text-neutral-500">Chart visualization (Integration ready)</p>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-neutral-900">Revenue Trends</h3>
+                <select
+                  onChange={(e) => {
+                    // Time period selector can be added here
+                  }}
+                  className="text-sm border border-neutral-300 rounded-lg px-3 py-1"
+                  defaultValue="30"
+                >
+                  <option value="7">Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="all">All time</option>
+                </select>
+              </div>
+              <div className="mt-4 h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={revenueTrendsData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                      tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px'
+                      }}
+                      formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Revenue']}
+                    />
+                    <Legend />
+                    <Area
+                      type="monotone"
+                      dataKey="revenue"
+                      stroke="#2563eb"
+                      fillOpacity={1}
+                      fill="url(#colorRevenue)"
+                      name="Daily Revenue"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Job Trends Chart */}
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Job Trends</h3>
+              <div className="mt-4 h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={jobTrendsData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                    />
+                    <Tooltip
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px'
+                      }}
+                    />
+                    <Legend />
+                    <Bar dataKey="created" fill="#3b82f6" name="Jobs Created" />
+                    <Bar dataKey="completed" fill="#10b981" name="Jobs Completed" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Transaction Volume Chart */}
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Transaction Volume</h3>
+              <div className="mt-4 h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={transactionVolumeData}
+                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      stroke="#6b7280"
+                      style={{ fontSize: '12px' }}
+                      tickFormatter={(value) => `₦${(value / 1000).toFixed(0)}k`}
+                    />
+                    <Tooltip
+                      contentStyle={{ 
+                        backgroundColor: '#fff', 
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '8px',
+                        padding: '12px'
+                      }}
+                      formatter={(value: number) => [`₦${value.toLocaleString()}`, '']}
+                    />
+                    <Legend />
+                    <Line type="monotone" dataKey="deposits" stroke="#3b82f6" strokeWidth={2} name="Deposits" />
+                    <Line type="monotone" dataKey="payouts" stroke="#ef4444" strokeWidth={2} name="Payouts" />
+                    <Line type="monotone" dataKey="payments" stroke="#10b981" strokeWidth={2} name="Payments" />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>

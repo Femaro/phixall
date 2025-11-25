@@ -807,7 +807,7 @@ export default function AdminDashboardPage() {
     }
   }
 
-  const stats = {
+  const stats = useMemo(() => ({
     totalClients: clients.length,
     totalArtisans: artisans.length,
     totalJobs: jobs.length,
@@ -818,7 +818,7 @@ export default function AdminDashboardPage() {
     totalResources: resources.length,
     totalResourceValue: resources.reduce((sum, r) => sum + (r.quantity * r.costPerUnit), 0),
     pendingBills: bills.filter(b => b.status === 'pending').length,
-  };
+  }), [clients, artisans, jobs, transactions, resources, bills]);
 
   const artisanRatingSummary = useMemo<Record<string, { average: number; count: number }>>(() => {
     const summary: Record<string, { sum: number; count: number }> = {};

@@ -855,6 +855,154 @@ export default function AdminDashboardPage() {
     );
   }, [jobs]);
 
+  // Process revenue trends data
+  const revenueTrendsData = useMemo(() => {
+    const revenueData: Record<string, number> = {};
+    const now = new Date();
+    const days = 30;
+    
+    // Initialize all days with 0
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      revenueData[dateKey] = 0;
+    }
+    
+    // Aggregate revenue by date
+    transactions
+      .filter(t => 
+        t.type === 'payment' && 
+        t.status === 'completed' &&
+        t.createdAt
+      )
+      .forEach(t => {
+        let date: Date;
+        if (t.createdAt instanceof Date) {
+          date = t.createdAt;
+        } else if (t.createdAt && typeof t.createdAt === 'object' && 'toDate' in t.createdAt) {
+          date = (t.createdAt as { toDate: () => Date }).toDate();
+        } else if (t.createdAt && typeof t.createdAt === 'object' && 'seconds' in t.createdAt) {
+          date = new Date((t.createdAt as { seconds: number }).seconds * 1000);
+        } else {
+          return;
+        }
+        
+        const dateKey = date.toISOString().split('T')[0];
+        const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff >= 0 && daysDiff < days) {
+          revenueData[dateKey] = (revenueData[dateKey] || 0) + t.amount;
+        }
+      });
+    
+    return Object.entries(revenueData).map(([date, revenue]) => ({
+      date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      revenue: Math.round(revenue),
+      cumulative: Object.entries(revenueData)
+        .filter(([d]) => d <= date)
+        .reduce((sum, [, r]) => sum + r, 0),
+    }));
+  }, [transactions]);
+
+  // Process job trends data
+  const jobTrendsData = useMemo(() => {
+    const jobData: Record<string, { created: number; completed: number }> = {};
+    const now = new Date();
+    const days = 30;
+    
+    // Initialize all days
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      jobData[dateKey] = { created: 0, completed: 0 };
+    }
+    
+    // Aggregate jobs by date
+    jobs.forEach(job => {
+      let createdDate: Date | null = null;
+      
+      if (job.createdAt) {
+        if (job.createdAt instanceof Date) {
+          createdDate = job.createdAt;
+        } else if (typeof job.createdAt === 'object' && 'toDate' in job.createdAt) {
+          createdDate = (job.createdAt as { toDate: () => Date }).toDate();
+        } else if (typeof job.createdAt === 'object' && 'seconds' in job.createdAt) {
+          createdDate = new Date((job.createdAt as { seconds: number }).seconds * 1000);
+        }
+      }
+      
+      if (createdDate) {
+        const dateKey = createdDate.toISOString().split('T')[0];
+        const daysDiff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff >= 0 && daysDiff < days && jobData[dateKey]) {
+          jobData[dateKey].created++;
+          if (job.status === 'completed') {
+            jobData[dateKey].completed++;
+          }
+        }
+      }
+    });
+    
+    return Object.entries(jobData).map(([date, data]) => ({
+      date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      created: data.created,
+      completed: data.completed,
+    }));
+  }, [jobs]);
+
+  // Process transaction volume data
+  const transactionVolumeData = useMemo(() => {
+    const transactionData: Record<string, { deposits: number; payouts: number; payments: number }> = {};
+    const now = new Date();
+    const days = 30;
+    
+    // Initialize all days
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      transactionData[dateKey] = { deposits: 0, payouts: 0, payments: 0 };
+    }
+    
+    // Aggregate transactions by type and date
+    transactions
+      .filter(t => t.createdAt)
+      .forEach(t => {
+        let date: Date;
+        if (t.createdAt instanceof Date) {
+          date = t.createdAt;
+        } else if (typeof t.createdAt === 'object' && 'toDate' in t.createdAt) {
+          date = (t.createdAt as { toDate: () => Date }).toDate();
+        } else if (typeof t.createdAt === 'object' && 'seconds' in t.createdAt) {
+          date = new Date((t.createdAt as { seconds: number }).seconds * 1000);
+        } else {
+          return;
+        }
+        
+        const dateKey = date.toISOString().split('T')[0];
+        const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff >= 0 && daysDiff < days && transactionData[dateKey]) {
+          if (t.type === 'deposit') {
+            transactionData[dateKey].deposits += t.amount;
+          } else if (t.type === 'payout') {
+            transactionData[dateKey].payouts += t.amount;
+          } else if (t.type === 'payment') {
+            transactionData[dateKey].payments += t.amount;
+          }
+        }
+      });
+    
+    return Object.entries(transactionData).map(([date, data]) => ({
+      date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      deposits: Math.round(data.deposits),
+      payouts: Math.round(data.payouts),
+      payments: Math.round(data.payments),
+    }));
+  }, [transactions]);
+
   const applicationStats = {
     total: applications.length,
     inProgress: applications.filter(a => ['pending', 'in-progress', 'training'].includes(a.status ?? '')).length,

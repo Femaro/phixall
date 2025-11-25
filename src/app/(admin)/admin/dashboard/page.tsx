@@ -941,6 +941,7 @@ export default function AdminDashboardPage() {
     { id: 'resources', label: 'Resources', icon: '📦' },
     { id: 'billing', label: 'Billing & Finance', icon: '💰' },
     { id: 'careers', label: 'Career Applications', icon: '📝' },
+    { id: 'emails', label: 'Email Management', icon: '📧' },
     { id: 'registration', label: 'Artisan Registration', icon: '📝' },
     { id: 'analytics', label: 'Analytics', icon: '📈' },
     { id: 'profile', label: 'Profile', icon: '👤' },

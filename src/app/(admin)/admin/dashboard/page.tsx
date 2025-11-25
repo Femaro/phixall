@@ -2189,7 +2189,12 @@ export default function AdminDashboardPage() {
                         setEmailBody('');
                         setSelectedEmailTemplate('');
                       } else {
-                        alert(`Failed to send email: ${data.error}`);
+                        const errorMsg = data.error || 'Failed to send email';
+                        if (errorMsg.includes('not configured')) {
+                          alert(`Email service not configured.\n\nPlease add RESEND_API_KEY to your .env.local file.\n\nSee EMAIL_SETUP.md for setup instructions.`);
+                        } else {
+                          alert(`Failed to send email: ${errorMsg}`);
+                        }
                       }
                     } catch (error) {
                       alert('Failed to send email. Please try again.');

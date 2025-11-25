@@ -15,7 +15,10 @@ interface SendEmailOptions {
 export async function sendEmail(options: SendEmailOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
   if (!RESEND_API_KEY) {
     console.error('RESEND_API_KEY not configured');
-    return { success: false, error: 'Email service not configured' };
+    return { 
+      success: false, 
+      error: 'Email service not configured. Please add RESEND_API_KEY to your .env.local file. See ENVIRONMENT_SETUP.md for instructions.' 
+    };
   }
 
   try {

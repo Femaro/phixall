@@ -10,12 +10,8 @@ const nextConfig: NextConfig = {
     ],
   },
   // Turbopack configuration (Next.js 16+)
-  turbopack: {
-    // Exclude mobile directory from build
-    resolveAlias: {
-      // Mobile directory is already excluded via tsconfig.json
-    },
-  },
+  // Empty config to silence the webpack/turbopack warning
+  turbopack: {},
 };
 
 export default nextConfig;

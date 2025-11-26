@@ -6,21 +6,26 @@ export function getFirebaseAdmin() {
   if (!app) {
     if (admin.apps.length === 0) {
       let serviceAccount;
-      try {
-        if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+        try {
           serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-        } else {
-          // Try to load from file (for local development only)
-          // In production/Vercel, this file won't exist, so we catch the error
-          try {
-            serviceAccount = require('../../serviceAccountKey.json');
-          } catch (fileError) {
-            // File doesn't exist - this is expected in production
-            throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable');
-          }
+        } catch (error) {
+          throw new Error('Invalid FIREBASE_SERVICE_ACCOUNT_KEY. Must be valid JSON.');
         }
-      } catch (error: any) {
-        throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable or provide serviceAccountKey.json');
+      } else {
+        // Only try to load from file in development (not in production/Vercel)
+        // This prevents build warnings when the file doesn't exist
+        if (process.env.NODE_ENV === 'development') {
+          try {
+            // Dynamic require to avoid bundling issues - only in development
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            serviceAccount = require('../../serviceAccountKey.json');
+          } catch (error) {
+            throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable or provide serviceAccountKey.json in project root.');
+          }
+        } else {
+          throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable in Vercel.');
+        }
       }
 
       app = admin.initializeApp({

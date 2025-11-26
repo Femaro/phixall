@@ -1,26 +1,26 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { Metadata } from 'next';
 import StructuredData from '@/components/seo/StructuredData';
 import { organizationSchema, servicesSchema } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'Professional Facility Management & Maintenance Services in Nigeria',
-  description: 'Connect with verified, skilled Phixers for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
+  description: 'Connect with verified, skilled artisans for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
   keywords: [
     'facility management Nigeria',
     'maintenance services Lagos',
-    'professional Phixers',
+    'professional artisans',
     'plumbing services',
     'electrical repairs',
     'HVAC maintenance',
     'building maintenance',
     'skilled technicians',
-    'verified Phixers',
+    'verified artisans',
     'facility services',
   ],
   openGraph: {
     title: 'Phixall - Professional Facility Management Made Simple',
-    description: 'Connect with verified Phixers for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
+    description: 'Connect with verified artisans for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
     url: '/',
     siteName: 'Phixall',
     images: [
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Phixall - Professional Facility Management',
-    description: 'Connect with verified Phixers for all your maintenance needs. Trusted by 500+ businesses.',
+    description: 'Connect with verified artisans for all your maintenance needs. Trusted by 500+ businesses.',
     images: ['/og-image.png'],
   },
   alternates: {
@@ -67,7 +67,7 @@ export default function Home() {
                 <span className="text-gradient"> simplified</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-neutral-600">
-                Connect with vetted Phixers for all your maintenance needs. Request services, track progress in real-time, and manage payments—all from one powerful platform.
+                Connect with vetted artisans for all your maintenance needs. Request services, track progress in real-time, and manage payments—all from one powerful platform.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -176,7 +176,7 @@ export default function Home() {
                   <div className="flex gap-6">
                     <div className="text-center">
                       <div className="mb-1 text-2xl font-bold text-brand-600">500+</div>
-                      <div className="text-xs text-neutral-600">Active Phixers</div>
+                      <div className="text-xs text-neutral-600">Active Artisans</div>
                     </div>
                     <div className="h-10 w-px bg-neutral-300"></div>
                     <div className="text-center">
@@ -222,7 +222,7 @@ export default function Home() {
               {
                 step: '02',
                 title: 'Get Matched',
-                description: 'Our system connects you with verified Phixers nearby. Review profiles, ratings, and accept quotes.',
+                description: 'Our system connects you with verified artisans nearby. Review profiles, ratings, and accept quotes.',
                 icon: (
                   <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -232,7 +232,7 @@ export default function Home() {
               {
                 step: '03',
                 title: 'Track & Pay',
-                description: 'Monitor Phixer location in real-time, review work upon completion, and pay securely online.',
+                description: 'Monitor artisan location in real-time, review work upon completion, and pay securely online.',
                 icon: (
                   <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -326,7 +326,7 @@ export default function Home() {
                       <h4 className="mb-2 text-lg font-bold text-neutral-900">HVAC Maintenance</h4>
                       <p className="mb-4 text-sm text-neutral-600">Scheduled for today, 2:00 PM</p>
                       <div className="flex items-center gap-3">
-                        <img src="/logo.png" alt="Phixer" className="h-10 w-10 rounded-full border-2 border-brand-200" />
+                        <img src="/logo.png" alt="Artisan" className="h-10 w-10 rounded-full border-2 border-brand-200" />
                         <div className="flex-1">
                           <p className="text-sm font-semibold text-neutral-900">John Adebayo</p>
                           <div className="flex items-center gap-1">
@@ -363,12 +363,12 @@ export default function Home() {
                   {
                     icon: '🔧',
                     title: 'On-Demand Services',
-                    desc: 'Access verified Phixers 24/7 for immediate assistance'
+                    desc: 'Access verified artisans 24/7 for immediate assistance'
                   },
                   {
                     icon: '📍',
                     title: 'Real-Time Tracking',
-                    desc: 'Monitor service progress and Phixer location live'
+                    desc: 'Monitor service progress and artisan location live'
                   },
                   {
                     icon: '💳',
@@ -549,7 +549,7 @@ export default function Home() {
                           <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
-                          <span>Access to Premium Phixers</span>
+                          <span>Access to Premium Artisans</span>
                         </div>
                       </div>
                     </div>
@@ -569,7 +569,7 @@ export default function Home() {
               Trusted by Facilities Nationwide
             </h2>
             <p className="mt-4 text-lg text-neutral-600">
-              Hear from clients and Phixers using Phixall every day
+              Hear from clients and artisans using Phixall every day
             </p>
           </div>
           <div className="mt-16 grid gap-8 md:grid-cols-3">
@@ -587,7 +587,7 @@ export default function Home() {
                 rating: 5,
               },
               {
-                quote: 'Reliable Phixers, transparent pricing, and on-time delivery every single time. Highly recommend for any facility needs.',
+                quote: 'Reliable artisans, transparent pricing, and on-time delivery every single time. Highly recommend for any facility needs.',
                 author: 'Chioma Nwosu',
                 role: 'Operations Lead',
                 rating: 5,
@@ -627,11 +627,11 @@ export default function Home() {
             {[
               {
                 q: 'How quickly can I book a service?',
-                a: 'Most service requests are confirmed within 2-4 hours. We offer same-day and emergency options in all supported areas, with average Phixer arrival times of 45-90 minutes.',
+                a: 'Most service requests are confirmed within 2-4 hours. We offer same-day and emergency options in all supported areas, with average artisan arrival times of 45-90 minutes.',
               },
               {
-                q: 'Are Phixers vetted and insured?',
-                a: 'Yes. Every Phixer undergoes identity verification, skills assessment, and background checks. We maintain ongoing performance reviews and require valid trade certifications.',
+                q: 'Are artisans vetted and insured?',
+                a: 'Yes. Every artisan undergoes identity verification, skills assessment, and background checks. We maintain ongoing performance reviews and require valid trade certifications.',
               },
               {
                 q: 'Do you support corporate and enterprise facilities?',
@@ -647,7 +647,7 @@ export default function Home() {
               },
               {
                 q: 'What if I\'m not satisfied with the work?',
-                a: 'We offer a 100% satisfaction guarantee. If you\'re not happy with the completed work, we\'ll send another Phixer at no additional charge or provide a full refund.',
+                a: 'We offer a 100% satisfaction guarantee. If you\'re not happy with the completed work, we\'ll send another artisan at no additional charge or provide a full refund.',
               },
             ].map((faq, i) => (
               <details key={i} className="group rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
@@ -660,6 +660,104 @@ export default function Home() {
                 <p className="mt-4 text-neutral-600">{faq.a}</p>
               </details>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile App Download */}
+      <section className="border-t border-neutral-200 bg-gradient-to-br from-neutral-50 to-white">
+        <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700">
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                </svg>
+                Available on Mobile
+              </div>
+              <h2 className="mt-6 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">
+                Take Phixall with You
+                <span className="text-gradient"> Anywhere</span>
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-neutral-600">
+                Download our mobile app for iOS and Android to manage your facility services on the go. Request services, track jobs in real-time, and communicate with Phixers—all from your smartphone.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <a
+                  href="https://apps.apple.com/app/phixall"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 rounded-xl border-2 border-neutral-300 bg-white px-6 py-4 shadow-soft transition-all hover:border-brand-300 hover:shadow-glow"
+                >
+                  <svg className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C1.79 15.25 2.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs text-neutral-500">Download on the</div>
+                    <div className="text-lg font-semibold text-neutral-900">App Store</div>
+                  </div>
+                </a>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.phixall.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 rounded-xl border-2 border-neutral-300 bg-white px-6 py-4 shadow-soft transition-all hover:border-brand-300 hover:shadow-glow"
+                >
+                  <svg className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L6.05,2.66L14.54,11.15L20.16,10.81M17.3,12L6.05,2.66L14.54,11.15L17.3,12Z"/>
+                  </svg>
+                  <div className="text-left">
+                    <div className="text-xs text-neutral-500">Get it on</div>
+                    <div className="text-lg font-semibold text-neutral-900">Google Play</div>
+                  </div>
+                </a>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-6 text-sm text-neutral-600">
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Real-time job tracking
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Push notifications
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Offline access
+                </div>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="relative mx-auto max-w-sm">
+                <div className="aspect-[9/19] overflow-hidden rounded-[2.5rem] border-8 border-neutral-900 bg-neutral-900 shadow-2xl">
+                  <div className="h-full w-full bg-gradient-to-br from-brand-50 to-brand-100 p-8">
+                    <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
+                      <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
+                        <span className="text-4xl">🔧</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-neutral-900">Phixall</h3>
+                        <p className="mt-1 text-sm text-neutral-600">Facility Management</p>
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        <div className="h-2 w-32 rounded-full bg-neutral-200"></div>
+                        <div className="h-2 w-24 rounded-full bg-neutral-200"></div>
+                        <div className="h-2 w-28 rounded-full bg-neutral-200"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-brand-200/30 blur-2xl"></div>
+                <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-purple-200/30 blur-2xl"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -699,4 +797,3 @@ export default function Home() {
     </>
   );
 }
-

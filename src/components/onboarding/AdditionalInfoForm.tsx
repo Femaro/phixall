@@ -52,6 +52,11 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
   };
 
   const addCertification = () => {
+    const MAX_CERTIFICATIONS = 5;
+    if (formData.certifications.length >= MAX_CERTIFICATIONS) {
+      alert(`Maximum ${MAX_CERTIFICATIONS} certifications allowed.`);
+      return;
+    }
     setFormData({
       ...formData,
       certifications: [
@@ -332,13 +337,19 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
         <div className="space-y-6 mb-8">
           <div className="flex items-center justify-between border-b border-neutral-200 pb-2">
             <h3 className="text-lg font-semibold text-neutral-900">Certifications (Optional)</h3>
-            <button
-              type="button"
-              onClick={addCertification}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700"
-            >
-              + Add Certification
-            </button>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-neutral-500">
+                {formData.certifications.length}/5
+              </span>
+              <button
+                type="button"
+                onClick={addCertification}
+                disabled={formData.certifications.length >= 5}
+                className="text-sm font-medium text-brand-600 hover:text-brand-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                + Add Certification
+              </button>
+            </div>
           </div>
 
           {formData.certifications.map((cert, index) => (

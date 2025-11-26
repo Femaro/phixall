@@ -77,7 +77,16 @@ export default function JobCompletionPage() {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    const MAX_IMAGES = 15;
+    
     if (files.length > 0) {
+      // Check total count after adding new files
+      if (images.length + files.length > MAX_IMAGES) {
+        alert(`Maximum ${MAX_IMAGES} photos allowed. You can add ${MAX_IMAGES - images.length} more photo(s).`);
+        e.target.value = ''; // Clear the input
+        return;
+      }
+      
       setImages([...images, ...files]);
       files.forEach(file => {
         const reader = new FileReader();
@@ -279,7 +288,7 @@ export default function JobCompletionPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Photos
             </label>
-            <p className="text-sm text-gray-500 mb-4">Add photos of the completed work (Max 10MB per file)</p>
+            <p className="text-sm text-gray-500 mb-4">Add photos of the completed work (Max 15 photos, 10MB per file)</p>
             <div className="flex gap-4 mb-4">
               <label className="flex-1 cursor-pointer">
                 <input

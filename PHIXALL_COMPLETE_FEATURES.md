@@ -708,39 +708,58 @@
 ### File Upload Limits
 
 #### CV/Resume Uploads (Careers)
-- **Maximum Size**: 5MB
+- **Maximum Files**: 1 file
+- **Maximum Size**: 5MB per file
 - **Accepted Formats**: PDF, DOC, DOCX
 - **Validation**: Server-side size and type checking
 - **Storage**: Firebase Storage (careers/resumes/)
 
 #### Registration Documents (Phixer Onboarding)
-- **ID Documents**: Maximum 5MB
-- **Certifications**: Maximum 5MB
-- **Accepted Formats**: PDF, JPG, JPEG, PNG
+- **ID Documents**: 
+  - Maximum Files: 1 file
+  - Maximum Size: 5MB
+  - Accepted Formats: PDF, JPG, JPEG, PNG
+- **Certifications**: 
+  - Maximum Files: 5 certifications (1 file per certification)
+  - Maximum Size: 5MB per file
+  - Accepted Formats: PDF, JPG, JPEG, PNG
 - **Validation**: Client and server-side validation
 - **Storage**: Firebase Storage (phixer-documents/)
 
 #### Client Job Attachments
+- **Maximum Files**: 10 files
 - **Maximum Size**: 10MB per file
 - **Accepted Formats**: Images (JPG, PNG, GIF, etc.), Videos (MP4, MOV, etc.)
 - **Multiple Files**: Support for multiple attachments
-- **Validation**: Size and type validation before upload
+- **Validation**: File count, size, and type validation before upload
 - **Storage**: Firebase Storage (jobs/[jobId]/)
 
 #### Job Completion Photos
+- **Maximum Files**: 15 photos
 - **Maximum Size**: 10MB per file
 - **Accepted Formats**: Images (JPG, PNG, etc.)
 - **Multiple Photos**: Support for multiple completion photos
-- **Validation**: Size validation with error messages
+- **Validation**: File count and size validation with error messages
 - **Storage**: Firebase Storage (job-completions/[jobId]/)
 
 ### File Management Features
 - **Secure Storage**: Firebase Storage with authentication
 - **File Type Validation**: MIME type checking
+- **File Count Limits**: Maximum number of files per upload
 - **Size Validation**: Client and server-side checks
 - **Progress Indicators**: Upload progress display
 - **Error Handling**: Clear error messages for failures
 - **Download Links**: Secure download URLs
+
+### File Upload Limits Summary
+
+| Upload Type | Max Files | Max Size per File | Formats |
+|------------|-----------|-------------------|---------|
+| CV/Resume | 1 | 5MB | PDF, DOC, DOCX |
+| ID Document | 1 | 5MB | PDF, JPG, JPEG, PNG |
+| Certifications | 5 (1 per cert) | 5MB | PDF, JPG, JPEG, PNG |
+| Job Attachments | 10 | 10MB | Images, Videos |
+| Completion Photos | 15 | 10MB | Images |
 
 ---
 

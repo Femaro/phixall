@@ -813,6 +813,39 @@ function ClientDashboardContent() {
     }
   }
 
+  async function handleVerifyQRCode(jobId: string, qrCodeData: string) {
+    if (!user) {
+      setMessage({ text: 'You must be signed in to verify a Phixer.', type: 'error' });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/jobs/verify-qr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          qrCodeData,
+          jobId,
+          clientId: user.uid,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage({ text: 'Phixer verified successfully!', type: 'success' });
+        // Close modal
+        const modal = document.getElementById(`qr-modal-${jobId}`);
+        if (modal) {
+          (modal as HTMLDialogElement).close();
+        }
+      } else {
+        setMessage({ text: data.error || 'Verification failed', type: 'error' });
+      }
+    } catch (error: any) {
+      setMessage({ text: error.message || 'Failed to verify QR code', type: 'error' });
+    }
+  }
+
   async function handleCancelJob(jobId: string) {
     if (!confirm('Are you sure you want to cancel this job?')) return;
 
@@ -1924,12 +1957,33 @@ function ClientDashboardContent() {
                           </button>
                         )}
                         {(job.phixerId || job.artisanId) && ['accepted', 'in-progress'].includes(job.status) && (
-                          <Link
-                            href={`/client/tracking?jobId=${job.id}&phixerId=${job.phixerId || job.artisanId}`}
-                            className="rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-brand-700"
-                          >
-                            {job.status === 'in-progress' ? 'Track Live' : 'View Tracking'}
-                          </Link>
+                          <div className="flex flex-col gap-2">
+                            {!job.clientVerified && job.status === 'accepted' && (
+                              <button
+                                onClick={() => {
+                                  const modal = document.getElementById(`qr-modal-${job.id}`);
+                                  if (modal) {
+                                    (modal as HTMLDialogElement).showModal();
+                                  }
+                                }}
+                                className="rounded-lg bg-green-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-green-700"
+                              >
+                                ✓ Verify Phixer
+                              </button>
+                            )}
+                            <Link
+                              href={`/client/tracking?jobId=${job.id}&phixerId=${job.phixerId || job.artisanId}`}
+                              className="rounded-lg bg-brand-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-brand-700"
+                            >
+                              {job.status === 'in-progress' ? 'Track Live' : 'View Tracking'}
+                            </Link>
+                          </div>
+                        )}
+                        {job.clientVerified && (
+                          <div className="flex items-center gap-2 text-sm text-green-600">
+                            <span>✓</span>
+                            <span>Verified</span>
+                          </div>
                         )}
                         {job.status === 'completed' && !job.amount && (
                           <button

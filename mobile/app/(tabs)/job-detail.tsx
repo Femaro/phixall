@@ -8,6 +8,7 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -15,6 +16,7 @@ import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { getFirebase } from '@/config/firebase';
 import * as Location from 'expo-location';
 import { calculateDistance, formatDistance } from '@/utils/distance';
+import { QRCodeDisplay } from '@/components/QRCodeDisplay';
 
 interface JobDetail {
   id: string;
@@ -64,6 +66,7 @@ export default function JobDetailScreen() {
   const [updating, setUpdating] = useState(false);
   const [artisanLocation, setArtisanLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   useEffect(() => {
     if (!user || !params.id) return;
@@ -421,6 +424,15 @@ export default function JobDetailScreen() {
             </>
           )}
 
+          {isArtisan && (job.status === 'accepted' || job.status === 'in-progress') && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.primaryButton]}
+              onPress={() => setShowQRCode(true)}
+            >
+              <Text style={styles.actionButtonText}>📱 Show Verification QR Code</Text>
+            </TouchableOpacity>
+          )}
+
           {isArtisan && job.status === 'pending-completion' && (
             <View style={styles.pendingBadge}>
               <Text style={styles.pendingText}>
@@ -466,6 +478,40 @@ export default function JobDetailScreen() {
           )}
         </View>
       </View>
+
+      {/* QR Code Verification Modal */}
+      <Modal
+        visible={showQRCode}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowQRCode(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Verification QR Code</Text>
+              <TouchableOpacity onPress={() => setShowQRCode(false)}>
+                <Text style={styles.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            {job && user && (
+              <QRCodeDisplay
+                jobId={job.id}
+                phixerId={job.phixerId || job.artisanId || user.uid}
+                onRefresh={() => {}}
+              />
+            )}
+
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setShowQRCode(false)}
+            >
+              <Text style={styles.modalCloseButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

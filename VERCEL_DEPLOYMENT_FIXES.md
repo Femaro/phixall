@@ -63,3 +63,11 @@ Make sure these are set in Vercel:
 2. Check Vercel build logs for any remaining errors
 3. Verify the deployment succeeds
 
+## Important Note
+
+If Vercel is still showing errors from an older commit:
+- The latest fix is in commit `b6bf0df` (or later)
+- Make sure Vercel is building the latest commit
+- You may need to manually trigger a redeployment in Vercel dashboard
+- Or wait for Vercel to automatically detect the new commit
+

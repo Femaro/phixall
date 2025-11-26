@@ -9,17 +9,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Exclude mobile directory from build
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-      };
-    }
-    return config;
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    // Exclude mobile directory from build
+    resolveAlias: {
+      // Mobile directory is already excluded via tsconfig.json
+    },
   },
 };
 

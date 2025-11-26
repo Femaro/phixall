@@ -148,23 +148,46 @@ export default function JobApprovalsPage() {
       const jobDoc = await getDoc(doc(db, 'jobs', completion.jobId));
       const jobData = jobDoc.data();
 
-      // Prompt admin for final amount
-      const finalAmountStr = prompt(
-        `Enter final amount for this job:\n\nJob: ${jobData?.title}\nDeposit held: ₦1,000\n\nEnter total amount (₦):`,
-        jobData?.amount?.toString() || '5000'
+      // Get material invoice if exists
+      let materialCost = 0;
+      const materialInvoiceId = jobData?.materialInvoiceId;
+      if (materialInvoiceId) {
+        const invoiceDoc = await getDoc(doc(db, 'materialInvoices', materialInvoiceId));
+        if (invoiceDoc.exists()) {
+          const invoiceData = invoiceDoc.data();
+          materialCost = invoiceData.subtotal || 0;
+        }
+      }
+
+      // Calculate base amount (deposit already held)
+      const depositHeld = 1000;
+      const baseServiceAmount = jobData?.amount || 5000;
+      const suggestedTotal = baseServiceAmount + materialCost; // Deposit already included in base
+
+      // Prompt admin for final service amount (excluding materials and deposit which are auto-included)
+      const serviceAmountStr = prompt(
+        `Bill Calculation for: ${jobData?.title}\n\n` +
+        `Deposit (already held): ₦${depositHeld.toLocaleString()}\n` +
+        `Materials Cost: ₦${materialCost.toLocaleString()}\n` +
+        `Suggested Service Amount: ₦${baseServiceAmount.toLocaleString()}\n\n` +
+        `Enter service amount (₦) - Materials and deposit will be added automatically:`,
+        baseServiceAmount.toString()
       );
 
-      if (!finalAmountStr) {
+      if (!serviceAmountStr) {
         setProcessing(null);
         return;
       }
 
-      const finalAmount = parseFloat(finalAmountStr);
-      if (isNaN(finalAmount) || finalAmount < 1000) {
-        alert('Invalid amount. Must be at least ₦1,000');
+      const serviceAmount = parseFloat(serviceAmountStr);
+      if (isNaN(serviceAmount) || serviceAmount < 0) {
+        alert('Invalid amount. Must be at least ₦0');
         setProcessing(null);
         return;
       }
+
+      // Final amount = service amount + materials (deposit already held, will be part of final charge)
+      const finalAmount = serviceAmount + materialCost;
 
       // Process payment through job completion API
       const paymentResponse = await fetch('/api/jobs/complete', {

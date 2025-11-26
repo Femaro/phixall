@@ -131,6 +131,8 @@ function ClientDashboardContent() {
   const [mapsLoaded, setMapsLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [jobToCancel, setJobToCancel] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalDeposits: 0, totalSpent: 0 });
@@ -295,6 +297,54 @@ function ClientDashboardContent() {
     return () => unsubscribe();
   }, [user]);
 
+  // Load pending bills
+  useEffect(() => {
+    if (!user) return;
+
+    const { db } = getFirebase();
+    const billsQuery = query(
+      collection(db, 'bills'),
+      where('recipientId', '==', user.uid),
+      where('status', '==', 'pending'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(billsQuery, (snapshot) => {
+      const billsData: any[] = [];
+      snapshot.forEach((doc) => {
+        billsData.push({ id: doc.id, ...doc.data() });
+      });
+      setPendingBills(billsData);
+    }, (error) => {
+      console.error('Error loading bills:', error);
+      // If index error, bills will load once index is created
+      // For now, try loading without orderBy as fallback
+      if (error.code === 'failed-precondition') {
+        const fallbackQuery = query(
+          collection(db, 'bills'),
+          where('recipientId', '==', user.uid),
+          where('status', '==', 'pending')
+        );
+        const fallbackUnsub = onSnapshot(fallbackQuery, (snapshot) => {
+          const billsData: any[] = [];
+          snapshot.forEach((doc) => {
+            billsData.push({ id: doc.id, ...doc.data() });
+          });
+          // Sort manually
+          billsData.sort((a, b) => {
+            const aTime = a.createdAt?.seconds || 0;
+            const bTime = b.createdAt?.seconds || 0;
+            return bTime - aTime;
+          });
+          setPendingBills(billsData);
+        });
+        return () => fallbackUnsub();
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
   useEffect(() => {
     if (!cancelledPayment) return;
     setMessage({ text: 'Deposit cancelled.', type: 'error' });
@@ -440,6 +490,11 @@ function ClientDashboardContent() {
       setScheduledAt('');
       setFiles(null);
       setActiveTab('jobs');
+      
+      // Auto-dismiss success message after 5 seconds
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
     } catch (error) {
       console.error('Error submitting job:', error);
       setMessage({ text: 'Failed to submit request. Please try again.', type: 'error' });
@@ -869,18 +924,25 @@ function ClientDashboardContent() {
     }
   }
 
-  async function handleCancelJob(jobId: string) {
-    if (!confirm('Are you sure you want to cancel this job?')) return;
+  function handleCancelJobClick(jobId: string) {
+    setJobToCancel(jobId);
+    setShowCancelModal(true);
+  }
 
+  async function handleCancelJob(jobId: string) {
     try {
       const { db } = getFirebase();
       await updateDoc(doc(db, 'jobs', jobId), {
         status: 'cancelled',
       });
-      setMessage({ text: 'Job cancelled successfully', type: 'success' });
+      setMessage({ text: 'Job cancelled successfully. Your deposit has been forfeited to offset logistics costs.', type: 'success' });
+      setShowCancelModal(false);
+      setJobToCancel(null);
     } catch (error) {
       console.error('Error cancelling job:', error);
       setMessage({ text: 'Failed to cancel job', type: 'error' });
+      setShowCancelModal(false);
+      setJobToCancel(null);
     }
   }
 
@@ -970,6 +1032,10 @@ function ClientDashboardContent() {
     },
   ];
 
+  const [pendingBills, setPendingBills] = useState<any[]>([]);
+  const [selectedBill, setSelectedBill] = useState<any | null>(null);
+  const [showBillModal, setShowBillModal] = useState(false);
+
   const tabConfig: Array<{ id: ClientTab; label: string; icon: string; badge?: number }> = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'request', label: 'Request Service', icon: '➕' },
@@ -978,6 +1044,30 @@ function ClientDashboardContent() {
     { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
+
+  async function approveBill(billId: string) {
+    if (!user) return;
+
+    try {
+      const response = await fetch('/api/bills/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ billId, userId: user.uid }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert('Bill approved and payment processed successfully!');
+        setShowBillModal(false);
+        setSelectedBill(null);
+      } else {
+        alert(`Failed to approve bill: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error approving bill:', error);
+      alert('Failed to approve bill. Please try again.');
+    }
+  }
 
   const mapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
@@ -1311,9 +1401,11 @@ function ClientDashboardContent() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="hidden border-b border-neutral-200 bg-white md:block">
+      <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex flex-wrap gap-3">{renderTabs()}</div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 md:flex-wrap md:pb-0">
+            {renderTabs()}
+          </div>
         </div>
       </div>
 
@@ -1321,15 +1413,26 @@ function ClientDashboardContent() {
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         {message && (
           <div className={`mb-6 rounded-lg border p-4 ${message.type === 'success' ? 'border-green-200 bg-green-50 text-green-800' : 'border-red-200 bg-red-50 text-red-800'}`}>
-            <div className="flex items-center gap-2">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                {message.type === 'success' ? (
+            <div className="flex items-start gap-3">
+              {message.type === 'success' ? (
+                <svg className="h-5 w-5 flex-shrink-0 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                ) : (
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 flex-shrink-0 text-red-600" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                )}
-              </svg>
-              <p className="font-medium">{message.text}</p>
+                </svg>
+              )}
+              <p className="font-medium flex-1">{message.text}</p>
+              <button
+                onClick={() => setMessage(null)}
+                className="flex-shrink-0 rounded p-1 hover:bg-black/10 transition-colors"
+                aria-label="Close message"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
         )}
@@ -1338,7 +1441,49 @@ function ClientDashboardContent() {
         {activeTab === 'overview' && (
           <div>
             <h2 className="text-xl font-bold text-neutral-900">Dashboard Overview</h2>
-            <p className="mt-1 text-neutral-600">Track your service requests and activity</p>
+            <p className="mt-1 text-neutral-600">Track your jobs and wallet</p>
+
+            {/* Pending Bills Section */}
+            {pendingBills.length > 0 && (
+              <div className="mt-6 rounded-xl border-2 border-amber-200 bg-amber-50 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-amber-900">Pending Bills</h3>
+                  <span className="rounded-full bg-amber-600 px-3 py-1 text-xs font-semibold text-white">
+                    {pendingBills.length}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  {pendingBills.map((bill) => (
+                    <div key={bill.id} className="rounded-lg border border-amber-200 bg-white p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-neutral-900">{bill.jobTitle || 'Job Bill'}</h4>
+                          <p className="mt-1 text-sm text-neutral-600">{bill.description || 'Bill for job completion'}</p>
+                          <div className="mt-2 flex items-center gap-4 text-sm">
+                            <span className="font-semibold text-amber-700">Amount: ₦{bill.amount?.toLocaleString() || '0'}</span>
+                            {bill.depositHeld && (
+                              <span className="text-neutral-500">Deposit: ₦{bill.depositHeld.toLocaleString()} (held)</span>
+                            )}
+                            {bill.materialCost && (
+                              <span className="text-neutral-500">Materials: ₦{bill.materialCost.toLocaleString()}</span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setSelectedBill(bill);
+                            setShowBillModal(true);
+                          }}
+                          className="ml-4 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+                        >
+                          Review & Approve
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Stats Cards */}
             <div className="mt-6 grid gap-6 sm:grid-cols-4">
@@ -1984,7 +2129,7 @@ function ClientDashboardContent() {
                       <div className="ml-4 flex flex-col gap-2">
                         {job.status === 'requested' && (
                           <button
-                            onClick={() => handleCancelJob(job.id)}
+                            onClick={() => handleCancelJobClick(job.id)}
                             className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
                           >
                             Cancel
@@ -2246,6 +2391,124 @@ function ClientDashboardContent() {
           </div>
         )}
       </div>
+
+      {/* Cancel Job Confirmation Modal */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="relative w-full max-w-md rounded-xl bg-white shadow-2xl">
+            <div className="border-b border-neutral-200 px-6 py-4">
+              <h3 className="text-lg font-bold text-neutral-900">Cancel Job Request</h3>
+            </div>
+            <div className="px-6 py-6">
+              <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                <div className="flex items-start gap-3">
+                  <svg className="h-5 w-5 flex-shrink-0 text-amber-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <h4 className="font-semibold text-amber-900">Deposit Forfeiture Notice</h4>
+                    <p className="mt-1 text-sm text-amber-800">
+                      Cancelling this job will result in the forfeiture of your ₦1,000 deposit. This deposit will be used to offset logistics costs incurred as a result of your service request.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <p className="text-sm text-neutral-600">
+                Are you sure you want to proceed with cancelling this job request?
+              </p>
+            </div>
+            <div className="border-t border-neutral-200 px-6 py-4 flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setJobToCancel(null);
+                }}
+                className="rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Keep Job
+              </button>
+              <button
+                onClick={() => jobToCancel && handleCancelJob(jobToCancel)}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+              >
+                Yes, Cancel Job
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bill Approval Modal */}
+      {showBillModal && selectedBill && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-w-2xl w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-neutral-900">Review & Approve Bill</h3>
+              <button
+                onClick={() => {
+                  setShowBillModal(false);
+                  setSelectedBill(null);
+                }}
+                className="rounded-lg p-2 text-neutral-500 hover:bg-neutral-100"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-neutral-900">{selectedBill.jobTitle || 'Job Bill'}</h4>
+                <p className="mt-1 text-sm text-neutral-600">{selectedBill.description || 'Bill for job completion'}</p>
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                <h5 className="text-sm font-semibold text-neutral-900 mb-3">Bill Breakdown</h5>
+                <div className="space-y-2">
+                  {selectedBill.items && selectedBill.items.map((item: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between text-sm">
+                      <span className="text-neutral-700">
+                        {item.name} {item.quantity > 1 && `× ${item.quantity}`}
+                      </span>
+                      <span className="font-medium text-neutral-900">₦{item.amount?.toLocaleString() || '0'}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-neutral-200">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-semibold text-neutral-900">Total Amount</span>
+                    <span className="text-lg font-bold text-neutral-900">₦{selectedBill.amount?.toLocaleString() || '0'}</span>
+                  </div>
+                  {selectedBill.depositHeld && (
+                    <div className="mt-2 text-xs text-neutral-500">
+                      Note: ₦{selectedBill.depositHeld.toLocaleString()} deposit already held. You will be charged ₦{(selectedBill.amount - selectedBill.depositHeld).toLocaleString()}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    setShowBillModal(false);
+                    setSelectedBill(null);
+                  }}
+                  className="flex-1 rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => approveBill(selectedBill.id)}
+                  className="flex-1 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                >
+                  Approve & Pay
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

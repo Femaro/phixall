@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useInactivityTimer } from '@/hooks/useInactivityTimer';
 import InactivityWarningModal from '@/components/auth/InactivityWarningModal';
 import { signOut } from 'firebase/auth';
@@ -46,6 +47,13 @@ export default function InactivityGuard({
                           pathname === '/client' ||
                           pathname === '/phixer' ||
                           pathname === '/admin';
+
+  // Debug logging (remove in production)
+  useEffect(() => {
+    if (isDashboardRoute) {
+      console.log('[InactivityGuard] Enabled for route:', pathname, 'Role:', role, 'Timeout:', timeout / 1000 / 60, 'minutes');
+    }
+  }, [isDashboardRoute, pathname, role, timeout]);
 
   const { showWarning, timeRemaining, extendSession } = useInactivityTimer({
     timeout,

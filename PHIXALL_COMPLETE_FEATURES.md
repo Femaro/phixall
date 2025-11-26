@@ -152,7 +152,7 @@
 
 #### Overview Tab
 - **Earnings Summary**: Total earnings, pending payments, completed jobs
-- **Availability Toggle**: Online/Offline status
+- **Availability Toggle**: Online/Offline status (affects job assignment eligibility)
 - **Recent Jobs**: Latest job assignments
 - **Performance Metrics**: Completion rate, average rating
 
@@ -166,9 +166,11 @@
   - Attachments preview
   - Estimated earnings
 - **Actions**:
-  - Accept job
+  - Accept job (with location validation)
+  - Location distance check (warns if >50km away)
   - View full job details
   - Filter by category/location
+- **Location Validation**: Requires Phixer location to accept jobs
 
 #### My Jobs Tab
 - **Active Jobs**: Currently assigned jobs
@@ -176,6 +178,14 @@
 - **Location Broadcasting**: Share real-time location with clients
 - **Job Completion**: Submit completion with photos and details
 - **Earnings Tracking**: Per-job earnings display
+- **Material Recommendations**:
+  - View recommended materials for each job
+  - Display material name, quantity, and status (Pending/Approved/Declined)
+  - Show procurement method (You Buy / Phixall Procures)
+  - Display amount to procure (only for materials Phixer will buy)
+  - Delete unapproved materials (only pending materials created by Phixer)
+  - Real-time status updates
+- **Material Recommendation**: Add materials during in-progress jobs
 
 #### Location Broadcast (`/phixer/location-broadcast`)
 - **Real-time GPS Tracking**: Continuous location updates
@@ -239,10 +249,15 @@
 
 #### Job Management Tab
 - **All Jobs View**: Complete job listing with filters
-- **Job Assignment**: Manually assign Phixers to jobs
+- **Job Assignment**: Manually assign Phixers to jobs (only available Phixers)
 - **Budget Setting**: Set and track job budgets
 - **Job Status Management**: Update job statuses
 - **Job Details**: Full job information and history
+- **Material Review**: Review and approve/decline material recommendations
+- **Location & Nearby Phixers**: View job location and nearby available Phixers on map
+  - Distance calculation from job to each Phixer
+  - Color-coded distance indicators (≤10km, 10-25km, >25km)
+  - Quick assign functionality
 
 #### Job Approvals Tab
 - **Completion Reviews**: Review Phixer job completions
@@ -275,6 +290,17 @@
 - **User Growth**: Client and Phixer growth metrics
 - **Performance Metrics**: Completion rates, average job value
 - **Export Options**: Download analytics reports
+
+#### Resources Tab
+- **Material Catalog Management**: 
+  - Add, edit, and delete material catalog items
+  - Material name, description, category, unit
+  - Estimated unit cost
+  - Photo upload for materials
+  - Active/inactive status
+- **Resource Management**: Inventory and resource tracking
+- **Resource Allocation**: Assign resources to jobs
+- **Resource Analytics**: Usage and availability metrics
 
 #### Support Tab
 - **Support Articles**: Knowledge base management
@@ -504,11 +530,18 @@
 #### Payment Flow
 1. **Client Deposit**: Funds added to wallet via Paystack
 2. **Job Creation**: ₦1,000 held from wallet
-3. **Job Completion**: Admin sets final amount
-4. **Client Charge**: Remaining amount charged
-5. **Platform Fee**: 10% deducted (platform revenue)
-6. **Phixer Payout**: 90% credited to Phixer wallet
-7. **Bank Transfer**: Automatic transfer to Phixer bank account
+3. **Material Recommendation**: Phixer recommends materials (if needed)
+4. **Material Approval**: Admin approves materials, sets markup, generates invoice
+5. **Material Payment**: Client pays for materials (if applicable)
+6. **Job Completion**: Admin sets final amount
+7. **Client Charge**: Remaining amount charged
+8. **Revenue Calculation**:
+   - Material cost deducted
+   - Material markup (Phixall revenue)
+   - 10% service fee (platform revenue)
+   - Phixer payout (remaining amount)
+9. **Phixer Payout**: Amount credited to Phixer wallet
+10. **Bank Transfer**: Automatic transfer to Phixer bank account
 
 ---
 
@@ -520,8 +553,10 @@
 1. **Requested**: Client creates service request
 2. **Accepted**: Phixer accepts or admin assigns
 3. **In-Progress**: Phixer starts work, location tracking active
-4. **Completed**: Phixer submits completion, admin reviews
-5. **Cancelled**: Job terminated (client or admin)
+4. **Materials-Pending-Payment**: Materials approved, awaiting client payment
+5. **Materials-Paid**: Client paid for materials, materials being procured
+6. **Completed**: Phixer submits completion, admin reviews
+7. **Cancelled**: Job terminated (client or admin)
 
 ### Job Features
 
@@ -533,21 +568,46 @@
 - **Completion Review**: View completion photos and details
 - **Rating System**: Rate and review Phixer performance
 - **Invoice Download**: Download job invoices
+- **Bill Management**: 
+  - View pending bills in Overview tab
+  - Review bill details with complete breakdown
+  - Approve bills for payment
+  - Automatic payment processing from wallet
+  - Deposit held amount automatically included
 
 #### Phixer Features
 - **Job Discovery**: Browse available jobs
-- **Job Acceptance**: Accept matching jobs
+- **Job Acceptance**: Accept matching jobs (with location validation)
 - **Location Broadcasting**: Share real-time location
 - **QR Code Display**: Show verification QR code
+- **Material Recommendations**: 
+  - Recommend materials during in-progress jobs
+  - View material status (Pending/Approved/Declined)
+  - See procurement method (You Buy / Phixall Procures)
+  - View amount to procure (for materials Phixer will buy)
+  - Delete unapproved materials
 - **Job Completion**: Submit completion with photos
 - **Earnings Tracking**: View per-job earnings
+- **Availability Management**: Toggle online/offline status
 
 #### Admin Features
-- **Job Assignment**: Manually assign Phixers
+- **Job Assignment**: Manually assign Phixers (only available Phixers)
+- **Location-Based Assignment**: View job location and nearby Phixers
 - **Budget Setting**: Set and track job budgets
 - **Status Management**: Update job statuses
+- **Material Management**:
+  - Review material recommendations
+  - Approve/decline materials
+  - Edit material details (name, quantity, cost)
+  - Set markup percentage
+  - Choose procurement method (Phixer/Phixall)
+  - Generate invoices automatically
 - **Completion Approval**: Review and approve completions
 - **Payment Processing**: Set final amounts and process payments
+  - Automatic material cost deduction
+  - Markup revenue calculation
+  - 10% service fee calculation
+  - Phixer payout calculation
 - **Job Analytics**: Track job metrics and trends
 
 ---
@@ -582,9 +642,36 @@
 #### Job Overview
 - View all platform jobs
 - Filter by status, category, date
-- Job assignment and budget setting
+- Job assignment and budget setting (only available Phixers)
+- View job location and nearby available Phixers on map
+- Job reassignment with reason tracking
+- View bill details and status for each job
+
+#### Bill Management
+- **Send Bills**: Create and send bills to clients or Phixers
+  - Auto-populate deposit (₦1,000) and approved materials
+  - Deposit and approved materials are read-only (cannot be edited)
+  - Only approved materials are included in bills
+  - Service fee is editable
+  - Automatic total calculation
+- **Bill Display**: View all bills for each job with:
+  - Complete line item breakdown
+  - Cost of materials, service fee, and deposit
+  - Bill status (pending/approved/rejected/paid)
+  - Timestamps (created, approved)
+  - Recipient information
+- **Bill Restrictions**: 
+  - Bills can only be sent to the job's client or assigned Phixer
+  - Deposit and approved materials cannot be edited
+  - Unapproved materials are not included
+- Location & Nearby Phixers view
+  - View job location on map
+  - See nearby available Phixers with distances
+  - Color-coded distance indicators (≤10km, 10-25km, >25km)
+  - Quick assign functionality
 - Status updates and management
 - Complete job history
+- Material review and approval
 
 #### Job Approvals
 - Review job completion submissions

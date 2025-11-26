@@ -319,6 +319,104 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
     
+    // Material Recommendations collection
+    match /materialRecommendations/{materialId} {
+      // Phixers can create recommendations for their assigned jobs
+      allow create: if isPhixer() && request.resource.data.phixerId == request.auth.uid;
+      
+      // Admins can read all (including queries)
+      // Phixers can read materials for jobs they are assigned to (check both phixerId on material and job assignment)
+      // Clients can read for their jobs
+      allow read: if isAdmin() || 
+        (isPhixer() && (
+          // Phixer created the material
+          resource.data.phixerId == request.auth.uid ||
+          // OR Phixer is assigned to the job this material belongs to
+          (resource.data.jobId != null && 
+           exists(/databases/$(database)/documents/jobs/$(resource.data.jobId)) && 
+           (get(/databases/$(database)/documents/jobs/$(resource.data.jobId)).data.phixerId == request.auth.uid ||
+            get(/databases/$(database)/documents/jobs/$(resource.data.jobId)).data.artisanId == request.auth.uid))
+        )) ||
+        (isClient() && resource.data.jobId != null && 
+                      exists(/databases/$(database)/documents/jobs/$(resource.data.jobId)) && 
+                      get(/databases/$(database)/documents/jobs/$(resource.data.jobId)).data.clientId == request.auth.uid);
+      
+      // Only admins can update (approve/reject)
+      // Allow updates if user is authenticated and has admin role
+      allow update: if isAuthenticated() && 
+                      exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
+                      get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin';
+      
+      // Admins can delete any material
+      // Phixers can delete their own pending materials
+      allow delete: if isAdmin() ||
+                      (isPhixer() && 
+                       resource.data.phixerId == request.auth.uid &&
+                       resource.data.status == 'pending');
+    }
+    
+    // Material Invoices collection
+    match /materialInvoices/{invoiceId} {
+      // Only admins can create invoices
+      allow create: if isAdmin();
+      
+      // Admins can read all, Clients can read their own invoices
+      allow read: if isAdmin() || 
+        (isClient() && resource.data.clientId == request.auth.uid);
+      
+      // Only admins can update invoices
+      allow update: if isAdmin();
+      
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+    
+    // Job Timeline collection
+    match /jobTimeline/{eventId} {
+      // Admins, Phixers, and Clients can create timeline events for their jobs
+      allow create: if isAdmin() || 
+        (isPhixer() && request.resource.data.userId == request.auth.uid) ||
+        (isClient() && request.resource.data.userId == request.auth.uid);
+      
+      // Admins can read all, Users can read timeline for their jobs
+      allow read: if isAdmin() || 
+        (isAuthenticated() && resource.data.jobId != null);
+      
+      // Only admins can update/delete
+      allow update, delete: if isAdmin();
+    }
+    
+    // Material Catalog collection
+    match /materialCatalog/{materialId} {
+      // Anyone authenticated can read active materials
+      allow read: if isAuthenticated();
+      
+      // Only admins can create, update, or delete
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Bills collection
+    match /bills/{billId} {
+      // Admins can create bills
+      allow create: if isAdmin();
+      
+      // Admins can read all bills
+      // Recipients can read their own bills
+      allow read: if isAdmin() || 
+                   (isAuthenticated() && resource.data.recipientId == request.auth.uid);
+      
+      // Admins can update bills
+      // Recipients can update their own pending bills (for approval)
+      allow update: if isAdmin() ||
+                     (isAuthenticated() && 
+                      resource.data.recipientId == request.auth.uid &&
+                      resource.data.status == 'pending' &&
+                      request.resource.data.status == 'approved');
+      
+      // Only admins can delete
+      allow delete: if isAdmin();
+    }
+    
     // Default: deny all access to other collections
     match /{document=**} {
       allow read, write: if false;

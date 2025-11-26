@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthState } from '@/hooks/useAuthState';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { getFirebase } from '@/config/firebase';
 import * as Location from 'expo-location';
 import { calculateDistance, formatDistance } from '@/utils/distance';
@@ -67,6 +67,8 @@ export default function JobDetailScreen() {
   const [artisanLocation, setArtisanLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [distance, setDistance] = useState<number | null>(null);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [materialRecommendations, setMaterialRecommendations] = useState<any[]>([]);
+  const [loadingMaterials, setLoadingMaterials] = useState(false);
 
   useEffect(() => {
     if (!user || !params.id) return;
@@ -126,6 +128,37 @@ export default function JobDetailScreen() {
 
     fetchJobAndRole();
   }, [user, params.id]);
+
+  // Load material recommendations for this job
+  useEffect(() => {
+    if (!params.id || !user) return;
+
+    const { db } = getFirebase();
+    setLoadingMaterials(true);
+
+    const materialsQuery = query(
+      collection(db, 'materialRecommendations'),
+      where('jobId', '==', params.id as string)
+    );
+
+    const unsubscribe = onSnapshot(
+      materialsQuery,
+      (snapshot) => {
+        const materials = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setMaterialRecommendations(materials);
+        setLoadingMaterials(false);
+      },
+      (error) => {
+        console.error('Error loading material recommendations:', error);
+        setLoadingMaterials(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [params.id, user]);
 
   const updateJobStatus = async (newStatus: string) => {
     if (!job || !user) return;
@@ -291,6 +324,113 @@ export default function JobDetailScreen() {
             </View>
           )}
         </View>
+
+        {/* Material Recommendations - Only for Phixers */}
+        {isArtisan && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>📦 Material Recommendations</Text>
+            {loadingMaterials ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="small" color="#2563EB" />
+                <Text style={styles.loadingText}>Loading materials...</Text>
+              </View>
+            ) : materialRecommendations.length > 0 ? (
+              <View style={styles.materialsList}>
+                {materialRecommendations.map((material) => (
+                  <View key={material.id} style={styles.materialCard}>
+                    <View style={styles.materialHeader}>
+                      <Text style={styles.materialName}>{material.materialName}</Text>
+                      <View
+                        style={[
+                          styles.materialStatusBadge,
+                          {
+                            backgroundColor:
+                              material.status === 'approved'
+                                ? '#D1FAE5'
+                                : material.status === 'declined' || material.status === 'rejected'
+                                ? '#FEE2E2'
+                                : '#FEF3C7',
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.materialStatusText,
+                            {
+                              color:
+                                material.status === 'approved'
+                                  ? '#059669'
+                                  : material.status === 'declined' || material.status === 'rejected'
+                                  ? '#DC2626'
+                                  : '#D97706',
+                            },
+                          ]}
+                        >
+                          {material.status === 'rejected' ? 'declined' : material.status || 'pending'}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.materialDetails}>
+                      <View style={styles.materialRow}>
+                        <Text style={styles.materialLabel}>Quantity:</Text>
+                        <Text style={styles.materialValue}>{material.quantity}</Text>
+                      </View>
+                      <View style={styles.materialRow}>
+                        <Text style={styles.materialLabel}>Unit Cost:</Text>
+                        <Text style={styles.materialValue}>₦{material.unitCost?.toLocaleString() || '0'}</Text>
+                      </View>
+                      <View style={styles.materialRow}>
+                        <Text style={styles.materialLabel}>Total Cost:</Text>
+                        <Text style={styles.materialValue}>₦{material.totalCost?.toLocaleString() || '0'}</Text>
+                      </View>
+                      {material.finalCost && material.finalCost !== material.totalCost && (
+                        <View style={styles.materialRow}>
+                          <Text style={styles.materialLabel}>Final Cost (with markup):</Text>
+                          <Text style={[styles.materialValue, styles.finalCost]}>
+                            ₦{material.finalCost.toLocaleString()}
+                          </Text>
+                        </View>
+                      )}
+                      {material.adminMarkup && material.adminMarkup > 0 && (
+                        <View style={styles.materialRow}>
+                          <Text style={styles.materialLabel}>Admin Markup:</Text>
+                          <Text style={styles.materialValue}>{material.adminMarkup}%</Text>
+                        </View>
+                      )}
+                      {material.procurementMethod && (
+                        <View style={styles.materialRow}>
+                          <Text style={styles.materialLabel}>Procurement:</Text>
+                          <Text style={styles.materialValue}>
+                            {material.procurementMethod === 'phixer' ? 'Phixer will buy' : 'Phixall will procure'}
+                          </Text>
+                        </View>
+                      )}
+                      {material.note && (
+                        <View style={styles.materialNoteContainer}>
+                          <Text style={styles.materialNoteLabel}>Note:</Text>
+                          <Text style={styles.materialNote}>{material.note}</Text>
+                        </View>
+                      )}
+                      {material.adminNotes && (
+                        <View style={styles.materialNoteContainer}>
+                          <Text style={styles.materialNoteLabel}>Admin Notes:</Text>
+                          <Text style={styles.materialNote}>{material.adminNotes}</Text>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyMaterialsContainer}>
+                <Text style={styles.emptyMaterialsText}>No material recommendations yet</Text>
+                <Text style={styles.emptyMaterialsSubtext}>
+                  Materials you recommend will appear here
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
 
         {/* Client/Artisan Info */}
         {isArtisan && (
@@ -803,6 +943,92 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  materialsList: {
+    marginTop: 8,
+  },
+  materialCard: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#2563EB',
+  },
+  materialHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  materialName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    flex: 1,
+    marginRight: 8,
+  },
+  materialStatusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  materialStatusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'capitalize',
+  },
+  materialDetails: {
+    marginTop: 8,
+  },
+  materialRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  materialLabel: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  materialValue: {
+    fontSize: 13,
+    color: '#111827',
+    fontWeight: '500',
+  },
+  finalCost: {
+    color: '#2563EB',
+    fontWeight: '600',
+  },
+  materialNoteContainer: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  materialNoteLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 4,
+    fontWeight: '600',
+  },
+  materialNote: {
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+  },
+  emptyMaterialsContainer: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyMaterialsText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  emptyMaterialsSubtext: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
 });
 

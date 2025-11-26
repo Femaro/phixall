@@ -7,6 +7,8 @@ import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { SupportChat } from '@/components/support/SupportChat';
+import MaterialRecommendationModal from '@/components/materials/MaterialRecommendationModal';
+import type { MaterialRecommendation } from '@/types/materials';
 
 type TimestampLike = Date | { seconds: number; nanoseconds: number } | { toDate: () => Date } | null | undefined;
 const formatTimestamp = (value: TimestampLike) => {
@@ -167,6 +169,9 @@ export default function ArtisanDashboardPage() {
   const [submittingClientReview, setSubmittingClientReview] = useState<string | null>(null);
   const [artisanCoords, setArtisanCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [capturingLocation, setCapturingLocation] = useState(false);
+  const [materialModalOpen, setMaterialModalOpen] = useState(false);
+  const [selectedJobForMaterial, setSelectedJobForMaterial] = useState<Job | null>(null);
+  const [jobMaterials, setJobMaterials] = useState<Record<string, MaterialRecommendation[]>>({});
 
   const CASHOUT_FEE_PERCENT = 2.5; // 2.5% fee
   const MIN_CASHOUT = 1000; // Minimum ₦1,000
@@ -318,25 +323,107 @@ export default function ArtisanDashboardPage() {
     if (!user || loading) return;
 
     const { db } = getFirebase();
-    const myJobsQuery = query(
+    // Query for jobs where user is the Phixer (check both phixerId and artisanId for backward compatibility)
+    // We'll query for phixerId first, then also check for artisanId
+    const phixerJobsQuery = query(
+      collection(db, 'jobs'),
+      where('phixerId', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    );
+
+    const artisanJobsQuery = query(
       collection(db, 'jobs'),
       where('artisanId', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribe = onSnapshot(myJobsQuery, (snapshot) => {
-      const jobs: Job[] = [];
+    const allJobs: Job[] = [];
+    const jobIds = new Set<string>();
+
+    const unsubscribePhixer = onSnapshot(phixerJobsQuery, (snapshot) => {
       snapshot.forEach((doc) => {
-        jobs.push({ id: doc.id, ...doc.data() } as Job);
+        if (!jobIds.has(doc.id)) {
+          jobIds.add(doc.id);
+          allJobs.push({ id: doc.id, ...doc.data() } as Job);
+        }
       });
-      setMyJobs(jobs);
+      setMyJobs([...allJobs]);
     }, (error) => {
-      console.error('Error loading my jobs:', error);
-      // Don't crash the app, just log the error
+      console.error('Error loading phixer jobs:', error);
     });
 
-    return () => unsubscribe();
+    const unsubscribeArtisan = onSnapshot(artisanJobsQuery, (snapshot) => {
+      snapshot.forEach((doc) => {
+        if (!jobIds.has(doc.id)) {
+          jobIds.add(doc.id);
+          allJobs.push({ id: doc.id, ...doc.data() } as Job);
+        }
+      });
+      setMyJobs([...allJobs]);
+    }, (error) => {
+      console.error('Error loading artisan jobs:', error);
+    });
+
+    return () => {
+      unsubscribePhixer();
+      unsubscribeArtisan();
+    };
   }, [user, loading]);
+
+  // Load material recommendations for my jobs
+  useEffect(() => {
+    if (!user || loading || myJobs.length === 0) {
+      setJobMaterials({});
+      return;
+    }
+
+    const { db } = getFirebase();
+
+    // Subscribe to materials for each job
+    console.log(`Setting up material listeners for ${myJobs.length} jobs`);
+    const unsubscribes: Array<() => void> = [];
+
+    myJobs.forEach((job) => {
+      const materialsQuery = query(
+        collection(db, 'materialRecommendations'),
+        where('jobId', '==', job.id)
+      );
+
+      const unsubscribe = onSnapshot(
+        materialsQuery,
+        (snapshot) => {
+          const materials = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as MaterialRecommendation[];
+          
+          console.log(`Loaded ${materials.length} materials for job ${job.id}:`, materials);
+          
+          setJobMaterials(prev => {
+            const updated = { ...prev };
+            if (materials.length > 0) {
+              updated[job.id] = materials;
+            } else {
+              // Keep empty array so we know the query ran
+              updated[job.id] = [];
+            }
+            return updated;
+          });
+        },
+        (error) => {
+          console.error(`Error loading materials for job ${job.id}:`, error);
+          // Set empty array on error so UI knows query was attempted
+          setJobMaterials(prev => ({ ...prev, [job.id]: [] }));
+        }
+      );
+
+      unsubscribes.push(unsubscribe);
+    });
+
+    return () => {
+      unsubscribes.forEach(unsub => unsub());
+    };
+  }, [user, loading, myJobs]);
 
   // Load transactions
   useEffect(() => {
@@ -384,19 +471,125 @@ export default function ArtisanDashboardPage() {
   async function acceptJob(jobId: string) {
     if (!user) return;
 
+    // Check if Phixer is available
+    if (!available) {
+      alert('You must be available to accept jobs. Please toggle your availability status.');
+      return;
+    }
+
     try {
       const { db } = getFirebase();
-      await updateDoc(doc(db, 'jobs', jobId), {
-        artisanId: user.uid,
-        artisanName: user.displayName || user.email,
+      
+      // Get Phixer profile and location
+      const profileRef = doc(db, 'profiles', user.uid);
+      const profileDoc = await getDoc(profileRef);
+      const profileData = profileDoc.data();
+      const phixerName = profileData?.name || user.displayName || user.email || 'Unknown';
+      
+      // Check if Phixer has location
+      let phixerLocation = artisanCoords;
+      
+      if (!phixerLocation && profileData?.coordinates?.lat && profileData?.coordinates?.lng) {
+        phixerLocation = {
+          lat: profileData.coordinates.lat,
+          lng: profileData.coordinates.lng,
+        };
+      }
+      
+      // If still no location, request it
+      if (!phixerLocation) {
+        const locationGranted = await new Promise<boolean>((resolve) => {
+          if (!navigator.geolocation) {
+            alert('Location services are required to accept jobs. Please enable location in your browser settings.');
+            resolve(false);
+            return;
+          }
+          
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              phixerLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              resolve(true);
+            },
+            (error) => {
+              console.error('Error getting location:', error);
+              alert('Unable to get your location. Please enable location services to accept jobs.');
+              resolve(false);
+            },
+            { timeout: 10000 }
+          );
+        });
+        
+        if (!locationGranted || !phixerLocation) {
+          return;
+        }
+      }
+
+      // Get job details to check location match
+      const jobRef = doc(db, 'jobs', jobId);
+      const jobDoc = await getDoc(jobRef);
+      
+      if (!jobDoc.exists()) {
+        alert('Job not found.');
+        return;
+      }
+      
+      const jobData = jobDoc.data();
+      const jobLocation = jobData.serviceCoordinates || jobData.serviceAddress;
+      
+      // If job has location, check distance (optional - can be made mandatory)
+      if (jobLocation && phixerLocation && jobLocation.lat && jobLocation.lng) {
+        const distance = calculateDistanceKm(
+          { lat: phixerLocation.lat, lng: phixerLocation.lng },
+          { lat: jobLocation.lat, lng: jobLocation.lng }
+        );
+        
+        // Warn if too far (more than 50km) but don't block
+        if (distance > 50) {
+          const proceed = confirm(
+            `This job is ${distance.toFixed(1)}km away from your location. Do you still want to accept it?`
+          );
+          if (!proceed) {
+            return;
+          }
+        }
+      }
+
+      // Update job with both phixerId and artisanId for backward compatibility
+      await updateDoc(jobRef, {
+        phixerId: user.uid,
+        phixerName: phixerName,
+        artisanId: user.uid, // Backward compatibility
+        artisanName: phixerName, // Backward compatibility
         status: 'accepted',
-        acceptedAt: new Date(),
+        acceptedAt: serverTimestamp(),
       });
 
+      // Update Phixer's location in profile if it was just captured
+      if (phixerLocation && (!profileData?.coordinates || 
+          profileData.coordinates.lat !== phixerLocation.lat || 
+          profileData.coordinates.lng !== phixerLocation.lng)) {
+        await updateDoc(profileRef, {
+          coordinates: {
+            lat: phixerLocation.lat,
+            lng: phixerLocation.lng,
+          },
+          updatedAt: serverTimestamp(),
+        });
+        setArtisanCoords(phixerLocation);
+      }
+
       setActiveTab('my-jobs');
-    } catch (error) {
+      alert('Job accepted successfully!');
+    } catch (error: any) {
       console.error('Error accepting job:', error);
-      alert('Failed to accept job. Please try again.');
+      if (error.code === 'permission-denied' || error.message?.includes('permission')) {
+        alert('Permission denied. Please ensure you are logged in and have the correct permissions.');
+      } else {
+        alert('Failed to accept job. Please try again.');
+      }
     }
   }
 
@@ -963,9 +1156,11 @@ export default function ArtisanDashboardPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="hidden border-b border-neutral-200 bg-white md:block">
+      <div className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="flex flex-wrap gap-3">{renderTabs()}</div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 md:flex-wrap md:pb-0">
+            {renderTabs()}
+          </div>
         </div>
       </div>
 
@@ -1606,24 +1801,225 @@ export default function ArtisanDashboardPage() {
                         )}
                         <span>Accepted: {formatTimestamp(job.createdAt)}</span>
                         </div>
+
+                        {/* Material Recommendations */}
+                        {jobMaterials[job.id] && Array.isArray(jobMaterials[job.id]) && jobMaterials[job.id].length > 0 && (
+                          <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                            <h4 className="text-sm font-semibold text-neutral-900 mb-3">📦 Material Recommendations</h4>
+                            <div className="space-y-2">
+                              {jobMaterials[job.id].map((material) => (
+                                <div
+                                  key={material.id}
+                                  className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
+                                >
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="font-medium text-neutral-900">{material.materialName}</span>
+                                      <span className="text-sm text-neutral-600">× {material.quantity}</span>
+                                      <span
+                                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                          material.status === 'approved'
+                                            ? 'bg-green-100 text-green-700'
+                                            : material.status === 'declined' || material.status === 'rejected'
+                                            ? 'bg-red-100 text-red-700'
+                                            : 'bg-amber-100 text-amber-700'
+                                        }`}
+                                      >
+                                        {material.status === 'approved' ? 'Approved' : (material.status === 'declined' || material.status === 'rejected') ? 'Declined' : 'Pending'}
+                                      </span>
+                                      {material.status === 'approved' && material.procurementMethod && (
+                                        <span
+                                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                            material.procurementMethod === 'phixer'
+                                              ? 'bg-blue-100 text-blue-700'
+                                              : 'bg-purple-100 text-purple-700'
+                                          }`}
+                                          title={material.procurementMethod === 'phixer' ? 'You will procure this material' : 'Phixall will procure this material'}
+                                        >
+                                          {material.procurementMethod === 'phixer' ? '🛒 You Buy' : '📦 Phixall Procures'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {material.status === 'approved' && material.procurementMethod === 'phixer' && material.totalCost && (
+                                      <div className="mt-2 flex items-center gap-2">
+                                        <span className="text-xs text-neutral-500">Amount to Procure:</span>
+                                        <span className="text-sm font-semibold text-green-700">
+                                          ₦{material.totalCost.toLocaleString()}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {material.note && (
+                                      <p className="mt-1 text-xs text-neutral-600 italic">"{material.note}"</p>
+                                    )}
+                                    {material.adminNotes && (
+                                      <p className="mt-1 text-xs text-amber-700">
+                                        <strong>Admin:</strong> {material.adminNotes}
+                                      </p>
+                                    )}
+                                  </div>
+                                  {material.status === 'pending' && material.phixerId === user?.uid && (
+                                    <button
+                                      onClick={async () => {
+                                        if (confirm(`Delete material recommendation for "${material.materialName}"?`)) {
+                                          try {
+                                            const { db } = getFirebase();
+                                            const { doc, deleteDoc } = await import('firebase/firestore');
+                                            await deleteDoc(doc(db, 'materialRecommendations', material.id));
+                                          } catch (error) {
+                                            console.error('Error deleting material:', error);
+                                            alert('Failed to delete material. Please try again.');
+                                          }
+                                        }
+                                      }}
+                                      className="ml-2 rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 transition-colors"
+                                      title="Delete material"
+                                    >
+                                      🗑️ Delete
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="ml-4 flex flex-col gap-2">
                         {job.status === 'accepted' && (
-                          <button
-                            onClick={() => updateJobStatus(job.id, 'in-progress')}
-                            className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
-                          >
-                            Start Job
-                          </button>
+                          <>
+                            <button
+                              onClick={() => updateJobStatus(job.id, 'in-progress')}
+                              className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                            >
+                              Start Job
+                            </button>
+                            <button
+                              onClick={async () => {
+                                if (!user) return;
+                                
+                                try {
+                                  const { db } = getFirebase();
+                                  const jobRef = doc(db, 'jobs', job.id);
+                                  const jobDoc = await getDoc(jobRef);
+                                  const jobData = jobDoc.data();
+                                  
+                                  // Check if job was accepted within 30 minutes
+                                  const acceptedAt = jobData?.acceptedAt;
+                                  if (!acceptedAt) {
+                                    alert('Cannot determine when job was accepted. Cancellation not allowed.');
+                                    return;
+                                  }
+                                  
+                                  let acceptedTime: Date;
+                                  if (acceptedAt instanceof Date) {
+                                    acceptedTime = acceptedAt;
+                                  } else if ('toDate' in acceptedAt && typeof acceptedAt.toDate === 'function') {
+                                    acceptedTime = acceptedAt.toDate();
+                                  } else if ('seconds' in acceptedAt && typeof acceptedAt.seconds === 'number') {
+                                    acceptedTime = new Date(acceptedAt.seconds * 1000);
+                                  } else {
+                                    alert('Cannot determine when job was accepted. Cancellation not allowed.');
+                                    return;
+                                  }
+                                  
+                                  const now = new Date();
+                                  const timeDiff = now.getTime() - acceptedTime.getTime();
+                                  const minutesDiff = timeDiff / (1000 * 60);
+                                  
+                                  if (minutesDiff > 30) {
+                                    alert('Job cancellation is only allowed within 30 minutes of acceptance. This job was accepted more than 30 minutes ago.');
+                                    return;
+                                  }
+                                  
+                                  const confirmCancel = confirm(
+                                    `Are you sure you want to cancel this job?\n\n` +
+                                    `⚠️ Warning: Cancelling a job will reduce your rating.\n\n` +
+                                    `Time since acceptance: ${Math.floor(minutesDiff)} minutes`
+                                  );
+                                  
+                                  if (!confirmCancel) return;
+                                  
+                                  // Reduce Phixer rating
+                                  const profileRef = doc(db, 'profiles', user.uid);
+                                  const profileDoc = await getDoc(profileRef);
+                                  const profileData = profileDoc.data();
+                                  
+                                  const currentRating = profileData?.rating || 5.0;
+                                  const ratingReduction = 0.2; // Reduce by 0.2 points
+                                  const newRating = Math.max(0, currentRating - ratingReduction);
+                                  
+                                  await updateDoc(profileRef, {
+                                    rating: newRating,
+                                    updatedAt: serverTimestamp(),
+                                  });
+                                  
+                                  // Update job status
+                                  await updateDoc(jobRef, {
+                                    status: 'cancelled',
+                                    cancelledAt: serverTimestamp(),
+                                    cancelledBy: 'phixer',
+                                    cancellationReason: 'Phixer cancelled within 30 minutes',
+                                  });
+                                  
+                                  // Add timeline event
+                                  await addDoc(collection(db, 'jobTimeline'), {
+                                    jobId: job.id,
+                                    type: 'job-cancelled',
+                                    description: `Job cancelled by Phixer ${profileData?.name || 'Phixer'} within 30 minutes of acceptance. Rating reduced.`,
+                                    userId: user.uid,
+                                    userName: profileData?.name || 'Phixer',
+                                    metadata: {
+                                      cancelledBy: 'phixer',
+                                      previousRating: currentRating,
+                                      newRating: newRating,
+                                      timeSinceAcceptance: minutesDiff,
+                                    },
+                                    createdAt: serverTimestamp(),
+                                  });
+                                  
+                                  // Notify client
+                                  if (jobData?.clientId) {
+                                    await addDoc(collection(db, 'notifications'), {
+                                      userId: jobData.clientId,
+                                      type: 'job-cancelled',
+                                      title: 'Job Cancelled',
+                                      message: `Job "${job.title}" has been cancelled by the assigned Phixer.`,
+                                      jobId: job.id,
+                                      read: false,
+                                      createdAt: serverTimestamp(),
+                                    });
+                                  }
+                                  
+                                  alert(`Job cancelled. Your rating has been reduced from ${currentRating.toFixed(1)} to ${newRating.toFixed(1)}.`);
+                                } catch (error) {
+                                  console.error('Error cancelling job:', error);
+                                  alert('Failed to cancel job. Please try again.');
+                                }
+                              }}
+                              className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100"
+                            >
+                              Cancel Job
+                            </button>
+                          </>
                         )}
                         {['accepted', 'in-progress'].includes(job.status) && (
-                          <Link
-                            href={`/artisan/location-broadcast?jobId=${job.id}`}
-                            className="rounded-lg border border-purple-300 px-4 py-2 text-center text-sm font-medium text-purple-600 hover:bg-purple-50"
-                          >
-                            Broadcast Location
-                          </Link>
+                          <>
+                            <Link
+                              href={`/phixer/location-broadcast?jobId=${job.id}`}
+                              className="rounded-lg border border-purple-300 px-4 py-2 text-center text-sm font-medium text-purple-600 hover:bg-purple-50"
+                            >
+                              Broadcast Location
+                            </Link>
+                            <button
+                              onClick={() => {
+                                setSelectedJobForMaterial(job);
+                                setMaterialModalOpen(true);
+                              }}
+                              className="rounded-lg border border-orange-300 bg-orange-50 px-4 py-2 text-center text-sm font-medium text-orange-700 hover:bg-orange-100"
+                            >
+                              Recommend Material
+                            </button>
+                          </>
                         )}
                         {job.status === 'in-progress' && (
                           <Link
@@ -1889,6 +2285,23 @@ export default function ArtisanDashboardPage() {
           </div>
         )}
       </div>
+
+      {/* Material Recommendation Modal */}
+      {selectedJobForMaterial && (
+        <MaterialRecommendationModal
+          jobId={selectedJobForMaterial.id}
+          jobTitle={selectedJobForMaterial.title}
+          isOpen={materialModalOpen}
+          onClose={() => {
+            setMaterialModalOpen(false);
+            setSelectedJobForMaterial(null);
+          }}
+          onSuccess={() => {
+            // Refresh jobs or show success message
+            alert('Material recommendation submitted successfully!');
+          }}
+        />
+      )}
     </div>
   );
 }

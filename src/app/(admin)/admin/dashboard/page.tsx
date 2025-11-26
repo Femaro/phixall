@@ -4,11 +4,14 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
-import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
 import { trainingModules } from '@/data/trainingModules';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { ArtisanOnboarding } from '@/types/onboarding';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import AdminMaterialReview from '@/components/materials/AdminMaterialReview';
+import JobLocationView from '@/components/admin/JobLocationView';
+import MaterialCatalogManager from '@/components/materials/MaterialCatalogManager';
 
 type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
 
@@ -35,6 +38,8 @@ interface User {
   phone?: string;
   address?: string;
   state?: string;
+  coordinates?: { lat: number; lng: number } | null;
+  available?: boolean;
   createdAt?: TimestampLike;
 }
 
@@ -103,14 +108,22 @@ interface Resource {
 interface Bill {
   id: string;
   jobId: string;
+  jobTitle?: string;
   recipientId: string;
   recipientName: string;
   recipientType: 'client' | 'artisan';
   amount: number;
+  serviceAmount?: number;
+  materialCost?: number;
+  depositHeld?: number;
   description: string;
   items: BillItem[];
   status: 'pending' | 'approved' | 'rejected' | 'paid';
+  requiresApproval?: boolean;
   createdAt?: TimestampLike;
+  approvedAt?: TimestampLike;
+  approvedBy?: string;
+  createdBy?: string;
 }
 
 interface BillItem {
@@ -155,6 +168,8 @@ export default function AdminDashboardPage() {
   const [showBillModal, setShowBillModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showCareerAppModal, setShowCareerAppModal] = useState(false);
+  const [showMaterialReviewModal, setShowMaterialReviewModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [selectedCareerApp, setSelectedCareerApp] = useState<any | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [pendingSupportCount, setPendingSupportCount] = useState(0);
@@ -297,6 +312,9 @@ export default function AdminDashboardPage() {
           status: docData.status || 'active',
           phone: docData.phone || '',
           address: docData.address || '',
+          state: docData.state || '',
+          coordinates: docData.coordinates || null,
+          available: docData.available || false,
           createdAt: docData.createdAt
         } as User);
       });
@@ -316,6 +334,9 @@ export default function AdminDashboardPage() {
           status: docData.status || 'active',
           phone: docData.phone || '',
           address: docData.address || '',
+          state: docData.state || '',
+          coordinates: docData.coordinates || null,
+          available: docData.available || false,
           createdAt: docData.createdAt
         } as User);
       });
@@ -371,6 +392,9 @@ export default function AdminDashboardPage() {
         data.push({ id: doc.id, ...doc.data() } as Bill);
       });
       setBills(data);
+    }, (error) => {
+      console.error('Error loading bills:', error);
+      // If index error, bills will load once index is created
     });
 
     return () => {
@@ -437,6 +461,9 @@ export default function AdminDashboardPage() {
 
     try {
       const { db } = getFirebase();
+      const previousPhixerId = selectedJob.phixerId || selectedJob.artisanId;
+      const previousPhixerName = selectedJob.phixerName || selectedJob.artisanName;
+      
       await updateDoc(doc(db, 'jobs', selectedJob.id), {
         phixerId: selectedArtisan,
         phixerName: artisans.find(a => a.id === selectedArtisan)?.name || 'Phixer',
@@ -446,7 +473,61 @@ export default function AdminDashboardPage() {
         status: 'accepted',
         assignedBy: 'admin',
         assignedAt: serverTimestamp(),
+        previousPhixerId: previousPhixerId || null,
+        previousPhixerName: previousPhixerName || null,
+        reassignmentReason: null, // Will be set if this is a reassignment
       });
+
+      // If this is a reassignment, ask for reason
+      if (previousPhixerId && previousPhixerId !== selectedArtisan) {
+        const reason = prompt('Please provide a reason for reassigning this job:');
+        if (reason) {
+          await updateDoc(doc(db, 'jobs', selectedJob.id), {
+            reassignmentReason: reason,
+            reassignedAt: serverTimestamp(),
+            reassignedBy: user.uid,
+          });
+
+          // Add timeline event
+          await addDoc(collection(db, 'jobTimeline'), {
+            jobId: selectedJob.id,
+            type: 'job-reassigned',
+            description: `Job reassigned from ${previousPhixerName} to ${artisans.find(a => a.id === selectedArtisan)?.name || 'Phixer'}. Reason: ${reason}`,
+            userId: user.uid,
+            userName: 'Admin',
+            metadata: {
+              previousPhixerId,
+              newPhixerId: selectedArtisan,
+              reason,
+            },
+            createdAt: serverTimestamp(),
+          });
+
+          // Notify previous Phixer
+          if (previousPhixerId) {
+            await addDoc(collection(db, 'notifications'), {
+              userId: previousPhixerId,
+              type: 'job-reassigned',
+              title: 'Job Reassigned',
+              message: `Job "${selectedJob.title}" has been reassigned. Reason: ${reason}`,
+              jobId: selectedJob.id,
+              read: false,
+              createdAt: serverTimestamp(),
+            });
+          }
+
+          // Notify new Phixer
+          await addDoc(collection(db, 'notifications'), {
+            userId: selectedArtisan,
+            type: 'job-assigned',
+            title: 'Job Assigned',
+            message: `You have been assigned to job "${selectedJob.title}"`,
+            jobId: selectedJob.id,
+            read: false,
+            createdAt: serverTimestamp(),
+          });
+        }
+      }
 
       alert('Job assigned successfully!');
       setShowAssignModal(false);
@@ -647,15 +728,8 @@ export default function AdminDashboardPage() {
   }
 
   async function sendBill() {
-    if (!billForm.recipientId || billForm.items.length === 0 || !selectedJob) {
-      alert('Please fill all required fields');
-      return;
-    }
-
-    const totalAmount = billForm.items.reduce((sum, item) => sum + item.amount, 0);
-
-    if (!user) {
-      alert('You must be signed in to send bills.');
+    if (!selectedJob) {
+      alert('Please select a job');
       return;
     }
 
@@ -666,6 +740,66 @@ export default function AdminDashboardPage() {
 
     try {
       const { db } = getFirebase();
+      
+      // Get job details
+      const jobDoc = await getDoc(doc(db, 'jobs', selectedJob.id));
+      const jobData = jobDoc.data();
+      
+      if (!jobData) {
+        alert('Job not found');
+        return;
+      }
+
+      // Validate recipient - only job client or assigned Phixer
+      const jobClientId = jobData.clientId;
+      const assignedPhixerId = jobData.phixerId || jobData.artisanId;
+      
+      if (billForm.recipientType === 'client' && billForm.recipientId !== jobClientId) {
+        alert('Bills can only be sent to the client who requested this job.');
+        return;
+      }
+      
+      if (billForm.recipientType === 'artisan' && billForm.recipientId !== assignedPhixerId) {
+        alert('Bills can only be sent to the Phixer assigned to this job.');
+        return;
+      }
+
+      // Get material invoice if exists
+      let materialCost = 0;
+      let materialItems: any[] = [];
+      const materialInvoiceId = jobData.materialInvoiceId;
+      if (materialInvoiceId) {
+        const invoiceDoc = await getDoc(doc(db, 'materialInvoices', materialInvoiceId));
+        if (invoiceDoc.exists()) {
+          const invoiceData = invoiceDoc.data();
+          materialCost = invoiceData.subtotal || 0;
+          materialItems = (invoiceData.materials || []).map((m: any) => ({
+            name: m.materialName,
+            quantity: m.quantity,
+            rate: m.unitCost,
+            amount: m.totalCost,
+          }));
+        }
+      }
+
+      // Deposit already held
+      const depositHeld = 1000;
+      
+      // Calculate service amount from line items
+      const serviceAmount = billForm.items.reduce((sum, item) => sum + item.amount, 0);
+      
+      // Total amount = service + materials (deposit already held)
+      const totalAmount = serviceAmount + materialCost;
+      
+      // Combine service items and material items
+      // Remove UI-only flags (isReadOnly, isMaterial, isDeposit) before saving
+      const allItems = billForm.items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        rate: item.rate,
+        amount: item.amount,
+      }));
+
       const recipientUser = billForm.recipientType === 'client' 
         ? clients.find(c => c.id === billForm.recipientId)
         : artisans.find(a => a.id === billForm.recipientId);
@@ -677,11 +811,26 @@ export default function AdminDashboardPage() {
         recipientName: recipientUser?.name || 'Unknown',
         recipientType: billForm.recipientType,
         amount: totalAmount,
-        description: billForm.description,
-        items: billForm.items,
+        serviceAmount: serviceAmount,
+        materialCost: materialCostFromForm,
+        depositHeld: depositFromForm,
+        description: billForm.description || `Bill for job: ${selectedJob.title}`,
+        items: allItems,
         status: 'pending',
+        requiresApproval: billForm.recipientType === 'client', // Clients need to approve
         createdAt: serverTimestamp(),
         createdBy: user.uid,
+      });
+
+      // Notify recipient
+      await addDoc(collection(db, 'notifications'), {
+        userId: billForm.recipientId,
+        type: billForm.recipientType === 'client' ? 'bill-sent' : 'bill-sent',
+        title: 'New Bill Received',
+        message: `A bill for ₦${totalAmount.toLocaleString()} has been sent for job "${selectedJob.title}"`,
+        jobId: selectedJob.id,
+        read: false,
+        createdAt: serverTimestamp(),
       });
 
       alert('Bill sent successfully!');
@@ -1018,12 +1167,16 @@ export default function AdminDashboardPage() {
   });
 
   const assignableArtisans = useMemo(() => {
+    // Only available and active Phixers can be assigned
+    const availableArtisans = artisans.filter((artisan) => 
+      artisan.status === 'active' && artisan.available === true
+    );
+
     if (!selectedJob?.serviceState) {
-      return artisans.filter((artisan) => artisan.status === 'active');
+      return availableArtisans;
     }
     const targetState = selectedJob.serviceState.toLowerCase().trim();
-    return artisans.filter((artisan) => {
-      if (artisan.status !== 'active') return false;
+    return availableArtisans.filter((artisan) => {
       const profileState = (artisan as { state?: string }).state?.toLowerCase().trim();
       if (profileState) {
         return profileState === targetState;
@@ -1668,13 +1821,120 @@ export default function AdminDashboardPage() {
                       </div>
                       {job.clientReview?.feedback && (
                         <p className="mt-3 rounded-lg border border-amber-100 bg-amber-50/60 p-3 text-sm text-amber-900">
-                          “{job.clientReview.feedback}”
+                          "{job.clientReview.feedback}"
                         </p>
                       )}
                       {job.artisanReview?.rating && (
                         <p className="mt-3 rounded-lg border border-blue-100 bg-blue-50/60 p-3 text-sm text-blue-900">
-                          Client Rating: {job.artisanReview.rating}/5{job.artisanReview.feedback ? ` – “${job.artisanReview.feedback}”` : ''}
+                          Client Rating: {job.artisanReview.rating}/5{job.artisanReview.feedback ? ` – "${job.artisanReview.feedback}"` : ''}
                         </p>
+                      )}
+
+                      {/* Bills Section */}
+                      {bills.filter(b => b.jobId === job.id).length > 0 && (
+                        <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                          <h4 className="text-sm font-semibold text-neutral-900 mb-3">📄 Bills Sent</h4>
+                          <div className="space-y-3">
+                            {bills.filter(b => b.jobId === job.id).map((bill) => (
+                              <div key={bill.id} className="rounded-lg border border-neutral-200 bg-white p-4">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 flex-wrap">
+                                      <span className="text-sm font-medium text-neutral-900">
+                                        {bill.recipientType === 'client' ? 'To Client' : 'To Phixer'}: {bill.recipientName}
+                                      </span>
+                                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                        bill.status === 'approved' ? 'bg-green-100 text-green-700' :
+                                        bill.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                        bill.status === 'paid' ? 'bg-blue-100 text-blue-700' :
+                                        'bg-amber-100 text-amber-700'
+                                      }`}>
+                                        {bill.status || 'pending'}
+                                      </span>
+                                    </div>
+                                    <p className="mt-1 text-sm text-neutral-600">{bill.description || 'Bill for job completion'}</p>
+                                  </div>
+                                </div>
+
+                                {/* Bill Breakdown */}
+                                <div className="mt-3 space-y-2">
+                                  <div className="text-xs font-semibold text-neutral-700 uppercase tracking-wide">Bill Breakdown</div>
+                                  {bill.items && bill.items.length > 0 ? (
+                                    <div className="space-y-1">
+                                      {bill.items.map((item, idx) => (
+                                        <div key={idx} className="flex items-center justify-between text-xs py-1 border-b border-neutral-100 last:border-0">
+                                          <span className="text-neutral-700">
+                                            {item.name} {item.quantity > 1 && `(×${item.quantity})`}
+                                          </span>
+                                          <span className="font-medium text-neutral-900">
+                                            ₦{item.amount?.toLocaleString() || '0'}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-neutral-500 italic">No line items</p>
+                                  )}
+                                </div>
+
+                                {/* Summary */}
+                                <div className="mt-3 pt-3 border-t border-neutral-200">
+                                  <div className="flex items-center justify-between text-xs mb-1">
+                                    <span className="text-neutral-600">Service Amount:</span>
+                                    <span className="font-medium text-neutral-900">
+                                      ₦{bill.serviceAmount?.toLocaleString() || '0'}
+                                    </span>
+                                  </div>
+                                  {bill.materialCost && bill.materialCost > 0 && (
+                                    <div className="flex items-center justify-between text-xs mb-1">
+                                      <span className="text-neutral-600">Materials Cost:</span>
+                                      <span className="font-medium text-neutral-900">
+                                        ₦{bill.materialCost.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {bill.depositHeld && bill.depositHeld > 0 && (
+                                    <div className="flex items-center justify-between text-xs mb-1">
+                                      <span className="text-neutral-600">Deposit (held):</span>
+                                      <span className="font-medium text-neutral-900">
+                                        ₦{bill.depositHeld.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between text-sm font-bold mt-2 pt-2 border-t border-neutral-200">
+                                    <span className="text-neutral-900">Total Amount:</span>
+                                    <span className="text-brand-600">
+                                      ₦{bill.amount?.toLocaleString() || '0'}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Timestamps */}
+                                <div className="mt-3 pt-3 border-t border-neutral-200 text-xs text-neutral-500">
+                                  <div>Created: {bill.createdAt ? (
+                                    bill.createdAt instanceof Date 
+                                      ? bill.createdAt.toLocaleString() 
+                                      : 'toDate' in bill.createdAt 
+                                        ? (bill.createdAt as any).toDate().toLocaleString()
+                                        : 'seconds' in bill.createdAt
+                                          ? new Date((bill.createdAt as any).seconds * 1000).toLocaleString()
+                                          : '—'
+                                  ) : '—'}</div>
+                                  {bill.approvedAt && (
+                                    <div className="mt-1">Approved: {bill.approvedAt instanceof Date 
+                                      ? bill.approvedAt.toLocaleString() 
+                                      : 'toDate' in bill.approvedAt 
+                                        ? (bill.approvedAt as any).toDate().toLocaleString()
+                                        : 'seconds' in bill.approvedAt
+                                          ? new Date((bill.approvedAt as any).seconds * 1000).toLocaleString()
+                                          : '—'}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
                       )}
                     </div>
                     <div className="ml-4 flex flex-col gap-2">
@@ -1687,6 +1947,17 @@ export default function AdminDashboardPage() {
                           className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
                         >
                           Assign Artisan
+                        </button>
+                      )}
+                      {job.artisanId && (job.status === 'accepted' || job.status === 'in-progress') && (
+                        <button
+                          onClick={() => {
+                            setSelectedJob(job);
+                            setShowAssignModal(true);
+                          }}
+                          className="rounded-lg border border-purple-600 px-4 py-2 text-sm font-medium text-purple-600 hover:bg-purple-50"
+                        >
+                          Reassign Job
                         </button>
                       )}
                       {!job.budget && (
@@ -1709,14 +1980,105 @@ export default function AdminDashboardPage() {
                       >
                         Assign Resources
                       </button>
+                      {(job.status === 'in-progress' || job.status === 'completed') && (
+                        <button
+                          onClick={async () => {
+                            setSelectedJob(job);
+                            // Auto-populate bill form with deposit and materials
+                            try {
+                              const { db } = getFirebase();
+                              
+                              // Get approved materials for this job
+                              const materialsQuery = query(
+                                collection(db, 'materialRecommendations'),
+                                where('jobId', '==', job.id),
+                                where('status', '==', 'approved')
+                              );
+                              const materialsSnapshot = await getDocs(materialsQuery);
+                              const approvedMaterials = materialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                              
+                              const materialCost = approvedMaterials.reduce((sum, m: any) => sum + (m.totalCost || 0), 0);
+                              const depositHeld = 1000; // Fixed deposit
+                              
+                              // Auto-set recipient to client
+                              const recipientId = job.clientId;
+                              const recipientType = 'client' as 'client' | 'artisan';
+                              
+                              // Create initial items with deposit and materials
+                              const initialItems: any[] = [];
+                              
+                              // Add service item placeholder
+                              initialItems.push({ 
+                                name: 'Service Fee', 
+                                quantity: 1, 
+                                rate: job.budget || 5000, 
+                                amount: job.budget || 5000 
+                              });
+                              
+                              // Add approved materials (read-only)
+                              approvedMaterials.forEach((m: any) => {
+                                initialItems.push({
+                                  name: m.materialName,
+                                  quantity: m.quantity,
+                                  rate: m.unitCost,
+                                  amount: m.totalCost,
+                                  isReadOnly: true, // Mark as read-only
+                                  isMaterial: true, // Mark as material
+                                });
+                              });
+                              
+                              // Add deposit (read-only)
+                              initialItems.push({
+                                name: 'Deposit (already held)',
+                                quantity: 1,
+                                rate: depositHeld,
+                                amount: depositHeld,
+                                isReadOnly: true, // Mark as read-only
+                                isDeposit: true, // Mark as deposit
+                              });
+                              
+                              setBillForm({
+                                recipientId,
+                                recipientType,
+                                description: `Final bill for job: ${job.title}`,
+                                items: initialItems,
+                              });
+                              
+                              setShowBillModal(true);
+                            } catch (error) {
+                              console.error('Error loading materials:', error);
+                              // Fallback: just set recipient and show modal
+                              setBillForm({
+                                recipientId: job.clientId,
+                                recipientType: 'client',
+                                description: `Final bill for job: ${job.title}`,
+                                items: [{ name: 'Service Fee', quantity: 1, rate: job.budget || 5000, amount: job.budget || 5000 }],
+                              });
+                              setShowBillModal(true);
+                            }
+                          }}
+                          className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50"
+                        >
+                          Send Bill
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           setSelectedJob(job);
-                          setShowBillModal(true);
+                          setShowMaterialReviewModal(true);
                         }}
-                        className="rounded-lg border border-amber-600 px-4 py-2 text-sm font-medium text-amber-600 hover:bg-amber-50"
+                        className="rounded-lg border border-orange-600 px-4 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50"
                       >
-                        Send Bill
+                        Review Materials
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedJob(job);
+                          setShowLocationModal(true);
+                        }}
+                        className="rounded-lg border border-purple-600 px-4 py-2 text-sm font-medium text-purple-600 hover:bg-purple-50"
+                      >
+                        View Location & Nearby Phixers
                       </button>
                     </div>
                   </div>
@@ -1771,6 +2133,11 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Material Catalog Section */}
+            <div className="mt-8 pt-8 border-t border-neutral-200">
+              <MaterialCatalogManager />
             </div>
           </div>
         )}
@@ -3007,6 +3374,78 @@ We have successfully received your application and our team will review it caref
         </div>
       )}
 
+      {/* Material Review Modal */}
+      {showMaterialReviewModal && selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-w-4xl w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-neutral-900">Material Recommendations</h3>
+              <button
+                onClick={() => {
+                  setShowMaterialReviewModal(false);
+                  setSelectedJob(null);
+                }}
+                className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <AdminMaterialReview
+              jobId={selectedJob.id}
+              jobTitle={selectedJob.title}
+              clientId={selectedJob.clientId}
+              clientName={selectedJob.clientName || 'Unknown'}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Job Location & Nearby Phixers Modal */}
+      {showLocationModal && selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-w-4xl w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Job Location & Nearby Phixers</h3>
+                <p className="mt-1 text-sm text-neutral-600">{selectedJob.title}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowLocationModal(false);
+                  setSelectedJob(null);
+                }}
+                className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <JobLocationView
+              job={selectedJob}
+              phixers={artisans.map(a => ({
+                id: a.id,
+                name: a.name,
+                email: a.email,
+                phone: a.phone,
+                address: a.address,
+                state: a.state,
+                coordinates: (a as User & { coordinates?: { lat: number; lng: number } | null }).coordinates || undefined,
+                status: a.status,
+                available: a.available || false,
+              }))}
+              onSelectPhixer={(phixerId) => {
+                setSelectedArtisan(phixerId);
+                setShowLocationModal(false);
+                setShowAssignModal(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Add Resource Modal */}
       {showAddResourceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -3248,66 +3687,139 @@ We have successfully received your application and our team will review it caref
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <label className="block text-sm font-medium text-neutral-700">Line Items</label>
                   <button
                     onClick={() => setBillForm({
                       ...billForm,
                       items: [...billForm.items, { name: '', quantity: 1, rate: 0, amount: 0 }]
                     })}
-                    className="text-sm text-purple-600 hover:text-purple-700"
+                    className="text-sm text-purple-600 hover:text-purple-700 font-medium"
                   >
                     + Add Item
                   </button>
                 </div>
+                {/* Column Headers */}
+                <div className="hidden sm:grid grid-cols-12 gap-2 mb-2 pb-2 border-b border-neutral-200">
+                  <div className="col-span-5 text-xs font-semibold text-neutral-600 uppercase tracking-wide">Item Name</div>
+                  <div className="col-span-2 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-center">Quantity</div>
+                  <div className="col-span-2 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-center">Rate (₦)</div>
+                  <div className="col-span-3 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-right">Amount (₦)</div>
+                </div>
                 <div className="space-y-2">
-                  {billForm.items.map((item, index) => (
-                    <div key={index} className="grid grid-cols-1 gap-2 sm:grid-cols-4">
-                      <input
-                        type="text"
-                        placeholder="Item name"
-                        className="rounded-lg border border-neutral-300 px-3 py-2 text-sm sm:col-span-2"
-                        value={item.name}
-                        onChange={(e) => {
-                          const newItems = [...billForm.items];
-                          newItems[index].name = e.target.value;
-                          setBillForm({...billForm, items: newItems});
-                        }}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Qty"
-                        className="rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-                        value={item.quantity}
-                        onChange={(e) => {
-                          const newItems = [...billForm.items];
-                          newItems[index].quantity = parseFloat(e.target.value) || 0;
-                          newItems[index].amount = newItems[index].quantity * newItems[index].rate;
-                          setBillForm({...billForm, items: newItems});
-                        }}
-                      />
-                      <input
-                        type="number"
-                        placeholder="Rate"
-                        className="rounded-lg border border-neutral-300 px-3 py-2 text-sm"
-                        value={item.rate}
-                        onChange={(e) => {
-                          const newItems = [...billForm.items];
-                          newItems[index].rate = parseFloat(e.target.value) || 0;
-                          newItems[index].amount = newItems[index].quantity * newItems[index].rate;
-                          setBillForm({...billForm, items: newItems});
-                        }}
-                      />
-                    </div>
-                  ))}
+                  {billForm.items.map((item, index) => {
+                    const isReadOnly = (item as any).isReadOnly === true;
+                    const isDeposit = (item as any).isDeposit === true;
+                    const isMaterial = (item as any).isMaterial === true;
+                    
+                    return (
+                      <div key={index} className={`grid grid-cols-1 gap-2 sm:grid-cols-12 ${isReadOnly ? 'bg-neutral-50 rounded-lg p-3 border border-neutral-200' : 'border-b border-neutral-100 pb-2'}`}>
+                        <div className="sm:col-span-5 flex items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Item name"
+                            className={`flex-1 rounded-lg border border-neutral-300 px-3 py-2 text-sm ${isReadOnly ? 'bg-neutral-100 cursor-not-allowed' : 'bg-white'}`}
+                            value={item.name}
+                            disabled={isReadOnly}
+                            readOnly={isReadOnly}
+                            onChange={(e) => {
+                              if (isReadOnly) return;
+                              const newItems = [...billForm.items];
+                              newItems[index].name = e.target.value;
+                              setBillForm({...billForm, items: newItems});
+                            }}
+                          />
+                          {isReadOnly && (
+                            <span className="text-xs text-neutral-500 flex-shrink-0" title="This item cannot be edited">
+                              🔒
+                            </span>
+                          )}
+                        </div>
+                        <input
+                          type="number"
+                          placeholder="Qty"
+                          className={`sm:col-span-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm ${isReadOnly ? 'bg-neutral-100 cursor-not-allowed' : 'bg-white'}`}
+                          value={item.quantity}
+                          disabled={isReadOnly}
+                          readOnly={isReadOnly}
+                          onChange={(e) => {
+                            if (isReadOnly) return;
+                            const newItems = [...billForm.items];
+                            newItems[index].quantity = parseFloat(e.target.value) || 0;
+                            newItems[index].amount = newItems[index].quantity * newItems[index].rate;
+                            setBillForm({...billForm, items: newItems});
+                          }}
+                        />
+                        <input
+                          type="number"
+                          placeholder="Rate"
+                          className={`sm:col-span-2 rounded-lg border border-neutral-300 px-3 py-2 text-sm ${isReadOnly ? 'bg-neutral-100 cursor-not-allowed' : 'bg-white'}`}
+                          value={item.rate}
+                          disabled={isReadOnly}
+                          readOnly={isReadOnly}
+                          onChange={(e) => {
+                            if (isReadOnly) return;
+                            const newItems = [...billForm.items];
+                            newItems[index].rate = parseFloat(e.target.value) || 0;
+                            newItems[index].amount = newItems[index].quantity * newItems[index].rate;
+                            setBillForm({...billForm, items: newItems});
+                          }}
+                        />
+                        <div className="sm:col-span-2 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-neutral-900">
+                            ₦{item.amount?.toLocaleString() || '0'}
+                          </span>
+                          {!isReadOnly && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newItems = billForm.items.filter((_, i) => i !== index);
+                                setBillForm({...billForm, items: newItems});
+                              }}
+                              className="text-red-600 hover:text-red-700 text-lg font-bold px-2"
+                              title="Remove item"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="rounded-lg bg-neutral-50 p-4">
-                <p className="text-sm font-medium text-neutral-700">Total Amount</p>
-                <p className="mt-1 text-2xl font-bold text-neutral-900">
-                  ₦{billForm.items.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
-                </p>
+              <div className="rounded-lg bg-neutral-50 p-4 space-y-2">
+                {billForm.items.some(item => (item as any).isMaterial === true) && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-neutral-600">Cost of Materials:</span>
+                    <span className="font-medium text-neutral-900">
+                      ₦{billForm.items.filter(item => (item as any).isMaterial === true).reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                {billForm.items.some(item => item.name !== 'Deposit (already held)' && !(item as any).isMaterial && !(item as any).isDeposit) && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-neutral-600">Service Fee:</span>
+                    <span className="font-medium text-neutral-900">
+                      ₦{billForm.items.filter(item => item.name !== 'Deposit (already held)' && !(item as any).isMaterial && !(item as any).isDeposit).reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                {billForm.items.some(item => (item as any).isDeposit === true) && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-neutral-600">Deposit (held):</span>
+                    <span className="font-medium text-neutral-900">
+                      ₦{billForm.items.find(item => (item as any).isDeposit === true)?.amount?.toLocaleString() || '0'}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-2 border-t border-neutral-200">
+                  <span className="text-sm font-semibold text-neutral-700">Total Amount:</span>
+                  <span className="text-xl font-bold text-brand-600">
+                    ₦{billForm.items.reduce((sum, item) => sum + item.amount, 0).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
 

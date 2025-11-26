@@ -4,7 +4,7 @@ export interface EmailTemplate {
   subject: string;
   body: string;
   variables: string[];
-  category: 'application' | 'job' | 'payment' | 'notification' | 'custom';
+  category: 'application' | 'job' | 'payment' | 'notification' | 'material' | 'custom';
 }
 
 export const defaultEmailTemplates: EmailTemplate[] = [
@@ -157,6 +157,29 @@ Best regards,
 Phixall Team`,
     variables: ['phixerName', 'amount', 'jobTitle', 'payoutDate', 'status'],
     category: 'payment',
+  },
+  {
+    id: 'material-invoice',
+    name: 'Material Invoice',
+    subject: 'Additional Materials Required - Review & Pay - Phixall',
+    body: `Dear {{clientName}},
+
+Additional materials are needed for your job "{{jobTitle}}".
+
+The Phixer has recommended materials that require your approval and payment before the job can continue.
+
+Invoice Details:
+- Total Amount: ₦{{invoiceAmount}}
+- Materials: {{materialCount}} item(s)
+
+Please review the materials in your dashboard and make payment to proceed with the job.
+
+You will receive a detailed invoice with all material breakdowns.
+
+Best regards,
+Phixall Team`,
+    variables: ['clientName', 'jobTitle', 'invoiceAmount', 'materialCount'],
+    category: 'notification',
   },
 ];
 

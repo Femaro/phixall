@@ -1,200 +1,209 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseServer } from '@/lib/firebaseServer';
-import { doc, getDoc, updateDoc, increment, serverTimestamp, addDoc, collection, setDoc } from 'firebase/firestore';
-import { createTransferRecipient, initiateTransfer } from '@/lib/paystackServer';
-import { toKobo } from '@/lib/paystackClient';
+import { doc, updateDoc, getDoc, collection, addDoc, serverTimestamp, increment } from 'firebase/firestore';
+import { sendTemplateEmail } from '@/lib/emailService';
 
-const PLATFORM_FEE_PERCENTAGE = 0.10; // 10% platform fee
-
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { jobId, finalAmount } = await req.json();
+    const body = await request.json();
+    const { jobId, finalAmount, phixerId, adminId } = body;
 
-    if (!jobId || !finalAmount) {
+    if (!jobId || !finalAmount || !phixerId || !adminId) {
       return NextResponse.json(
-        { success: false, error: 'Job ID and final amount are required' },
+        { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
     const { db } = getFirebaseServer();
 
-    // Get job details
-    const jobRef = doc(db, 'jobs', jobId);
-    const jobSnap = await getDoc(jobRef);
-
-    if (!jobSnap.exists()) {
+    // Get job data
+    const jobDoc = await getDoc(doc(db, 'jobs', jobId));
+    if (!jobDoc.exists()) {
       return NextResponse.json(
-        { success: false, error: 'Job not found' },
+        { error: 'Job not found' },
         { status: 404 }
       );
     }
 
-    const job = jobSnap.data();
-    const deposit = job.deposit || 1000;
-    const phixerId = job.phixerId || job.artisanId;
-    const clientId = job.clientId;
+    const jobData = jobDoc.data();
+    const clientId = jobData.clientId;
+    const assignedPhixerId = jobData.phixerId || jobData.artisanId;
 
-    if (!phixerId) {
+    // Validate that billing is only to job client and assigned Phixer
+    if (phixerId !== assignedPhixerId) {
       return NextResponse.json(
-        { success: false, error: 'No Phixer assigned to this job' },
-        { status: 400 }
+        { error: 'Billing can only be sent to the Phixer assigned to this job' },
+        { status: 403 }
       );
     }
 
+    // Verify admin has permission
+    const adminDoc = await getDoc(doc(db, 'profiles', adminId));
+    if (!adminDoc.exists() || adminDoc.data()?.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Unauthorized. Only admins can process job completion payments.' },
+        { status: 403 }
+      );
+    }
+
+    // Get material invoice if exists
+    const materialInvoiceId = jobData.materialInvoiceId;
+    let materialCost = 0;
+    let markupRevenue = 0;
+
+    if (materialInvoiceId) {
+      const invoiceDoc = await getDoc(doc(db, 'materialInvoices', materialInvoiceId));
+      if (invoiceDoc.exists()) {
+        const invoiceData = invoiceDoc.data();
+        materialCost = invoiceData.subtotal || 0;
+        markupRevenue = invoiceData.markupAmount || 0;
+      }
+    }
+
+    // Deposit already held (₦1,000) - this is part of the final amount
+    const depositHeld = 1000;
+    
     // Calculate amounts
-    const platformFee = finalAmount * PLATFORM_FEE_PERCENTAGE;
-    const phixerPayout = finalAmount - platformFee;
-    const remainingAmount = finalAmount - deposit; // Amount to charge from wallet (after deposit)
+    // finalAmount already includes service amount + materials
+    // We need to charge the remaining amount (finalAmount - depositHeld) from client
+    const remainingAmount = finalAmount - depositHeld;
+    const serviceFee = finalAmount * 0.1; // 10% service fee
+    const phixerPayout = finalAmount - serviceFee - materialCost; // Remaining after service fee and material cost
 
-    // Get client wallet
+    // Charge client (deduct remaining amount from wallet, deposit already held)
     const clientWalletRef = doc(db, 'wallets', clientId);
-    const clientWalletSnap = await getDoc(clientWalletRef);
+    const clientWalletDoc = await getDoc(clientWalletRef);
+    const clientWallet = clientWalletDoc.data() || { balance: 0, heldBalance: 0 };
 
-    if (!clientWalletSnap.exists()) {
+    // Release held deposit and charge remaining
+    const newBalance = clientWallet.balance - remainingAmount;
+    if (newBalance < 0) {
       return NextResponse.json(
-        { success: false, error: 'Client wallet not found' },
-        { status: 404 }
-      );
-    }
-
-    const clientWallet = clientWalletSnap.data();
-    const availableBalance = clientWallet.balance || 0;
-    const heldBalance = clientWallet.heldBalance || 0;
-
-    // Check if client has enough balance (excluding held deposit)
-    if (availableBalance < remainingAmount) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Insufficient wallet balance. Required: ₦${remainingAmount.toLocaleString()}, Available: ₦${availableBalance.toLocaleString()}`,
-        },
+        { error: `Client has insufficient wallet balance. Need ₦${remainingAmount.toLocaleString()}, has ₦${clientWallet.balance.toLocaleString()}` },
         { status: 400 }
       );
     }
 
-    // Deduct remaining amount from client wallet and release held deposit
     await updateDoc(clientWalletRef, {
-      balance: availableBalance - remainingAmount,
-      heldBalance: Math.max(0, heldBalance - deposit),
+      balance: newBalance,
+      heldBalance: increment(-depositHeld), // Release held deposit
+      totalSpent: increment(finalAmount),
       updatedAt: serverTimestamp(),
     });
 
-    // Update Phixer wallet
+    // Credit Phixer (add to wallet)
     const phixerWalletRef = doc(db, 'wallets', phixerId);
-    await setDoc(
-      phixerWalletRef,
-      {
-        balance: increment(phixerPayout),
-        totalEarnings: increment(phixerPayout),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+    await updateDoc(phixerWalletRef, {
+      balance: increment(phixerPayout),
+      totalEarnings: increment(phixerPayout),
+      updatedAt: serverTimestamp(),
+    });
 
-    // Record transactions
+    // Create transaction records
+    // Client payment
     await addDoc(collection(db, 'transactions'), {
       userId: clientId,
-      jobId,
       type: 'job_payment',
       amount: finalAmount,
+      description: `Job completion payment for ${jobData.title}`,
       status: 'completed',
-      description: `Payment for job: ${job.title}`,
+      metadata: {
+        jobId,
+        serviceFee,
+        materialCost,
+        phixerPayout,
+      },
       createdAt: serverTimestamp(),
     });
 
+    // Phixer earning
     await addDoc(collection(db, 'transactions'), {
       userId: phixerId,
-      jobId,
-      type: 'payout',
+      type: 'earning',
       amount: phixerPayout,
-      platformFee,
+      description: `Earnings from job: ${jobData.title}`,
       status: 'completed',
-      description: `Payout for job: ${job.title}`,
-      createdAt: serverTimestamp(),
-    });
-
-    await addDoc(collection(db, 'transactions'), {
-      userId: 'platform',
       jobId,
-      type: 'platform_fee',
-      amount: platformFee,
-      status: 'completed',
-      description: `Platform fee for job: ${job.title}`,
       createdAt: serverTimestamp(),
     });
 
-    // Update job status
-    await updateDoc(jobRef, {
-      status: 'completed',
-      paymentStatus: 'paid',
-      finalAmount,
-      platformFee,
-      phixerPayout,
-      paidAt: serverTimestamp(),
-      completedAt: serverTimestamp(),
-    });
-
-    // Try to initiate bank transfer to Phixer (if bank account is configured)
-    try {
-      const bankAccountRef = doc(db, 'bank_accounts', phixerId);
-      const bankAccountSnap = await getDoc(bankAccountRef);
-
-      if (bankAccountSnap.exists() && bankAccountSnap.data().verified) {
-        const bankAccount = bankAccountSnap.data();
-
-        // Create transfer recipient
-        const recipientResult = await createTransferRecipient({
-          type: 'nuban',
-          name: bankAccount.accountName,
-          account_number: bankAccount.accountNumber,
-          bank_code: bankAccount.bankCode,
-        });
-
-        if (recipientResult.status) {
-          // Initiate transfer
-          const transferResult = await initiateTransfer({
-            amount: toKobo(phixerPayout),
-            recipient: recipientResult.data.recipient_code,
-            reason: `Payout for job: ${job.title}`,
-            reference: `PXL-PAYOUT-${jobId}-${Date.now()}`,
-          });
-
-          if (transferResult.status) {
-            await addDoc(collection(db, 'transactions'), {
-              userId: phixerId,
-              jobId,
-              type: 'bank_transfer',
-              amount: phixerPayout,
-              status: 'pending',
-              transferCode: transferResult.data.transfer_code,
-              description: `Bank transfer for job: ${job.title}`,
-              createdAt: serverTimestamp(),
-            });
-          }
-        }
-      }
-    } catch (transferError) {
-      console.error('Error initiating bank transfer:', transferError);
-      // Continue even if transfer fails - funds are in wallet
+    // Platform revenue (service fee + markup)
+    const platformRevenue = serviceFee + markupRevenue;
+    if (platformRevenue > 0) {
+      await addDoc(collection(db, 'transactions'), {
+        userId: 'platform',
+        type: 'revenue',
+        amount: platformRevenue,
+        description: `Platform revenue from job: ${jobData.title}`,
+        status: 'completed',
+        metadata: {
+          jobId,
+          serviceFee,
+          markupRevenue,
+        },
+        createdAt: serverTimestamp(),
+      });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        finalAmount,
-        platformFee,
-        phixerPayout,
-        remainingCharged: remainingAmount,
-        depositUsed: deposit,
-      },
+    // Update job status
+    await updateDoc(doc(db, 'jobs', jobId), {
+      status: 'completed',
+      amount: finalAmount,
+      completedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
-  } catch (error) {
-    console.error('Job completion error:', error);
+
+    // Add timeline event
+    await addDoc(collection(db, 'jobTimeline'), {
+      jobId,
+      type: 'job-resumed',
+      description: `Job completed. Final amount: ₦${finalAmount.toLocaleString()}`,
+      metadata: {
+        finalAmount,
+        serviceFee,
+        materialCost,
+        phixerPayout,
+        platformRevenue,
+      },
+      createdAt: serverTimestamp(),
+    });
+
+    // Send notifications
+    const phixerProfile = await getDoc(doc(db, 'profiles', phixerId));
+    const phixerName = phixerProfile.data()?.name || 'Phixer';
+
+    try {
+      await sendTemplateEmail('payout-processed', phixerProfile.data()?.email || '', {
+        phixerName,
+        amount: phixerPayout.toLocaleString(),
+        jobTitle: jobData.title,
+        payoutDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        status: 'Completed',
+      });
+    } catch (emailError) {
+      console.error('Failed to send payout email:', emailError);
+    }
+
     return NextResponse.json(
-      { success: false, error: 'Failed to complete job payment' },
+      { 
+        success: true, 
+        message: 'Job completion processed successfully',
+        breakdown: {
+          finalAmount,
+          serviceFee,
+          materialCost,
+          phixerPayout,
+          platformRevenue,
+        },
+      },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error('Error processing job completion:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to process job completion' },
       { status: 500 }
     );
   }
 }
-

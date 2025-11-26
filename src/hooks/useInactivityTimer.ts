@@ -46,10 +46,7 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
   const lastActivityRef = useRef<number>(Date.now());
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const resetTimer = useCallback(() => {
-    if (!enabled) return;
-
-    // Clear existing timeouts
+  const clearAllTimers = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
@@ -62,6 +59,17 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+  }, []);
+
+  const resetTimer = useCallback(() => {
+    if (!enabled) {
+      clearAllTimers();
+      setShowWarning(false);
+      return;
+    }
+
+    // Clear existing timeouts
+    clearAllTimers();
 
     // Reset warning state
     setShowWarning(false);
@@ -71,10 +79,18 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
     // Set warning timeout (timeout - warningTime)
     const warningTimeout = timeout - warningTime;
     warningTimeoutRef.current = setTimeout(() => {
+      if (!enabled) return;
       setShowWarning(true);
       
       // Start countdown interval
       intervalRef.current = setInterval(() => {
+        if (!enabled) {
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
+          return;
+        }
         const elapsed = Date.now() - (lastActivityRef.current + warningTimeout);
         const remaining = Math.max(0, warningTime - elapsed);
         setTimeRemaining(remaining);
@@ -90,6 +106,7 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
 
     // Set logout timeout
     timeoutRef.current = setTimeout(async () => {
+      if (!enabled) return;
       try {
         const { auth } = getFirebase();
         await signOut(auth);
@@ -100,7 +117,7 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
         router.push('/login?reason=inactivity');
       }
     }, timeout);
-  }, [timeout, warningTime, enabled, router]);
+  }, [timeout, warningTime, enabled, router, clearAllTimers]);
 
   const handleActivity = useCallback(() => {
     if (!enabled) return;
@@ -111,12 +128,8 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
     resetTimer();
   }, [resetTimer]);
 
+  // Set up event listeners (always track activity, even if timer is disabled)
   useEffect(() => {
-    if (!enabled) return;
-
-    // Set initial timer
-    resetTimer();
-
     // Add event listeners
     events.forEach((event) => {
       window.addEventListener(event, handleActivity, { passive: true });
@@ -127,17 +140,26 @@ export function useInactivityTimer(config: InactivityTimerConfig = {}) {
       events.forEach((event) => {
         window.removeEventListener(event, handleActivity);
       });
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      if (warningTimeoutRef.current) {
-        clearTimeout(warningTimeoutRef.current);
-      }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
     };
-  }, [enabled, events, handleActivity, resetTimer]);
+  }, [events, handleActivity]);
+
+  // Initialize and manage timer based on enabled state
+  useEffect(() => {
+    if (enabled) {
+      // Start timer when enabled
+      resetTimer();
+    } else {
+      // Clear everything when disabled
+      clearAllTimers();
+      setShowWarning(false);
+      setTimeRemaining(warningTime);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      clearAllTimers();
+    };
+  }, [enabled, resetTimer, clearAllTimers, warningTime]);
 
   return {
     showWarning,

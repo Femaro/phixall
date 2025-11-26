@@ -1,7 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import QRCode from 'react-qr-code';
-import { createQRCodeData, encodeQRCodeData } from '@/lib/qrCodeVerification';
+import CryptoJS from 'crypto-js';
+
+// Mobile-specific QR code generation (doesn't use shared lib to avoid path issues)
+const SECRET_KEY = 'phixall-qr-secret-key-change-in-production'; // Should match server key
+
+interface QRCodeData {
+  jobId: string;
+  phixerId: string;
+  timestamp: number;
+  token: string;
+}
+
+function generateVerificationToken(jobId: string, phixerId: string, timestamp: number): string {
+  const data = `${jobId}:${phixerId}:${timestamp}`;
+  return CryptoJS.HMAC_SHA256(data, SECRET_KEY).toString();
+}
+
+function createQRCodeData(jobId: string, phixerId: string): QRCodeData {
+  const timestamp = Date.now();
+  const token = generateVerificationToken(jobId, phixerId, timestamp);
+  
+  return {
+    jobId,
+    phixerId,
+    timestamp,
+    token,
+  };
+}
+
+function encodeQRCodeData(data: QRCodeData): string {
+  return JSON.stringify(data);
+}
 
 interface QRCodeDisplayProps {
   jobId: string;

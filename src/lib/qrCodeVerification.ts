@@ -1,9 +1,16 @@
-import CryptoJS from 'crypto-js';
-
-// For client-side usage, we'll use a simpler approach
-// In production, this should be done server-side
-
+// Client-side only: use crypto-js
+// Server-side: use Node.js crypto (in API routes)
 const SECRET_KEY = process.env.NEXT_PUBLIC_QR_SECRET_KEY || 'phixall-qr-secret-key-change-in-production';
+
+// Only import crypto-js on client-side
+let CryptoJS: any;
+if (typeof window !== 'undefined') {
+  try {
+    CryptoJS = require('crypto-js');
+  } catch {
+    // Fallback if not available
+  }
+}
 
 export interface QRCodeData {
   jobId: string;
@@ -13,9 +20,18 @@ export interface QRCodeData {
 }
 
 /**
- * Generate a verification token for QR code
+ * Generate a verification token for QR code (client-side only)
+ * For server-side, use Node.js crypto directly
  */
 export function generateVerificationToken(jobId: string, phixerId: string, timestamp: number): string {
+  if (typeof window === 'undefined') {
+    throw new Error('generateVerificationToken should only be called client-side. Use server-side crypto in API routes.');
+  }
+  
+  if (!CryptoJS) {
+    throw new Error('CryptoJS not available. Make sure crypto-js is installed.');
+  }
+  
   const data = `${jobId}:${phixerId}:${timestamp}`;
   return CryptoJS.HMAC_SHA256(data, SECRET_KEY).toString();
 }

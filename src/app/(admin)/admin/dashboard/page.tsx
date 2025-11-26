@@ -782,14 +782,22 @@ export default function AdminDashboardPage() {
         }
       }
 
-      // Deposit already held
-      const depositHeld = 1000;
+      // Calculate service amount from editable items only (exclude materials and deposit)
+      const serviceAmount = billForm.items
+        .filter(item => !(item as any).isMaterial && !(item as any).isDeposit)
+        .reduce((sum, item) => sum + item.amount, 0);
       
-      // Calculate service amount from line items
-      const serviceAmount = billForm.items.reduce((sum, item) => sum + item.amount, 0);
+      // Calculate material cost from approved materials in form
+      const materialCostFromForm = billForm.items
+        .filter(item => (item as any).isMaterial === true)
+        .reduce((sum, item) => sum + item.amount, 0);
       
-      // Total amount = service + materials (deposit already held)
-      const totalAmount = serviceAmount + materialCost;
+      // Get deposit from form
+      const depositFromForm = billForm.items
+        .find(item => (item as any).isDeposit === true)?.amount || 1000;
+      
+      // Total amount = service + materials + deposit
+      const totalAmount = serviceAmount + materialCostFromForm + depositFromForm;
       
       // Combine service items and material items
       // Remove UI-only flags (isReadOnly, isMaterial, isDeposit) before saving

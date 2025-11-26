@@ -116,6 +116,12 @@ export default function JobCompletionPage() {
   };
 
   const uploadImage = async (file: File, jobId: string, index: number): Promise<string> => {
+    // Validate file size (10MB max for images)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`File size must be less than 10MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+    }
+
     const { storage } = getFirebase();
     const filename = `completion-${Date.now()}-${index}.jpg`;
     const storageRef = ref(storage, `job-completions/${jobId}/${filename}`);
@@ -273,7 +279,7 @@ export default function JobCompletionPage() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Photos
             </label>
-            <p className="text-sm text-gray-500 mb-4">Add photos of the completed work</p>
+            <p className="text-sm text-gray-500 mb-4">Add photos of the completed work (Max 10MB per file)</p>
             <div className="flex gap-4 mb-4">
               <label className="flex-1 cursor-pointer">
                 <input

@@ -28,10 +28,17 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
   const handleFileUpload = async (file: File, type: 'id' | 'certification') => {
     if (!file) return '';
 
+    // Validate file size (5MB max for documents)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`File size must be less than 5MB. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+      return '';
+    }
+
     setUploading(true);
     try {
       const { storage } = getFirebase();
-      const fileRef = ref(storage, `artisan-documents/${user.uid}/${type}-${Date.now()}-${file.name}`);
+      const fileRef = ref(storage, `phixer-documents/${user.uid}/${type}-${Date.now()}-${file.name}`);
       await uploadBytes(fileRef, file);
       const url = await getDownloadURL(fileRef);
       setUploading(false);
@@ -381,6 +388,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                     }}
                     className="w-full text-sm"
                   />
+                  <p className="mt-1 text-xs text-neutral-500">Max 5MB (PDF, JPG, PNG)</p>
                   {cert.fileUrl && <p className="mt-1 text-xs text-green-600">✓ Uploaded</p>}
                 </div>
               </div>
@@ -508,6 +516,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                 }}
                 className="w-full text-sm"
               />
+              <p className="mt-1 text-xs text-neutral-500">Max 5MB (PDF, JPG, PNG)</p>
               {formData.idFileUrl && <p className="mt-1 text-sm text-green-600">✓ ID uploaded successfully</p>}
               {errors.idFileUrl && <p className="mt-1 text-sm text-red-500">{errors.idFileUrl}</p>}
             </div>

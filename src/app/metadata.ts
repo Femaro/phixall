@@ -65,10 +65,17 @@ export const defaultMetadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any' },
       { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
     ],
     apple: [
       { url: '/apple-icon.svg', type: 'image/svg+xml' },
+      { url: '/apple-touch-icon.png', type: 'image/png', sizes: '180x180' },
+    ],
+    shortcut: [
+      { url: '/favicon.ico' },
     ],
   },
   manifest: '/manifest.json',

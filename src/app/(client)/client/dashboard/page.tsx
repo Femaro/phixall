@@ -342,7 +342,19 @@ function ClientDashboardContent() {
       const jobRef = doc(collection(db, 'jobs'));
       const attachmentUrls: string[] = [];
 
+      // Validate file sizes (10MB max for images/videos)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
       if (files && files.length > 0) {
+        for (const file of Array.from(files)) {
+          if (file.size > MAX_FILE_SIZE) {
+            setMessage({
+              text: `File "${file.name}" exceeds the maximum size of 10MB. Please compress or select a smaller file.`,
+              type: 'error',
+            });
+            setSubmitting(false);
+            return;
+          }
+        }
         for (const file of Array.from(files)) {
           const fileRef = ref(storage, `jobs/${jobRef.id}/${Date.now()}-${file.name}`);
           await uploadBytes(fileRef, file);
@@ -1843,7 +1855,7 @@ function ClientDashboardContent() {
                     className="mt-2 block w-full text-sm text-neutral-600 file:mr-4 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand-700 hover:file:bg-brand-100"
                     onChange={(e) => setFiles(e.target.files)}
                   />
-                  <p className="mt-1 text-xs text-neutral-500">Upload photos or videos to help artisans understand the job</p>
+                  <p className="mt-1 text-xs text-neutral-500">Upload photos or videos to help artisans understand the job (Max 10MB per file)</p>
                 </div>
 
                 {/* Wallet Balance Notice */}

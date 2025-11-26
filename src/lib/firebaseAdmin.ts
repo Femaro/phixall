@@ -10,10 +10,16 @@ export function getFirebaseAdmin() {
         if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
           serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
         } else {
-          // Try to load from file (for local development)
-          serviceAccount = require('../../serviceAccountKey.json');
+          // Try to load from file (for local development only)
+          // In production/Vercel, this file won't exist, so we catch the error
+          try {
+            serviceAccount = require('../../serviceAccountKey.json');
+          } catch (fileError) {
+            // File doesn't exist - this is expected in production
+            throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable');
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         throw new Error('Firebase Admin SDK not configured. Please set FIREBASE_SERVICE_ACCOUNT_KEY environment variable or provide serviceAccountKey.json');
       }
 

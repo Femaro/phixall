@@ -871,18 +871,18 @@ export default function AdminDashboardPage() {
     
     // Aggregate revenue by date
     transactions
-      .filter(t => 
+      .filter((t): t is typeof t & { createdAt: NonNullable<typeof t.createdAt> } => 
         t.type === 'payment' && 
         t.status === 'completed' &&
-        t.createdAt
+        t.createdAt != null
       )
       .forEach(t => {
         let date: Date;
         if (t.createdAt instanceof Date) {
           date = t.createdAt;
-        } else if (t.createdAt && typeof t.createdAt === 'object' && 'toDate' in t.createdAt) {
+        } else if (typeof t.createdAt === 'object' && t.createdAt !== null && 'toDate' in t.createdAt) {
           date = (t.createdAt as { toDate: () => Date }).toDate();
-        } else if (t.createdAt && typeof t.createdAt === 'object' && 'seconds' in t.createdAt) {
+        } else if (typeof t.createdAt === 'object' && t.createdAt !== null && 'seconds' in t.createdAt) {
           date = new Date((t.createdAt as { seconds: number }).seconds * 1000);
         } else {
           return;
@@ -968,14 +968,16 @@ export default function AdminDashboardPage() {
     
     // Aggregate transactions by type and date
     transactions
-      .filter(t => t.createdAt)
+      .filter((t): t is typeof t & { createdAt: NonNullable<typeof t.createdAt> } => 
+        t.createdAt != null
+      )
       .forEach(t => {
         let date: Date;
         if (t.createdAt instanceof Date) {
           date = t.createdAt;
-        } else if (typeof t.createdAt === 'object' && 'toDate' in t.createdAt) {
+        } else if (typeof t.createdAt === 'object' && t.createdAt !== null && 'toDate' in t.createdAt) {
           date = (t.createdAt as { toDate: () => Date }).toDate();
-        } else if (typeof t.createdAt === 'object' && 'seconds' in t.createdAt) {
+        } else if (typeof t.createdAt === 'object' && t.createdAt !== null && 'seconds' in t.createdAt) {
           date = new Date((t.createdAt as { seconds: number }).seconds * 1000);
         } else {
           return;

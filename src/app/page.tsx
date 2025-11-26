@@ -680,7 +680,7 @@ export default function Home() {
                 <span className="text-gradient"> Anywhere</span>
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-neutral-600">
-                Download our mobile app for iOS and Android to manage your facility services on the go. Request services, track jobs in real-time, and communicate with Phixers—all from your smartphone.
+                Download our mobile app for iOS and Android to manage your facility services on the go. Request services, track jobs in real-time, and communicate with Phixers, all from your smartphone.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <a
@@ -733,29 +733,29 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="relative">
-              <div className="relative mx-auto max-w-sm">
-                <div className="aspect-[9/19] overflow-hidden rounded-[2.5rem] border-8 border-neutral-900 bg-neutral-900 shadow-2xl">
-                  <div className="h-full w-full bg-gradient-to-br from-brand-50 to-brand-100 p-8">
-                    <div className="flex h-full flex-col items-center justify-center gap-6 text-center">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
-                        <span className="text-4xl">🔧</span>
+            <div className="relative flex items-center justify-center">
+              <div className="relative mx-auto max-w-[200px]">
+                <div className="aspect-[9/19] overflow-hidden rounded-[2rem] border-[6px] border-neutral-900 bg-neutral-900 shadow-xl">
+                  <div className="h-full w-full bg-gradient-to-br from-brand-50 to-brand-100 p-6">
+                    <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white shadow-md">
+                        <span className="text-3xl">🔧</span>
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-neutral-900">Phixall</h3>
-                        <p className="mt-1 text-sm text-neutral-600">Facility Management</p>
+                        <h3 className="text-lg font-bold text-neutral-900">Phixall</h3>
+                        <p className="mt-1 text-xs text-neutral-600">Facility Management</p>
                       </div>
-                      <div className="mt-4 space-y-2">
-                        <div className="h-2 w-32 rounded-full bg-neutral-200"></div>
-                        <div className="h-2 w-24 rounded-full bg-neutral-200"></div>
-                        <div className="h-2 w-28 rounded-full bg-neutral-200"></div>
+                      <div className="mt-2 space-y-1.5">
+                        <div className="h-1.5 w-20 rounded-full bg-neutral-200"></div>
+                        <div className="h-1.5 w-16 rounded-full bg-neutral-200"></div>
+                        <div className="h-1.5 w-18 rounded-full bg-neutral-200"></div>
                       </div>
                     </div>
                   </div>
                 </div>
                 {/* Decorative elements */}
-                <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-brand-200/30 blur-2xl"></div>
-                <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-purple-200/30 blur-2xl"></div>
+                <div className="absolute -right-3 -top-3 h-16 w-16 rounded-full bg-brand-200/30 blur-xl"></div>
+                <div className="absolute -bottom-3 -left-3 h-20 w-20 rounded-full bg-purple-200/30 blur-xl"></div>
               </div>
             </div>
           </div>

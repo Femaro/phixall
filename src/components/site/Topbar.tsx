@@ -1,4 +1,4 @@
-﻿import Container from '@/components/ui/Container';
+import Container from '@/components/ui/Container';
 
 export default function Topbar() {
   return (
@@ -17,7 +17,6 @@ export default function Topbar() {
     </div>
   );
 }
-
 
 
 

@@ -79,3 +79,4 @@ A secure QR code-based verification system that allows clients to verify that th
 - ✅ Works offline (QR code contains all needed data)
 - ✅ Time-limited security (expires automatically)
 
+

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { sendTemplateEmail } from '@/lib/emailService';
+import type { MaterialRecommendation } from '@/types/materials';
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,8 +88,8 @@ export async function POST(request: NextRequest) {
         .collection('materialRecommendations')
         .where('jobId', '==', jobId)
         .get();
-      const allMaterials = materialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const allApproved = allMaterials.every(m => m.status === 'approved' || m.status === 'rejected');
+      const allMaterials = materialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as MaterialRecommendation & { id: string }));
+      const allApproved = allMaterials.every(m => m.status === 'approved' || m.status === 'rejected' || m.status === 'declined');
       const approvedMaterials = allMaterials.filter(m => m.status === 'approved');
 
       if (allApproved && approvedMaterials.length > 0) {

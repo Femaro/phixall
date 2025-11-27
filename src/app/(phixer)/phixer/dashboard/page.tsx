@@ -166,6 +166,7 @@ export default function ArtisanDashboardPage() {
   const [savingSettings, setSavingSettings] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [clientRatingForms, setClientRatingForms] = useState<Record<string, { rating: number; feedback: string }>>({});
+  const [expandedJobs, setExpandedJobs] = useState<Set<string>>(new Set());
   const [submittingClientReview, setSubmittingClientReview] = useState<string | null>(null);
   const [artisanCoords, setArtisanCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [capturingLocation, setCapturingLocation] = useState(false);
@@ -1763,6 +1764,28 @@ export default function ArtisanDashboardPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => {
+                              const newExpanded = new Set(expandedJobs);
+                              if (expandedJobs.has(job.id)) {
+                                newExpanded.delete(job.id);
+                              } else {
+                                newExpanded.add(job.id);
+                              }
+                              setExpandedJobs(newExpanded);
+                            }}
+                            className="flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors"
+                            title={expandedJobs.has(job.id) ? 'Hide details' : 'Show details'}
+                          >
+                            <svg
+                              className={`w-5 h-5 transition-transform ${expandedJobs.has(job.id) ? 'rotate-180' : ''}`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
                           <span className="text-2xl">
                             {job.serviceCategory === 'plumbing' && '🔧'}
                             {job.serviceCategory === 'electrical' && '⚡'}
@@ -1781,26 +1804,36 @@ export default function ArtisanDashboardPage() {
                           </div>
                         </div>
 
-                        <p className="mt-3 text-sm text-neutral-600">{job.description}</p>
+                        {expandedJobs.has(job.id) && (
+                          <div className="mt-3 space-y-2">
+                            <p className="text-sm text-neutral-600">{job.description}</p>
 
-                        {job.clientName && (
-                          <div className="mt-3 flex items-center gap-2 rounded-lg bg-neutral-50 p-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
-                              {job.clientName.charAt(0)}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-neutral-900">{job.clientName}</p>
-                              <p className="text-xs text-neutral-500">Client</p>
+                            {job.clientName && (
+                              <div className="flex items-center gap-2 rounded-lg bg-neutral-50 p-3">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
+                                  {job.clientName.charAt(0)}
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-neutral-900">{job.clientName}</p>
+                                  <p className="text-xs text-neutral-500">Client</p>
+                                </div>
+                              </div>
+                            )}
+
+                            {job.serviceAddress?.description && (
+                              <p className="text-sm text-neutral-600">
+                                <span className="font-medium">Location:</span> {job.serviceAddress.description}
+                              </p>
+                            )}
+
+                            <div className="flex items-center gap-4 text-xs text-neutral-500">
+                              {job.scheduledAt && (
+                                <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
+                              )}
+                              <span>Accepted: {formatTimestamp(job.createdAt)}</span>
                             </div>
                           </div>
                         )}
-
-                        <div className="mt-3 flex items-center gap-4 text-xs text-neutral-500">
-                        {job.scheduledAt && (
-                          <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
-                        )}
-                        <span>Accepted: {formatTimestamp(job.createdAt)}</span>
-                        </div>
 
                         {/* Material Recommendations */}
                         {jobMaterials[job.id] && Array.isArray(jobMaterials[job.id]) && jobMaterials[job.id].length > 0 && (

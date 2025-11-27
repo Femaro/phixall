@@ -1832,87 +1832,87 @@ export default function ArtisanDashboardPage() {
                               )}
                               <span>Accepted: {formatTimestamp(job.createdAt)}</span>
                             </div>
-                          </div>
-                        )}
 
-                        {/* Material Recommendations */}
-                        {jobMaterials[job.id] && Array.isArray(jobMaterials[job.id]) && jobMaterials[job.id].length > 0 && (
-                          <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
-                            <h4 className="text-sm font-semibold text-neutral-900 mb-3">📦 Material Recommendations</h4>
-                            <div className="space-y-2">
-                              {jobMaterials[job.id].map((material) => (
-                                <div
-                                  key={material.id}
-                                  className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
-                                >
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 flex-wrap">
-                                      <span className="font-medium text-neutral-900">{material.materialName}</span>
-                                      <span className="text-sm text-neutral-600">× {material.quantity}</span>
-                                      <span
-                                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                          material.status === 'approved'
-                                            ? 'bg-green-100 text-green-700'
-                                            : material.status === 'declined' || material.status === 'rejected'
-                                            ? 'bg-red-100 text-red-700'
-                                            : 'bg-amber-100 text-amber-700'
-                                        }`}
-                                      >
-                                        {material.status === 'approved' ? 'Approved' : (material.status === 'declined' || material.status === 'rejected') ? 'Declined' : 'Pending'}
-                                      </span>
-                                      {material.status === 'approved' && material.procurementMethod && (
-                                        <span
-                                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                            material.procurementMethod === 'phixer'
-                                              ? 'bg-blue-100 text-blue-700'
-                                              : 'bg-purple-100 text-purple-700'
-                                          }`}
-                                          title={material.procurementMethod === 'phixer' ? 'You will procure this material' : 'Phixall will procure this material'}
+                            {/* Material Recommendations */}
+                            {jobMaterials[job.id] && Array.isArray(jobMaterials[job.id]) && jobMaterials[job.id].length > 0 && (
+                              <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+                                <h4 className="text-sm font-semibold text-neutral-900 mb-3">📦 Material Recommendations</h4>
+                                <div className="space-y-2">
+                                  {jobMaterials[job.id].map((material) => (
+                                    <div
+                                      key={material.id}
+                                      className="flex items-center justify-between rounded-lg border border-neutral-200 bg-white p-3"
+                                    >
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                          <span className="font-medium text-neutral-900">{material.materialName}</span>
+                                          <span className="text-sm text-neutral-600">× {material.quantity}</span>
+                                          <span
+                                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                              material.status === 'approved'
+                                                ? 'bg-green-100 text-green-700'
+                                                : material.status === 'declined' || material.status === 'rejected'
+                                                ? 'bg-red-100 text-red-700'
+                                                : 'bg-amber-100 text-amber-700'
+                                            }`}
+                                          >
+                                            {material.status === 'approved' ? 'Approved' : (material.status === 'declined' || material.status === 'rejected') ? 'Declined' : 'Pending'}
+                                          </span>
+                                          {material.status === 'approved' && material.procurementMethod && (
+                                            <span
+                                              className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                                                material.procurementMethod === 'phixer'
+                                                  ? 'bg-blue-100 text-blue-700'
+                                                  : 'bg-purple-100 text-purple-700'
+                                              }`}
+                                              title={material.procurementMethod === 'phixer' ? 'You will procure this material' : 'Phixall will procure this material'}
+                                            >
+                                              {material.procurementMethod === 'phixer' ? '🛒 You Buy' : '📦 Phixall Procures'}
+                                            </span>
+                                          )}
+                                        </div>
+                                        {material.status === 'approved' && material.procurementMethod === 'phixer' && material.totalCost && (
+                                          <div className="mt-2 flex items-center gap-2">
+                                            <span className="text-xs text-neutral-500">Amount to Procure:</span>
+                                            <span className="text-sm font-semibold text-green-700">
+                                              ₦{material.totalCost.toLocaleString()}
+                                            </span>
+                                          </div>
+                                        )}
+                                        {material.note && (
+                                          <p className="mt-1 text-xs text-neutral-600 italic">"{material.note}"</p>
+                                        )}
+                                        {material.adminNotes && (
+                                          <p className="mt-1 text-xs text-amber-700">
+                                            <strong>Admin:</strong> {material.adminNotes}
+                                          </p>
+                                        )}
+                                      </div>
+                                      {material.status === 'pending' && material.phixerId === user?.uid && (
+                                        <button
+                                          onClick={async () => {
+                                            if (confirm(`Delete material recommendation for "${material.materialName}"?`)) {
+                                              try {
+                                                const { db } = getFirebase();
+                                                const { doc, deleteDoc } = await import('firebase/firestore');
+                                                await deleteDoc(doc(db, 'materialRecommendations', material.id));
+                                              } catch (error) {
+                                                console.error('Error deleting material:', error);
+                                                alert('Failed to delete material. Please try again.');
+                                              }
+                                            }
+                                          }}
+                                          className="ml-2 rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 transition-colors"
+                                          title="Delete material"
                                         >
-                                          {material.procurementMethod === 'phixer' ? '🛒 You Buy' : '📦 Phixall Procures'}
-                                        </span>
+                                          🗑️ Delete
+                                        </button>
                                       )}
                                     </div>
-                                    {material.status === 'approved' && material.procurementMethod === 'phixer' && material.totalCost && (
-                                      <div className="mt-2 flex items-center gap-2">
-                                        <span className="text-xs text-neutral-500">Amount to Procure:</span>
-                                        <span className="text-sm font-semibold text-green-700">
-                                          ₦{material.totalCost.toLocaleString()}
-                                        </span>
-                                      </div>
-                                    )}
-                                    {material.note && (
-                                      <p className="mt-1 text-xs text-neutral-600 italic">"{material.note}"</p>
-                                    )}
-                                    {material.adminNotes && (
-                                      <p className="mt-1 text-xs text-amber-700">
-                                        <strong>Admin:</strong> {material.adminNotes}
-                                      </p>
-                                    )}
-                                  </div>
-                                  {material.status === 'pending' && material.phixerId === user?.uid && (
-                                    <button
-                                      onClick={async () => {
-                                        if (confirm(`Delete material recommendation for "${material.materialName}"?`)) {
-                                          try {
-                                            const { db } = getFirebase();
-                                            const { doc, deleteDoc } = await import('firebase/firestore');
-                                            await deleteDoc(doc(db, 'materialRecommendations', material.id));
-                                          } catch (error) {
-                                            console.error('Error deleting material:', error);
-                                            alert('Failed to delete material. Please try again.');
-                                          }
-                                        }
-                                      }}
-                                      className="ml-2 rounded-lg border border-red-300 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 transition-colors"
-                                      title="Delete material"
-                                    >
-                                      🗑️ Delete
-                                    </button>
-                                  )}
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>

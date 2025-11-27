@@ -787,7 +787,7 @@ export default function AdminDashboardPage() {
         .filter(item => !(item as any).isMaterial && !(item as any).isDeposit)
         .reduce((sum, item) => sum + item.amount, 0);
       
-      // Calculate material cost from approved materials in form
+      // Calculate material cost from approved materials in form (read-only items)
       const materialCostFromForm = billForm.items
         .filter(item => (item as any).isMaterial === true)
         .reduce((sum, item) => sum + item.amount, 0);

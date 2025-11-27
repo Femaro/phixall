@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
-import { collection, query, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, onSnapshot, addDoc, updateDoc, doc, deleteDoc, serverTimestamp, orderBy } from 'firebase/firestore';
 import type { MaterialCatalogItem } from '@/types/materialCatalog';
 
 export default function MaterialCatalogManager() {
@@ -21,9 +21,9 @@ export default function MaterialCatalogManager() {
 
   useEffect(() => {
     const { db } = getFirebase();
-    const materialsQuery = query(collection(db, 'materialCatalog'), query(collection(db, 'materialCatalog')));
+    const materialsQuery = query(collection(db, 'materialCatalog'), orderBy('name'));
 
-    const unsubscribe = onSnapshot(collection(db, 'materialCatalog'), (snapshot) => {
+    const unsubscribe = onSnapshot(materialsQuery, (snapshot) => {
       const materialsData = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),

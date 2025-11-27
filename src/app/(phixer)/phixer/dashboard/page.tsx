@@ -1364,26 +1364,65 @@ export default function ArtisanDashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {myJobs.slice(0, 5).map((job) => (
-                    <div key={job.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <h3 className="font-semibold text-neutral-900">{job.title}</h3>
-                            <span className={`rounded-full border px-3 py-0.5 text-xs font-medium ${getStatusColor(job.status)}`}>
-                              {job.status}
-                            </span>
+                  {myJobs.slice(0, 5).map((job) => {
+                    const isExpanded = expandedJobs.has(job.id);
+                    return (
+                      <div key={job.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => {
+                                  const newExpanded = new Set(expandedJobs);
+                                  if (isExpanded) {
+                                    newExpanded.delete(job.id);
+                                  } else {
+                                    newExpanded.add(job.id);
+                                  }
+                                  setExpandedJobs(newExpanded);
+                                }}
+                                className="flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors"
+                                title={isExpanded ? 'Hide details' : 'Show details'}
+                              >
+                                <svg
+                                  className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                              <h3 className="font-semibold text-neutral-900">{job.title}</h3>
+                              <span className={`rounded-full border px-3 py-0.5 text-xs font-medium ${getStatusColor(job.status)}`}>
+                                {job.status}
+                              </span>
+                            </div>
+                            {isExpanded && (
+                              <div className="mt-3 space-y-2">
+                                <p className="text-sm text-neutral-600">{job.description}</p>
+                                {job.clientName && (
+                                  <p className="text-sm text-neutral-600">
+                                    <span className="font-medium">Client:</span> {job.clientName}
+                                  </p>
+                                )}
+                                {job.serviceAddress?.description && (
+                                  <p className="text-sm text-neutral-600">
+                                    <span className="font-medium">Location:</span> {job.serviceAddress.description}
+                                  </p>
+                                )}
+                                {job.scheduledAt && (
+                                  <p className="text-xs text-neutral-500">
+                                    Scheduled: {formatTimestamp(job.scheduledAt)}
+                                  </p>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <p className="mt-2 text-sm text-neutral-600">{job.description}</p>
-                          {job.clientName && (
-                            <p className="mt-2 text-sm text-neutral-600">
-                              <span className="font-medium">Client:</span> {job.clientName}
-                            </p>
-                          )}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

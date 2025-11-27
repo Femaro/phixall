@@ -1681,77 +1681,49 @@ export default function ArtisanDashboardPage() {
                   </p>
                 </div>
               ) : (
-                visibleAvailableJobs.map((job) => {
-                  const isExpanded = expandedJobs.has(job.id);
-                  return (
-                    <div key={job.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft transition-all hover:shadow-glow">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <button
-                              onClick={() => {
-                                const newExpanded = new Set(expandedJobs);
-                                if (isExpanded) {
-                                  newExpanded.delete(job.id);
-                                } else {
-                                  newExpanded.add(job.id);
-                                }
-                                setExpandedJobs(newExpanded);
-                              }}
-                              className="flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors"
-                              title={isExpanded ? 'Hide details' : 'Show details'}
-                            >
-                              <svg
-                                className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </button>
-                            <span className="text-2xl">
-                              {job.serviceCategory === 'plumbing' && '🔧'}
-                              {job.serviceCategory === 'electrical' && '⚡'}
-                              {job.serviceCategory === 'hvac' && '❄️'}
-                              {job.serviceCategory === 'appliance' && '🔨'}
-                              {job.serviceCategory === 'painting' && '🎨'}
-                              {job.serviceCategory === 'carpentry' && '🚪'}
-                              {job.serviceCategory === 'cleaning' && '🧹'}
-                              {!job.serviceCategory && '📦'}
+                visibleAvailableJobs.map((job) => (
+                  <div key={job.id} className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft transition-all hover:shadow-glow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">
+                            {job.serviceCategory === 'plumbing' && '🔧'}
+                            {job.serviceCategory === 'electrical' && '⚡'}
+                            {job.serviceCategory === 'hvac' && '❄️'}
+                            {job.serviceCategory === 'appliance' && '🔨'}
+                            {job.serviceCategory === 'painting' && '🎨'}
+                            {job.serviceCategory === 'carpentry' && '🚪'}
+                            {job.serviceCategory === 'cleaning' && '🧹'}
+                            {!job.serviceCategory && '📦'}
+                          </span>
+                          <div>
+                            <h3 className="font-semibold text-neutral-900">{job.title}</h3>
+                            <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
+                              New Request
                             </span>
-                            <div>
-                              <h3 className="font-semibold text-neutral-900">{job.title}</h3>
-                              <span className="mt-1 inline-block rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
-                                New Request
-                              </span>
-                            </div>
                           </div>
-
-                          {isExpanded && (
-                            <div className="mt-3 space-y-2">
-                              <p className="text-sm text-neutral-600">{job.description}</p>
-                              {job.serviceAddress?.description && (
-                                <p className="flex flex-wrap items-center gap-2 text-sm text-neutral-600">
-                                  <span>📍 {job.serviceAddress.description}</span>
-                                  {job.distanceMiles != null && (
-                                    <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-700">
-                                      {job.distanceMiles.toFixed(1)} miles away
-                                    </span>
-                                  )}
-                                </p>
-                              )}
-
-                              <div className="flex flex-wrap items-center gap-4 text-xs text-neutral-500">
-                                {job.clientName && <span>Client: {job.clientName}</span>}
-                                {job.scheduledAt && (
-                                  <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
-                                )}
-                                <span>Posted: {formatTimestamp(job.createdAt)}</span>
-                              </div>
-                            </div>
-                          )}
                         </div>
+
+                        <p className="mt-3 text-sm text-neutral-600">{job.description}</p>
+                        {job.serviceAddress?.description && (
+                          <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-neutral-600">
+                            <span>📍 {job.serviceAddress.description}</span>
+                            {job.distanceMiles != null && (
+                              <span className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs font-semibold text-neutral-700">
+                                {job.distanceMiles.toFixed(1)} miles away
+                              </span>
+                            )}
+                          </p>
+                        )}
+
+                        <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-neutral-500">
+                          {job.clientName && <span>Client: {job.clientName}</span>}
+                          {job.scheduledAt && (
+                            <span>Scheduled: {formatTimestamp(job.scheduledAt)}</span>
+                          )}
+                          <span>Posted: {formatTimestamp(job.createdAt)}</span>
+                        </div>
+                      </div>
 
                       <button
                         onClick={() => acceptJob(job.id)}

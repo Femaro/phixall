@@ -9,9 +9,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Turbopack configuration (Next.js 16+)
-  // Empty config to silence the webpack/turbopack warning
-  turbopack: {},
+  // Disable Turbopack for production builds to avoid dependency tracking issues
+  // Turbopack is still available for dev with `next dev --turbopack`
+  experimental: {
+    turbo: undefined,
+  },
 };
 
 export default nextConfig;

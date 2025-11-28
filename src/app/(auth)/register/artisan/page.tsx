@@ -9,7 +9,7 @@ export default function ArtisanRegisterPage() {
       <div className="flex w-full flex-col justify-center px-6 py-12 lg:w-1/2 lg:px-12">
         <div className="mx-auto w-full max-w-md">
           <RegisterForm
-            heading="Become a Phixall Artisan"
+            heading="Become a Phixer"
             subheading="Get vetted job opportunities, fast payments, and dedicated support."
             allowRoleToggle={false}
             defaultRole="Phixer"

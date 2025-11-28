@@ -152,9 +152,25 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
       } as ArtisanOnboarding);
 
       alert('Information saved successfully! Proceeding to training...');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Save error:', error);
-      alert('Failed to save information. Please try again.');
+      console.error('Error details:', {
+        code: error?.code,
+        message: error?.message,
+        stack: error?.stack
+      });
+      
+      let errorMessage = 'Failed to submit application. Please try again later.';
+      
+      if (error?.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Please ensure you are logged in and your account is properly set up. If the issue persists, please contact support.';
+      } else if (error?.code === 'unavailable') {
+        errorMessage = 'Service temporarily unavailable. Please check your internet connection and try again.';
+      } else if (error?.message) {
+        errorMessage = `Error: ${error.message}. Please try again or contact support if the issue persists.`;
+      }
+      
+      alert(errorMessage);
     } finally {
       setSaving(false);
     }

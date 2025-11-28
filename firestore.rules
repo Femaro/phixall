@@ -67,10 +67,12 @@ service cloud.firestore {
       // Users can read and update their own onboarding, admins can access all
       allow read, update: if isAuthenticated() && 
                             (request.auth.uid == userId || 
-                             get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin');
+                             (exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
+                              get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin'));
       
       // Only admins can delete onboarding records
       allow delete: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/profiles/$(request.auth.uid)) &&
                        get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin';
     }
     

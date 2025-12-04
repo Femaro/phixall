@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirebaseServer } from '@/lib/firebaseServer';
 import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 import { sendTemplateEmail } from '@/lib/emailService';
 
 export async function POST(request: NextRequest) {
@@ -43,8 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { db } = getFirebaseServer();
-    const { storage } = getFirebaseAdmin();
+    const { storage, firestore } = getFirebaseAdmin();
 
     // Upload resume to Firebase Storage using Admin SDK
     const bucket = storage.bucket();
@@ -64,7 +62,7 @@ export async function POST(request: NextRequest) {
     await file.makePublic();
     const resumeUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
 
-    // Save application to Firestore
+    // Save application to Firestore using Admin SDK
     const applicationData = {
       firstName,
       lastName,
@@ -77,11 +75,11 @@ export async function POST(request: NextRequest) {
       resumeUrl,
       resumeFileName: resume.name,
       status: 'pending',
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
       reviewed: false,
     };
 
-    await addDoc(collection(db, 'career_applications'), applicationData);
+    await firestore.collection('career_applications').add(applicationData);
 
     // Send confirmation email to applicant
     try {

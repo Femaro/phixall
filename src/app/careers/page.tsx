@@ -59,7 +59,15 @@ export default function CareersPage() {
         body: formData,
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        // If response is not JSON, use a generic error
+        setMessage({ type: 'error', text: 'An error occurred. Please try again or contact us directly.' });
+        setSubmitting(false);
+        return;
+      }
 
       if (response.ok) {
         setMessage({ type: 'success', text: data.message || 'Application submitted successfully!' });
@@ -68,6 +76,7 @@ export default function CareersPage() {
         setMessage({ type: 'error', text: data.error || 'Failed to submit application. Please try again.' });
       }
     } catch (error) {
+      console.error('Error submitting application:', error);
       setMessage({ type: 'error', text: 'An error occurred. Please try again or contact us directly.' });
     } finally {
       setSubmitting(false);

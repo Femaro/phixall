@@ -50,10 +50,20 @@ export async function POST(request: NextRequest) {
       firestore = admin.firestore;
     } catch (adminError: any) {
       console.error('Firebase Admin initialization error:', adminError);
+      const errorMessage = adminError?.message || 'Unknown error';
+      
+      // Provide more helpful error messages
+      let userMessage = 'Server configuration error. Please contact support.';
+      if (errorMessage.includes('FIREBASE_SERVICE_ACCOUNT_KEY') || errorMessage.includes('not configured')) {
+        userMessage = 'Firebase Admin SDK is not configured. Please ensure FIREBASE_SERVICE_ACCOUNT_KEY environment variable is set in Vercel.';
+      } else if (errorMessage.includes('Invalid') || errorMessage.includes('JSON')) {
+        userMessage = 'Invalid Firebase service account key format. Please check the FIREBASE_SERVICE_ACCOUNT_KEY environment variable in Vercel.';
+      }
+      
       return NextResponse.json(
         { 
-          error: 'Server configuration error. Please contact support.',
-          details: process.env.NODE_ENV === 'development' ? adminError?.message : undefined
+          error: userMessage,
+          details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
         },
         { status: 500 }
       );

@@ -42,44 +42,96 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { storage, firestore } = getFirebaseAdmin();
+    // Initialize Firebase Admin SDK
+    let storage, firestore;
+    try {
+      const admin = getFirebaseAdmin();
+      storage = admin.storage;
+      firestore = admin.firestore;
+    } catch (adminError: any) {
+      console.error('Firebase Admin initialization error:', adminError);
+      return NextResponse.json(
+        { 
+          error: 'Server configuration error. Please contact support.',
+          details: process.env.NODE_ENV === 'development' ? adminError?.message : undefined
+        },
+        { status: 500 }
+      );
+    }
 
     // Upload resume to Firebase Storage using Admin SDK
-    const bucket = storage.bucket();
-    const fileName = `careers/resumes/${Date.now()}-${resume.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const file = bucket.file(fileName);
-    
-    // Convert File to Buffer for upload
-    const resumeBuffer = Buffer.from(await resume.arrayBuffer());
-    
-    await file.save(resumeBuffer, {
-      metadata: {
-        contentType: resume.type || 'application/pdf',
-      },
-    });
-    
-    // Make file publicly readable (or use signed URL)
-    await file.makePublic();
-    const resumeUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+    let resumeUrl: string;
+    let uploadedFileName: string;
+    try {
+      const bucket = storage.bucket();
+      uploadedFileName = `careers/resumes/${Date.now()}-${resume.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+      const file = bucket.file(uploadedFileName);
+      
+      // Convert File to Buffer for upload
+      const resumeBuffer = Buffer.from(await resume.arrayBuffer());
+      
+      await file.save(resumeBuffer, {
+        metadata: {
+          contentType: resume.type || 'application/pdf',
+        },
+      });
+      
+      // Generate a signed URL that's valid for 1 year (for admin access)
+      const expiresAt = new Date();
+      expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+      const [url] = await file.getSignedUrl({
+        action: 'read',
+        expires: expiresAt,
+      });
+      resumeUrl = url;
+    } catch (uploadError: any) {
+      console.error('File upload error:', uploadError);
+      return NextResponse.json(
+        { 
+          error: 'Failed to upload resume. Please try again with a different file.',
+          details: process.env.NODE_ENV === 'development' ? uploadError?.message : undefined
+        },
+        { status: 500 }
+      );
+    }
 
     // Save application to Firestore using Admin SDK
-    const applicationData = {
-      firstName,
-      lastName,
-      email,
-      phone,
-      experience,
-      education,
-      coverLetter,
-      position,
-      resumeUrl,
-      resumeFileName: resume.name,
-      status: 'pending',
-      createdAt: FieldValue.serverTimestamp(),
-      reviewed: false,
-    };
+    try {
+      const applicationData = {
+        firstName,
+        lastName,
+        email,
+        phone,
+        experience,
+        education,
+        coverLetter,
+        position,
+        resumeUrl,
+        resumeFileName: resume.name,
+        status: 'pending',
+        createdAt: FieldValue.serverTimestamp(),
+        reviewed: false,
+      };
 
-    await firestore.collection('career_applications').add(applicationData);
+      await firestore.collection('career_applications').add(applicationData);
+    } catch (firestoreError: any) {
+      console.error('Firestore write error:', firestoreError);
+      // Try to delete the uploaded file if Firestore write fails
+      try {
+        const bucket = storage.bucket();
+        await bucket.file(uploadedFileName).delete();
+      } catch (deleteError) {
+        console.error('Failed to delete uploaded file after Firestore error:', deleteError);
+      }
+      
+      return NextResponse.json(
+        { 
+          error: 'Failed to save application. Please try again.',
+          details: process.env.NODE_ENV === 'development' ? firestoreError?.message : undefined
+        },
+        { status: 500 }
+      );
+    }
 
     // Send confirmation email to applicant
     try {
@@ -111,11 +163,32 @@ export async function POST(request: NextRequest) {
       message: error?.message,
       code: error?.code,
       stack: error?.stack,
+      name: error?.name,
     });
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to submit application. Please try again or contact us directly.';
+    let errorDetails: string | undefined;
+    
+    if (error?.message) {
+      if (error.message.includes('FIREBASE_SERVICE_ACCOUNT_KEY') || error.message.includes('not configured')) {
+        errorMessage = 'Server configuration error. Please contact support.';
+        errorDetails = 'Firebase Admin SDK not configured';
+      } else if (error.message.includes('permission') || error.code === 'permission-denied') {
+        errorMessage = 'Permission denied. Please contact support.';
+        errorDetails = error.message;
+      } else if (error.message.includes('Storage') || error.code?.includes('storage')) {
+        errorMessage = 'File upload failed. Please try again with a different file.';
+        errorDetails = error.message;
+      } else {
+        errorDetails = error.message;
+      }
+    }
+    
     return NextResponse.json(
       { 
-        error: 'Failed to submit application. Please try again or contact us directly.',
-        details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+        error: errorMessage,
+        details: process.env.NODE_ENV === 'development' ? errorDetails : undefined
       },
       { status: 500 }
     );

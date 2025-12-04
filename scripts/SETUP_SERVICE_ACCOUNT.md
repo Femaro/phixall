@@ -59,6 +59,45 @@ set FIREBASE_SERVICE_ACCOUNT_KEY=<paste the entire JSON content>
 export FIREBASE_SERVICE_ACCOUNT_KEY="$(cat serviceAccountKey.json)"
 ```
 
+## For Vercel Deployment
+
+When adding the service account key to Vercel, you **must** preserve the `\n` characters in the `private_key` field. 
+
+### ⚠️ Common Error: "Invalid PEM formatted message"
+
+This error occurs when the `\n` (newline) characters in the private key are lost during copy-paste. The private key must contain literal `\n` strings, not actual line breaks.
+
+### ✅ Solution: Use the Formatting Script
+
+**Easiest method - Use the helper script:**
+
+1. Make sure you have `serviceAccountKey.json` in your project root
+2. Run:
+   ```bash
+   node scripts/format-service-account-for-vercel.js
+   ```
+3. Copy the output (single-line JSON)
+4. Paste it into Vercel's `FIREBASE_SERVICE_ACCOUNT_KEY` environment variable
+
+### Manual Method (if script doesn't work)
+
+1. Open your `serviceAccountKey.json` file
+2. Use a JSON minifier that **preserves escape sequences**:
+   - Online: https://jsonformatter.org/json-minify
+   - Or use: `node -e "console.log(JSON.stringify(require('./serviceAccountKey.json')))"`
+3. Copy the minified output (should be one line)
+4. Verify the `private_key` field contains `\\n` (double backslash + n)
+5. Paste into Vercel
+
+### Verify in Vercel
+
+After adding the variable, check the diagnostic endpoint:
+```
+https://your-domain.vercel.app/api/admin/check-config
+```
+
+It should show `"status": "success"` if configured correctly.
+
 ## Verify Setup
 
 After setting up the service account key, verify it works:

@@ -16,8 +16,9 @@ export async function GET() {
 
     // Try to parse the JSON
     let parsed = false;
+    let parsedData: any;
     try {
-      JSON.parse(serviceAccountKey);
+      parsedData = JSON.parse(serviceAccountKey);
       parsed = true;
     } catch (parseError) {
       return NextResponse.json({
@@ -28,6 +29,11 @@ export async function GET() {
         error: parseError instanceof Error ? parseError.message : 'Unknown parse error',
       }, { status: 500 });
     }
+
+    // Check if private_key contains newline characters
+    const privateKey = parsedData?.private_key || '';
+    const hasNewlines = privateKey.includes('\\n') || privateKey.includes('\n');
+    const hasBeginEnd = privateKey.includes('BEGIN PRIVATE KEY') && privateKey.includes('END PRIVATE KEY');
 
     // Try to initialize Firebase Admin
     try {
@@ -46,13 +52,23 @@ export async function GET() {
         initialized: true,
       });
     } catch (initError: any) {
+      const errorMessage = initError?.message || 'Unknown initialization error';
+      const isPemError = errorMessage.includes('PEM') || errorMessage.includes('private key');
+      
       return NextResponse.json({
         status: 'error',
         message: 'Firebase Admin SDK initialization failed',
         hasEnvVar: true,
         parsed: true,
         initialized: false,
-        error: initError?.message || 'Unknown initialization error',
+        error: errorMessage,
+        diagnostic: isPemError ? {
+          issue: 'Invalid private key format',
+          cause: 'The private key in your service account JSON may have lost its newline characters (\\n) when pasted into Vercel',
+          solution: 'Ensure the private_key field contains \\n characters. When copying JSON to Vercel, use a JSON minifier that preserves escape sequences, or use the raw JSON file content directly.',
+          hasNewlines: hasNewlines,
+          hasBeginEnd: hasBeginEnd,
+        } : undefined,
       }, { status: 500 });
     }
   } catch (error: any) {

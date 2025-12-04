@@ -4,9 +4,9 @@ import { getFirebaseAdmin } from '@/lib/firebaseAdmin';
 export async function GET() {
   try {
     // Check if environment variable exists
-    const hasEnvVar = !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+    const serviceAccountKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
     
-    if (!hasEnvVar) {
+    if (!serviceAccountKey) {
       return NextResponse.json({
         status: 'error',
         message: 'FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set',
@@ -17,7 +17,7 @@ export async function GET() {
     // Try to parse the JSON
     let parsed = false;
     try {
-      JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      JSON.parse(serviceAccountKey);
       parsed = true;
     } catch (parseError) {
       return NextResponse.json({

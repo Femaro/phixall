@@ -56,7 +56,7 @@ export default function OnboardingScreen() {
         [
           {
             text: 'OK',
-            onPress: () => router.replace('/(tabs)/artisan'),
+            onPress: () => router.replace('/(tabs)/client'),
           },
         ]
       );

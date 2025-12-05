@@ -205,12 +205,21 @@ export default function ClientDashboard() {
         )}
       </View>
 
-      <TouchableOpacity
-        style={[styles.button, styles.primaryButton]}
-        onPress={() => router.push('/(tabs)/request')}
-      >
-        <Text style={styles.primaryButtonText}>+ Request New Service</Text>
-      </TouchableOpacity>
+      <View style={styles.actionsContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.primaryButton]}
+          onPress={() => router.push('/(tabs)/request')}
+        >
+          <Text style={styles.primaryButtonText}>+ Request New Service</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.phixerButton]}
+          onPress={() => router.push('/(auth)/onboarding')}
+        >
+          <Text style={styles.phixerButtonText}>🔧 Become a Phixer</Text>
+        </TouchableOpacity>
+      </View>
 
       <SupportChat role="client" />
     </ScrollView>
@@ -347,11 +356,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
   },
+  actionsContainer: {
+    padding: 16,
+    paddingTop: 0,
+    gap: 12,
+  },
   primaryButton: {
-    margin: 16,
-    marginTop: 8,
+    margin: 0,
   },
   primaryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  phixerButton: {
+    backgroundColor: '#7C3AED',
+    margin: 0,
+  },
+  phixerButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',

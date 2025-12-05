@@ -10,8 +10,9 @@ import {
 import { useRouter } from 'expo-router';
 import { useAuthState } from '@/hooks/useAuthState';
 import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { doc, onSnapshot as onDocSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot as onDocSnapshot, getDoc } from 'firebase/firestore';
 import { getFirebase } from '@/config/firebase';
+import { SupportChat } from '@/components/SupportChat';
 
 interface Job {
   id: string;
@@ -27,6 +28,8 @@ export default function ClientDashboard() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [wallet, setWallet] = useState({ balance: 0, totalSpent: 0 });
   const [refreshing, setRefreshing] = useState(false);
+  const [clientAverageRating, setClientAverageRating] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -59,6 +62,32 @@ export default function ClientDashboard() {
         });
       }
     });
+
+    // Load client profile (rating and name)
+    const loadProfile = async () => {
+      try {
+        const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
+        if (profileDoc.exists()) {
+          const profile = profileDoc.data();
+          if (profile.clientAverageRating !== undefined) {
+            setClientAverageRating(profile.clientAverageRating);
+          }
+          // Get user name from profile, displayName, or email
+          const name = profile.name || user.displayName || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+        } else {
+          // Fallback to displayName or email if profile doesn't exist
+          const name = user.displayName || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        // Fallback to displayName or email on error
+        const name = user.displayName || user.email?.split('@')[0] || 'User';
+        setUserName(name);
+      }
+    };
+    loadProfile();
 
     return () => {
       unsubscribeJobs();
@@ -98,8 +127,18 @@ export default function ClientDashboard() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <Text style={styles.greeting}>Welcome back!</Text>
+        <Text style={styles.greeting}>
+          Welcome {userName ? userName.split(' ')[0] : 'back'}!
+        </Text>
         <Text style={styles.subtitle}>Manage your facility services</Text>
+        {clientAverageRating !== null && (
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingLabel}>Your Rating:</Text>
+            <Text style={styles.ratingValue}>
+              {'⭐'.repeat(Math.round(clientAverageRating))} {clientAverageRating.toFixed(1)}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.card}>
@@ -172,6 +211,8 @@ export default function ClientDashboard() {
       >
         <Text style={styles.primaryButtonText}>+ Request New Service</Text>
       </TouchableOpacity>
+
+      <SupportChat role="client" />
     </ScrollView>
   );
 }
@@ -314,6 +355,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  ratingLabel: {
+    fontSize: 12,
+    color: '#92400E',
+    marginRight: 6,
+  },
+  ratingValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#92400E',
   },
 });
 

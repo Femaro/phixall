@@ -17,6 +17,7 @@ import { getFirebase } from '@/config/firebase';
 import * as Location from 'expo-location';
 import { calculateDistance, formatDistance } from '@/utils/distance';
 import { QRCodeDisplay } from '@/components/QRCodeDisplay';
+import { RatingForm } from '@/components/RatingForm';
 
 interface JobDetail {
   id: string;
@@ -69,6 +70,8 @@ export default function JobDetailScreen() {
   const [showQRCode, setShowQRCode] = useState(false);
   const [materialRecommendations, setMaterialRecommendations] = useState<any[]>([]);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
+  const [showRatingForm, setShowRatingForm] = useState(false);
+  const [ratingTargetRole, setRatingTargetRole] = useState<'client' | 'Phixer' | 'artisan'>('Phixer');
 
   useEffect(() => {
     if (!user || !params.id) return;
@@ -528,6 +531,48 @@ export default function JobDetailScreen() {
           </View>
         )}
 
+        {job.artisanReview && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Phixer Review</Text>
+            <View style={styles.reviewContainer}>
+              <Text style={styles.reviewRating}>
+                {'⭐'.repeat(job.artisanReview.rating || 0)}
+              </Text>
+              {job.artisanReview.feedback && (
+                <Text style={styles.reviewFeedback}>{job.artisanReview.feedback}</Text>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* Rating Button for Completed Jobs */}
+        {job.status === 'completed' && user && (
+          <View style={styles.section}>
+            {isClient && !job.clientReview && (
+              <TouchableOpacity
+                style={styles.ratingButton}
+                onPress={() => {
+                  setRatingTargetRole('Phixer');
+                  setShowRatingForm(true);
+                }}
+              >
+                <Text style={styles.ratingButtonText}>⭐ Rate Phixer</Text>
+              </TouchableOpacity>
+            )}
+            {(isArtisan || userRole === 'Phixer') && !job.artisanReview && (
+              <TouchableOpacity
+                style={styles.ratingButton}
+                onPress={() => {
+                  setRatingTargetRole('client');
+                  setShowRatingForm(true);
+                }}
+              >
+                <Text style={styles.ratingButtonText}>⭐ Rate Client</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+
         {/* Action Buttons */}
         <View style={styles.actions}>
           {isArtisan && job.status === 'accepted' && (
@@ -652,6 +697,19 @@ export default function JobDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Rating Form */}
+      {user && (
+        <RatingForm
+          visible={showRatingForm}
+          onClose={() => setShowRatingForm(false)}
+          jobId={job.id}
+          userId={user.uid}
+          userRole={isClient ? 'client' : 'Phixer'}
+          targetRole={ratingTargetRole}
+          targetName={isClient ? (job.phixerName || job.artisanName) : job.clientName}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -1029,6 +1087,17 @@ const styles = StyleSheet.create({
   emptyMaterialsSubtext: {
     fontSize: 12,
     color: '#9CA3AF',
+  },
+  ratingButton: {
+    backgroundColor: '#2563EB',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  ratingButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

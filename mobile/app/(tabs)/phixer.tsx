@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthState } from '@/hooks/useAuthState';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, getDoc } from 'firebase/firestore';
 import { doc, updateDoc, onSnapshot as onDocSnapshot } from 'firebase/firestore';
 import { getFirebase } from '@/config/firebase';
 import * as Location from 'expo-location';
 import { calculateDistance, formatDistance } from '@/utils/distance';
+import { SupportChat } from '@/components/SupportChat';
 
 interface Job {
   id: string;
@@ -41,6 +42,9 @@ export default function ArtisanDashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [artisanLocation, setArtisanLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [jobDistances, setJobDistances] = useState<Record<string, number>>({});
+  const [artisanState, setArtisanState] = useState<string | null>(null);
+  const [artisanAverageRating, setArtisanAverageRating] = useState<number | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -65,6 +69,33 @@ export default function ArtisanDashboard() {
 
     getArtisanLocation();
 
+    // Load artisan profile for state, rating, and name
+    const loadProfile = async () => {
+      try {
+        const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
+        if (profileDoc.exists()) {
+          const profile = profileDoc.data();
+          setArtisanState(profile.state || null);
+          if (profile.artisanAverageRating !== undefined) {
+            setArtisanAverageRating(profile.artisanAverageRating);
+          }
+          // Get user name from profile, displayName, or email
+          const name = profile.name || user.displayName || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+        } else {
+          // Fallback to displayName or email if profile doesn't exist
+          const name = user.displayName || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        // Fallback to displayName or email on error
+        const name = user.displayName || user.email?.split('@')[0] || 'User';
+        setUserName(name);
+      }
+    };
+    loadProfile();
+
     // Load available jobs (jobs without artisan)
     const availableJobsQuery = query(
       collection(db, 'jobs'),
@@ -80,7 +111,13 @@ export default function ArtisanDashboard() {
         const data = doc.data();
         if (!data.phixerId && !data.artisanId) {
           const jobData = { id: doc.id, ...data } as Job;
-          jobsData.push(jobData);
+          
+          // Filter by state if artisan has state set
+          if (artisanState && jobData.serviceState) {
+            if (jobData.serviceState.toLowerCase().trim() !== artisanState.toLowerCase().trim()) {
+              return; // Skip jobs not in artisan's state
+            }
+          }
 
           // Calculate distance if location is available
           if (artisanLocation && jobData.serviceAddress?.lat && jobData.serviceAddress?.lng) {
@@ -90,8 +127,16 @@ export default function ArtisanDashboard() {
               jobData.serviceAddress.lat,
               jobData.serviceAddress.lng
             );
+            
+            // Filter by distance (20 miles = ~32 km)
+            if (dist > 32) {
+              return; // Skip jobs beyond 20 miles
+            }
+            
             distances[jobData.id] = dist;
           }
+          
+          jobsData.push(jobData);
         }
       });
       setAvailableJobs(jobsData.slice(0, 5));
@@ -205,8 +250,18 @@ export default function ArtisanDashboard() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
       <View style={styles.header}>
-        <Text style={styles.greeting}>Welcome back!</Text>
+        <Text style={styles.greeting}>
+          Welcome {userName ? userName.split(' ')[0] : 'back'}!
+        </Text>
         <Text style={styles.subtitle}>Manage your jobs and earnings</Text>
+        {artisanAverageRating !== null && (
+          <View style={styles.ratingContainer}>
+            <Text style={styles.ratingLabel}>Your Rating:</Text>
+            <Text style={styles.ratingValue}>
+              {'⭐'.repeat(Math.round(artisanAverageRating))} {artisanAverageRating.toFixed(1)}
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.card}>
@@ -317,6 +372,8 @@ export default function ArtisanDashboard() {
           ))
         )}
       </View>
+
+      <SupportChat role="Phixer" />
     </ScrollView>
   );
 }
@@ -499,6 +556,25 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
     color: '#2563EB',
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#FEF3C7',
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  ratingLabel: {
+    fontSize: 12,
+    color: '#92400E',
+    marginRight: 6,
+  },
+  ratingValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#92400E',
   },
 });
 

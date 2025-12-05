@@ -30,7 +30,7 @@ export default function RequestServiceScreen() {
     scheduledAt: '',
   });
   const [useCurrentLocation, setUseCurrentLocation] = useState(true);
-  const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null);
+  const [location, setLocation] = useState<{ lat: number; lng: number; address: string; state?: string } | null>(null);
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [locationLoading, setLocationLoading] = useState(false);
@@ -82,11 +82,13 @@ export default function RequestServiceScreen() {
       const currentLocation = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = currentLocation.coords;
 
-      // Reverse geocode to get address
+      // Reverse geocode to get address and state
       const geocode = await Location.reverseGeocodeAsync({ latitude, longitude });
-      const address = geocode[0]?.formattedAddress || `${latitude}, ${longitude}`;
+      const firstResult = geocode[0];
+      const address = firstResult?.formattedAddress || `${latitude}, ${longitude}`;
+      const state = firstResult?.region || firstResult?.administrativeArea || null;
 
-      setLocation({ lat: latitude, lng: longitude, address });
+      setLocation({ lat: latitude, lng: longitude, address, state: state || undefined });
     } catch (error) {
       console.error('Location error:', error);
       Alert.alert('Error', 'Failed to get location. Please try again.');
@@ -162,6 +164,10 @@ export default function RequestServiceScreen() {
             state: profile?.state || '',
           };
 
+      const serviceState = useCurrentLocation && location?.state
+        ? location.state
+        : profile?.state || null;
+
       await setDoc(jobRef, {
         clientId: currentUser.uid,
         clientName: profile?.name || currentUser.displayName || currentUser.email,
@@ -172,6 +178,7 @@ export default function RequestServiceScreen() {
         serviceCategory: formData.serviceCategory,
         scheduledAt: formData.scheduledAt ? new Date(formData.scheduledAt) : null,
         serviceAddress,
+        serviceState,
         serviceCoordinates: location
           ? { lat: location.lat, lng: location.lng }
           : null,

@@ -40,7 +40,8 @@ export default function LoginScreen() {
       const role = profile?.role || 'client';
 
       // Navigate based on role
-      if (role === 'admin') {
+      // Check for admin roles (full_admin, manager, billing_finance)
+      if (role === 'admin' || role === 'full_admin' || role === 'manager' || role === 'billing_finance') {
         router.replace('/(tabs)/admin');
       } else if (role === 'Phixer' || role === 'phixer' || role === 'artisan') {
         router.replace('/(tabs)/phixer');

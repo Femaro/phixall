@@ -198,12 +198,13 @@ export function SupportChat({ role }: SupportChatProps) {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Top Right Sticky Button */}
       <TouchableOpacity
-        style={styles.floatingButton}
+        style={styles.stickyButton}
         onPress={() => setOpen(true)}
+        activeOpacity={0.8}
       >
-        <Text style={styles.floatingButtonText}>💬</Text>
+        <Text style={styles.stickyButtonText}>◉</Text>
         {sessionStatus === 'pending-agent' && (
           <View style={styles.badge} />
         )}
@@ -316,25 +317,26 @@ export function SupportChat({ role }: SupportChatProps) {
 }
 
 const styles = StyleSheet.create({
-  floatingButton: {
+  stickyButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    top: 50,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#2563EB',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
     zIndex: 1000,
   },
-  floatingButtonText: {
-    fontSize: 24,
+  stickyButtonText: {
+    fontSize: 20,
+    color: '#fff',
   },
   badge: {
     position: 'absolute',

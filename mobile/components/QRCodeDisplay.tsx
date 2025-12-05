@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import QRCode from 'react-qr-code';
+import QRCode from 'react-native-qrcode-svg';
 import CryptoJS from 'crypto-js';
 
 // Mobile-specific QR code generation (doesn't use shared lib to avoid path issues)
@@ -79,9 +79,8 @@ export function QRCodeDisplay({ jobId, phixerId, onRefresh }: QRCodeDisplayProps
         <QRCode
           value={qrData}
           size={250}
-          style={styles.qrCode}
-          bgColor="#FFFFFF"
-          fgColor="#000000"
+          backgroundColor="#FFFFFF"
+          color="#000000"
         />
       </View>
 
@@ -130,10 +129,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E5E7EB',
     marginBottom: 16,
-  },
-  qrCode: {
-    height: 250,
-    width: 250,
   },
   infoContainer: {
     marginTop: 16,

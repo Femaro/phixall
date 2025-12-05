@@ -34,6 +34,7 @@ import * as Location from 'expo-location';
 import { calculateDistance, formatDistance } from '@/utils/distance';
 import { SupportChat } from '@/components/SupportChat';
 import { RatingForm } from '@/components/RatingForm';
+import { MenuDrawer } from '@/components/MenuDrawer';
 
 type PhixerTab = 'overview' | 'available' | 'my-jobs' | 'wallet' | 'profile' | 'settings';
 
@@ -110,6 +111,7 @@ export default function ArtisanDashboard() {
   const router = useRouter();
   const { user } = useAuthState();
   const [activeTab, setActiveTab] = useState<PhixerTab>('overview');
+  const [drawerVisible, setDrawerVisible] = useState(false);
   const [availableJobs, setAvailableJobs] = useState<Job[]>([]);
   const [myJobs, setMyJobs] = useState<Job[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -1542,38 +1544,67 @@ export default function ArtisanDashboard() {
     }
   };
 
+  // Main tabs shown in header (most important)
+  const mainTabs = tabConfig.slice(0, 3); // Overview, Available, My Jobs
+  // Secondary tabs in drawer
+  const drawerTabs = tabConfig.slice(3); // Wallet, Profile, Settings
+
+  const menuItems = drawerTabs.map(tab => ({
+    id: tab.id,
+    label: tab.label,
+    icon: tab.icon,
+    badge: tab.badge,
+    onPress: () => setActiveTab(tab.id),
+  }));
+
   return (
     <View style={styles.container}>
-      {/* Tab Navigation */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabBar}
-        contentContainerStyle={styles.tabBarContent}
-      >
-        {tabConfig.map((tab) => (
-          <TouchableOpacity
-            key={tab.id}
-            style={[styles.tab, activeTab === tab.id && styles.tabActive]}
-            onPress={() => setActiveTab(tab.id)}
-          >
-            <Text style={[styles.tabIcon, activeTab === tab.id && styles.tabIconActive]}>
-              {tab.icon}
-            </Text>
-            <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
-              {tab.label}
-            </Text>
-            {tab.badge !== undefined && tab.badge > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{tab.badge}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+      {/* Header with Hamburger and Main Tabs */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity
+          style={styles.hamburgerButton}
+          onPress={() => setDrawerVisible(true)}
+        >
+          <Text style={styles.hamburgerIcon}>☰</Text>
+        </TouchableOpacity>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.mainTabBar}
+          contentContainerStyle={styles.mainTabBarContent}
+        >
+          {mainTabs.map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              style={[styles.mainTab, activeTab === tab.id && styles.mainTabActive]}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Text style={[styles.mainTabIcon, activeTab === tab.id && styles.mainTabIconActive]}>
+                {tab.icon}
+              </Text>
+              <Text style={[styles.mainTabLabel, activeTab === tab.id && styles.mainTabLabelActive]}>
+                {tab.label}
+              </Text>
+              {tab.badge !== undefined && tab.badge > 0 && (
+                <View style={styles.headerBadge}>
+                  <Text style={styles.headerBadgeText}>{tab.badge}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
       {/* Tab Content */}
       {renderTabContent()}
+
+      {/* Menu Drawer */}
+      <MenuDrawer
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+        items={menuItems}
+        activeItemId={activeTab}
+      />
 
       {/* Rating Form Modal */}
       {ratingJobId && user && (
@@ -1587,7 +1618,7 @@ export default function ArtisanDashboard() {
           userId={user.uid}
           userRole="Phixer"
           targetRole="client"
-          targetName={myJobs.find((j) => j.id === ratingJobId)?.clientName}
+          targetName={myJobs.find((j) => j.id === ratingJobId)?.clientName || 'Client'}
         />
       )}
 
@@ -1613,45 +1644,62 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
   },
-  tabBar: {
+  headerContainer: {
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
-    maxHeight: 70,
-  },
-  tabBarContent: {
-    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 8,
+    paddingHorizontal: 4,
   },
-  tab: {
+  hamburgerButton: {
+    padding: 12,
+    marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hamburgerIcon: {
+    fontSize: 24,
+    color: '#111827',
+  },
+  mainTabBar: {
+    flex: 1,
+  },
+  mainTabBarContent: {
+    paddingHorizontal: 4,
+    alignItems: 'center',
+  },
+  mainTab: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     marginHorizontal: 4,
     borderRadius: 8,
     alignItems: 'center',
     minWidth: 80,
     position: 'relative',
   },
-  tabActive: {
+  mainTabActive: {
     backgroundColor: '#EFF6FF',
   },
-  tabIcon: {
+  mainTabIcon: {
     fontSize: 20,
     marginBottom: 4,
+    color: '#6B7280',
   },
-  tabIconActive: {
-    opacity: 1,
+  mainTabIconActive: {
+    color: '#2563EB',
   },
-  tabLabel: {
+  mainTabLabel: {
     fontSize: 11,
     color: '#6B7280',
     fontWeight: '500',
   },
-  tabLabelActive: {
+  mainTabLabelActive: {
     color: '#2563EB',
     fontWeight: '600',
   },
-  badge: {
+  headerBadge: {
     position: 'absolute',
     top: 4,
     right: 4,
@@ -1663,7 +1711,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 4,
   },
-  badgeText: {
+  headerBadgeText: {
     color: '#fff',
     fontSize: 10,
     fontWeight: 'bold',

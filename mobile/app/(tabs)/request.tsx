@@ -17,6 +17,7 @@ import { useAuthState } from '@/hooks/useAuthState';
 import { doc, collection, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirebase } from '@/config/firebase';
+import { CategoryPicker } from '@/components/CategoryPicker';
 
 export default function RequestServiceScreen() {
   const router = useRouter();
@@ -249,27 +250,12 @@ export default function RequestServiceScreen() {
       <View style={styles.form}>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Service Category *</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {categories.map((cat) => (
-              <TouchableOpacity
-                key={cat.value}
-                style={[
-                  styles.categoryButton,
-                  formData.serviceCategory === cat.value && styles.categoryButtonActive,
-                ]}
-                onPress={() => setFormData({ ...formData, serviceCategory: cat.value })}
-              >
-                <Text
-                  style={[
-                    styles.categoryText,
-                    formData.serviceCategory === cat.value && styles.categoryTextActive,
-                  ]}
-                >
-                  {cat.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <CategoryPicker
+            categories={categories}
+            selectedValue={formData.serviceCategory}
+            onValueChange={(value) => setFormData({ ...formData, serviceCategory: value })}
+            placeholder="Select a service category"
+          />
         </View>
 
         <View style={styles.inputContainer}>

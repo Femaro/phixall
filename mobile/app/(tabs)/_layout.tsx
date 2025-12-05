@@ -231,9 +231,15 @@ export default function TabsLayout() {
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>○</Text>,
         }}
       />
-      {/* Hide artisan/admin only tabs */}
+      {/* Hide artisan/admin/phixer only tabs */}
       <Tabs.Screen
         name="artisan"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="phixer"
         options={{
           href: null,
         }}

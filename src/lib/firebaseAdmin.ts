@@ -40,6 +40,7 @@ export function getFirebaseAdmin() {
   return {
     storage: app.storage(),
     firestore: app.firestore(),
+    auth: app.auth(),
   };
 }
 

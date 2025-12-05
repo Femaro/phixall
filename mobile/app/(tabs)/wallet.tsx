@@ -102,13 +102,13 @@ export default function WalletScreen() {
   const getTransactionIcon = (type: string) => {
     switch (type) {
       case 'deposit':
-        return '📥';
+        return '↓';
       case 'payment':
-        return '📤';
+        return '→';
       case 'refund':
         return '↩️';
       default:
-        return '💰';
+        return '$';
     }
   };
 

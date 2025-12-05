@@ -121,7 +121,7 @@ export default function RegisterScreen() {
             ]}
             onPress={() => setFormData({ ...formData, role: 'artisan' })}
           >
-            <Text style={styles.roleIcon}>🔧</Text>
+            <Text style={styles.roleIcon}>⚙</Text>
             <Text
               style={[
                 styles.roleText,

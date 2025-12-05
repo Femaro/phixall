@@ -214,22 +214,22 @@ export default function JobsScreen() {
 
   const getCategoryIcon = (category?: string) => {
     const icons: Record<string, string> = {
-      plumbing: '🔧',
+      plumbing: '⚙',
       electrical: '⚡',
-      hvac: '❄️',
-      appliance: '🔨',
-      painting: '🎨',
-      carpentry: '🚪',
-      cleaning: '🧹',
+      hvac: '❄',
+      appliance: '⚙',
+      painting: '◉',
+      carpentry: '☰',
+      cleaning: '○',
     };
-    return icons[category || ''] || '📦';
+    return icons[category || ''] || '☰';
   };
 
   if (jobs.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <Text style={styles.emptyIcon}>☰</Text>
           <Text style={styles.emptyTitle}>No jobs found</Text>
           <Text style={styles.emptyText}>Request your first service to get started</Text>
           <TouchableOpacity

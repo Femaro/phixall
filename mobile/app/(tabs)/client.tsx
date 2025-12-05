@@ -135,7 +135,7 @@ export default function ClientDashboard() {
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingLabel}>Your Rating:</Text>
             <Text style={styles.ratingValue}>
-              {'⭐'.repeat(Math.round(clientAverageRating))} {clientAverageRating.toFixed(1)}
+              {'★'.repeat(Math.round(clientAverageRating))} {clientAverageRating.toFixed(1)}
             </Text>
           </View>
         )}
@@ -162,7 +162,7 @@ export default function ClientDashboard() {
 
         {jobs.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>📋</Text>
+            <Text style={styles.emptyIcon}>☰</Text>
             <Text style={styles.emptyText}>No jobs yet</Text>
             <TouchableOpacity
               style={styles.button}
@@ -217,7 +217,7 @@ export default function ClientDashboard() {
           style={[styles.button, styles.phixerButton]}
           onPress={() => router.push('/(auth)/onboarding')}
         >
-          <Text style={styles.phixerButtonText}>🔧 Become a Phixer</Text>
+          <Text style={styles.phixerButtonText}>⚙ Become a Phixer</Text>
         </TouchableOpacity>
       </View>
 

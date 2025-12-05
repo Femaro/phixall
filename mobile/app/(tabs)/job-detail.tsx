@@ -236,15 +236,15 @@ export default function JobDetailScreen() {
 
   const getCategoryIcon = (category?: string) => {
     const icons: Record<string, string> = {
-      plumbing: '🔧',
+      plumbing: '⚙',
       electrical: '⚡',
-      hvac: '❄️',
-      appliance: '🔨',
-      painting: '🎨',
-      carpentry: '🚪',
-      cleaning: '🧹',
+      hvac: '❄',
+      appliance: '⚙',
+      painting: '◉',
+      carpentry: '☰',
+      cleaning: '○',
     };
-    return icons[category || ''] || '📦';
+    return icons[category || ''] || '☰';
   };
 
   const statusColors = getStatusColor(job.status);
@@ -331,7 +331,7 @@ export default function JobDetailScreen() {
         {/* Material Recommendations - Only for Phixers */}
         {isArtisan && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📦 Material Recommendations</Text>
+            <Text style={styles.sectionTitle}>☰ Material Recommendations</Text>
             {loadingMaterials ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="small" color="#2563EB" />
@@ -536,7 +536,7 @@ export default function JobDetailScreen() {
             <Text style={styles.sectionTitle}>Phixer Review</Text>
             <View style={styles.reviewContainer}>
               <Text style={styles.reviewRating}>
-                {'⭐'.repeat(job.artisanReview.rating || 0)}
+                {'★'.repeat(job.artisanReview.rating || 0)}
               </Text>
               {job.artisanReview.feedback && (
                 <Text style={styles.reviewFeedback}>{job.artisanReview.feedback}</Text>
@@ -556,7 +556,7 @@ export default function JobDetailScreen() {
                   setShowRatingForm(true);
                 }}
               >
-                <Text style={styles.ratingButtonText}>⭐ Rate Phixer</Text>
+                <Text style={styles.ratingButtonText}>★ Rate Phixer</Text>
               </TouchableOpacity>
             )}
             {(isArtisan || userRole === 'Phixer') && !job.artisanReview && (
@@ -567,7 +567,7 @@ export default function JobDetailScreen() {
                   setShowRatingForm(true);
                 }}
               >
-                <Text style={styles.ratingButtonText}>⭐ Rate Client</Text>
+                <Text style={styles.ratingButtonText}>★ Rate Client</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -614,7 +614,7 @@ export default function JobDetailScreen() {
               style={[styles.actionButton, styles.primaryButton]}
               onPress={() => setShowQRCode(true)}
             >
-              <Text style={styles.actionButtonText}>📱 Show Verification QR Code</Text>
+              <Text style={styles.actionButtonText}>◉ Show Verification QR Code</Text>
             </TouchableOpacity>
           )}
 

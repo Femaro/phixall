@@ -813,15 +813,15 @@ export default function ArtisanDashboard() {
 
   const getCategoryIcon = (category?: string) => {
     const icons: Record<string, string> = {
-      plumbing: '🔧',
+      plumbing: '⚙',
       electrical: '⚡',
-      hvac: '❄️',
-      appliance: '🔨',
-      painting: '🎨',
-      carpentry: '🚪',
-      cleaning: '🧹',
+      hvac: '❄',
+      appliance: '⚙',
+      painting: '◉',
+      carpentry: '☰',
+      cleaning: '○',
     };
-    return icons[category || ''] || '📦';
+    return icons[category || ''] || '☰';
   };
 
   const formatDate = (timestamp: any) => {
@@ -858,12 +858,12 @@ export default function ArtisanDashboard() {
   );
 
   const tabConfig: Array<{ id: PhixerTab; label: string; icon: string; badge?: number }> = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'available', label: 'Available', icon: '🔔', badge: availableJobs.length },
-    { id: 'my-jobs', label: 'My Jobs', icon: '💼', badge: myJobs.length },
-    { id: 'wallet', label: 'Wallet', icon: '💰' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'overview', label: 'Overview', icon: '≡' },
+    { id: 'available', label: 'Available', icon: '◉', badge: availableJobs.length },
+    { id: 'my-jobs', label: 'My Jobs', icon: '☰', badge: myJobs.length },
+    { id: 'wallet', label: 'Wallet', icon: '$' },
+    { id: 'profile', label: 'Profile', icon: '○' },
+    { id: 'settings', label: 'Settings', icon: '⚙' },
   ];
 
   if (loading) {
@@ -893,12 +893,12 @@ export default function ArtisanDashboard() {
       {/* Stats Cards */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
-          <Text style={styles.statIcon}>💰</Text>
+          <Text style={styles.statIcon}>$</Text>
           <Text style={styles.statValue}>₦{wallet.balance.toLocaleString()}</Text>
           <Text style={styles.statLabel}>Balance</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statIcon}>🔄</Text>
+          <Text style={styles.statIcon}>◉</Text>
           <Text style={styles.statValue}>{stats.active}</Text>
           <Text style={styles.statLabel}>Active</Text>
         </View>
@@ -938,7 +938,7 @@ export default function ArtisanDashboard() {
                 setShowRatingForm(true);
               }}
             >
-              <Text style={styles.ratingButtonText}>⭐ Rate {job.clientName || 'Client'}</Text>
+              <Text style={styles.ratingButtonText}>★ Rate {job.clientName || 'Client'}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -954,7 +954,7 @@ export default function ArtisanDashboard() {
         </View>
         {myJobs.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>💼</Text>
+            <Text style={styles.emptyIcon}>☰</Text>
             <Text style={styles.emptyText}>No jobs yet</Text>
             <TouchableOpacity
               style={styles.button}
@@ -997,7 +997,7 @@ export default function ArtisanDashboard() {
           style={styles.quickActionCard}
           onPress={() => setActiveTab('available')}
         >
-          <Text style={styles.quickActionIcon}>🔔</Text>
+          <Text style={styles.quickActionIcon}>◉</Text>
           <Text style={styles.quickActionText}>Available Jobs</Text>
           <Text style={styles.quickActionSubtext}>{availableJobs.length} jobs</Text>
         </TouchableOpacity>
@@ -1005,7 +1005,7 @@ export default function ArtisanDashboard() {
           style={styles.quickActionCard}
           onPress={() => setActiveTab('wallet')}
         >
-          <Text style={styles.quickActionIcon}>💰</Text>
+          <Text style={styles.quickActionIcon}>$</Text>
           <Text style={styles.quickActionText}>Cash Out</Text>
           <Text style={styles.quickActionSubtext}>Withdraw earnings</Text>
         </TouchableOpacity>
@@ -1050,7 +1050,7 @@ export default function ArtisanDashboard() {
 
       {availableJobs.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>📍</Text>
+          <Text style={styles.emptyIcon}>○</Text>
           <Text style={styles.emptyText}>No jobs nearby</Text>
           <Text style={styles.emptySubtext}>
             Try refreshing your location or updating your state in Profile
@@ -1106,8 +1106,8 @@ export default function ArtisanDashboard() {
 
       {myJobs.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>💼</Text>
-          <Text style={styles.emptyText}>No jobs yet</Text>
+            <Text style={styles.emptyIcon}>☰</Text>
+            <Text style={styles.emptyText}>No jobs yet</Text>
           <TouchableOpacity
             style={styles.button}
             onPress={() => setActiveTab('available')}
@@ -1159,7 +1159,7 @@ export default function ArtisanDashboard() {
                     setShowRatingForm(true);
                   }}
                 >
-                  <Text style={styles.ratingButtonText}>⭐ Rate Client</Text>
+                  <Text style={styles.ratingButtonText}>★ Rate Client</Text>
                 </TouchableOpacity>
               )}
             </TouchableOpacity>
@@ -1179,17 +1179,17 @@ export default function ArtisanDashboard() {
       {/* Wallet Stats */}
       <View style={styles.walletStats}>
         <View style={styles.walletStatCard}>
-          <Text style={styles.walletStatIcon}>💰</Text>
+          <Text style={styles.walletStatIcon}>$</Text>
           <Text style={styles.walletStatValue}>₦{wallet.balance.toLocaleString()}</Text>
           <Text style={styles.walletStatLabel}>Available Balance</Text>
         </View>
         <View style={styles.walletStatCard}>
-          <Text style={styles.walletStatIcon}>📈</Text>
+          <Text style={styles.walletStatIcon}>↑</Text>
           <Text style={styles.walletStatValue}>₦{wallet.totalEarnings.toLocaleString()}</Text>
           <Text style={styles.walletStatLabel}>Total Earnings</Text>
         </View>
         <View style={styles.walletStatCard}>
-          <Text style={styles.walletStatIcon}>📤</Text>
+          <Text style={styles.walletStatIcon}>→</Text>
           <Text style={styles.walletStatValue}>₦{wallet.totalCashout.toLocaleString()}</Text>
           <Text style={styles.walletStatLabel}>Total Cashout</Text>
         </View>
@@ -1278,7 +1278,7 @@ export default function ArtisanDashboard() {
         <Text style={styles.sectionTitle}>Transaction History</Text>
         {transactions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>📜</Text>
+            <Text style={styles.emptyIcon}>☰</Text>
             <Text style={styles.emptyText}>No transactions yet</Text>
           </View>
         ) : (
@@ -1287,7 +1287,7 @@ export default function ArtisanDashboard() {
               <View style={styles.transactionHeader}>
                 <View style={styles.transactionIcon}>
                   <Text style={styles.transactionIconText}>
-                    {transaction.type === 'earning' ? '💵' : transaction.type === 'cashout' ? '📤' : '💸'}
+                    {transaction.type === 'earning' ? '+' : transaction.type === 'cashout' ? '→' : '-'}
                   </Text>
                 </View>
                 <View style={styles.transactionInfo}>

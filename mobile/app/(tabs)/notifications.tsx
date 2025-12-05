@@ -89,13 +89,13 @@ export default function NotificationsScreen() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'completion-submitted':
-        return '📤';
+        return '→';
       case 'completion-approved':
-        return '✅';
+        return '✓';
       case 'completion-rejected':
-        return '❌';
+        return '✗';
       default:
-        return '🔔';
+        return '◉';
     }
   };
 
@@ -125,7 +125,7 @@ export default function NotificationsScreen() {
 
       {notifications.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>🔔</Text>
+          <Text style={styles.emptyIcon}>◉</Text>
           <Text style={styles.emptyText}>No notifications</Text>
         </View>
       ) : (

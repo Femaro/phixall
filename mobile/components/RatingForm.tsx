@@ -149,7 +149,7 @@ export function RatingForm({
                   style={styles.starButton}
                 >
                   <Text style={[styles.star, star <= rating && styles.starActive]}>
-                    ⭐
+                    ★
                   </Text>
                 </TouchableOpacity>
               ))}

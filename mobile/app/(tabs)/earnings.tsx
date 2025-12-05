@@ -160,7 +160,7 @@ export default function EarningsScreen() {
             <View key={transaction.id} style={styles.transactionCard}>
               <View style={styles.transactionHeader}>
                 <View style={styles.transactionIcon}>
-                  <Text style={styles.transactionIconText}>💰</Text>
+                  <Text style={styles.transactionIconText}>$</Text>
                 </View>
                 <View style={styles.transactionInfo}>
                   <Text style={styles.transactionDescription}>

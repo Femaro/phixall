@@ -201,14 +201,14 @@ export default function RequestServiceScreen() {
   };
 
   const categories = [
-    { value: 'plumbing', label: '🔧 Plumbing & Leak Repair' },
+    { value: 'plumbing', label: '⚙ Plumbing & Leak Repair' },
     { value: 'electrical', label: '⚡ Electrical & Lighting' },
-    { value: 'hvac', label: '❄️ HVAC & Ventilation' },
-    { value: 'appliance', label: '🔨 Appliance Installation' },
-    { value: 'painting', label: '🎨 Painting & Drywall' },
-    { value: 'carpentry', label: '🚪 Carpentry & Doors' },
-    { value: 'cleaning', label: '🧹 Cleaning Services' },
-    { value: 'other', label: '📦 Other' },
+    { value: 'hvac', label: '❄ HVAC & Ventilation' },
+    { value: 'appliance', label: '⚙ Appliance Installation' },
+    { value: 'painting', label: '◉ Painting & Drywall' },
+    { value: 'carpentry', label: '☰ Carpentry & Doors' },
+    { value: 'cleaning', label: '○ Cleaning Services' },
+    { value: 'other', label: '☰ Other' },
   ];
 
   // Prevent artisans from accessing request screen

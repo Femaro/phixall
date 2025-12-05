@@ -95,7 +95,7 @@ export default function TabsLayout() {
           name="phixer"
           options={{
             title: 'Dashboard',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📊</Text>,
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>≡</Text>,
           }}
         />
         {/* Hide legacy artisan tab */}
@@ -109,28 +109,28 @@ export default function TabsLayout() {
           name="jobs"
           options={{
             title: 'Jobs',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📋</Text>,
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>☰</Text>,
           }}
         />
         <Tabs.Screen
           name="earnings"
           options={{
             title: 'Earnings',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>💰</Text>,
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>$</Text>,
           }}
         />
         <Tabs.Screen
           name="notifications"
           options={{
             title: 'Notifications',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🔔</Text>,
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>◉</Text>,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>👤</Text>,
+            tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>○</Text>,
           }}
         />
         {/* Hide client/admin only tabs */}
@@ -200,35 +200,35 @@ export default function TabsLayout() {
         name="client"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>🏠</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>⌂</Text>,
         }}
       />
       <Tabs.Screen
         name="request"
         options={{
           title: 'Request',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>➕</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>+</Text>,
         }}
       />
       <Tabs.Screen
         name="jobs"
         options={{
           title: 'Jobs',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📋</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>☰</Text>,
         }}
       />
       <Tabs.Screen
         name="wallet"
         options={{
           title: 'Wallet',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>💰</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>$</Text>,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>👤</Text>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20, color }}>○</Text>,
         }}
       />
       {/* Hide artisan/admin only tabs */}

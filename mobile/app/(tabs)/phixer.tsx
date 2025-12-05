@@ -878,27 +878,38 @@ export default function ArtisanDashboard() {
   }
 
   const renderOverview = () => (
-    <ScrollView style={styles.tabContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Welcome {userName ? userName.split(' ')[0] : 'back'}!</Text>
-        <Text style={styles.subtitle}>Manage your jobs and earnings</Text>
-        {artisanAverageRating !== null && artisanAverageRating !== undefined && (
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingLabel}>Your Rating:</Text>
-            <Text style={styles.ratingValue}>
-              {'★'.repeat(Math.round(artisanAverageRating || 0))} {(artisanAverageRating || 0).toFixed(1)}
-            </Text>
-          </View>
-        )}
+    <ScrollView 
+      style={styles.tabContent} 
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      showsVerticalScrollIndicator={false}
+    >
+      {/* Welcome Section */}
+      <View style={styles.welcomeSection}>
+        <View>
+          <Text style={styles.greeting}>
+            {userName ? `Hi, ${userName.split(' ')[0]}` : 'Welcome back'}
+          </Text>
+          {artisanAverageRating !== null && artisanAverageRating !== undefined && (
+            <View style={styles.ratingBadge}>
+              <Text style={styles.ratingText}>
+                {'★'.repeat(Math.round(artisanAverageRating || 0))} {(artisanAverageRating || 0).toFixed(1)}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Stats Cards */}
       <View style={styles.statsGrid}>
-        <View style={styles.statCard}>
+        <TouchableOpacity
+          style={styles.statCard}
+          onPress={() => setActiveTab('wallet')}
+          activeOpacity={0.8}
+        >
           <Text style={styles.statIcon}>$</Text>
           <Text style={styles.statValue}>₦{wallet.balance.toLocaleString()}</Text>
           <Text style={styles.statLabel}>Balance</Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.statCard}>
           <Text style={styles.statIcon}>◉</Text>
           <Text style={styles.statValue}>{stats.active}</Text>
@@ -911,16 +922,21 @@ export default function ArtisanDashboard() {
         </View>
       </View>
 
-      {/* Availability */}
+      {/* Availability Card */}
       <View style={styles.card}>
         <View style={styles.availabilityRow}>
-          <View>
+          <View style={styles.availabilityInfo}>
             <Text style={styles.cardTitle}>Availability</Text>
             <Text style={styles.cardSubtitle}>
               {available ? 'Available for jobs' : 'Not available'}
             </Text>
           </View>
-          <Switch value={available} onValueChange={toggleAvailability} />
+          <Switch 
+            value={available} 
+            onValueChange={toggleAvailability}
+            trackColor={{ false: '#374151', true: '#2563EB' }}
+            thumbColor="#FFFFFF"
+          />
         </View>
       </View>
 
@@ -939,6 +955,7 @@ export default function ArtisanDashboard() {
                 setRatingJobId(job.id);
                 setShowRatingForm(true);
               }}
+              activeOpacity={0.7}
             >
               <Text style={styles.ratingButtonText}>★ Rate {job.clientName || 'Client'}</Text>
             </TouchableOpacity>
@@ -946,23 +963,49 @@ export default function ArtisanDashboard() {
         </View>
       )}
 
-      {/* Recent Jobs */}
+      {/* Quick Actions */}
+      <View style={styles.quickActionsGrid}>
+        <TouchableOpacity
+          style={styles.quickActionCard}
+          onPress={() => setActiveTab('available')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.quickActionIcon}>◉</Text>
+          <Text style={styles.quickActionText}>Available Jobs</Text>
+          <Text style={styles.quickActionSubtext}>{availableJobs.length} jobs</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.quickActionCard}
+          onPress={() => setActiveTab('wallet')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.quickActionIcon}>$</Text>
+          <Text style={styles.quickActionText}>Cash Out</Text>
+          <Text style={styles.quickActionSubtext}>Withdraw earnings</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Recent Jobs Section */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Recent Jobs</Text>
-          <TouchableOpacity onPress={() => setActiveTab('my-jobs')}>
-            <Text style={styles.seeAll}>View All →</Text>
-          </TouchableOpacity>
+          {myJobs.length > 0 && (
+            <TouchableOpacity onPress={() => setActiveTab('my-jobs')}>
+              <Text style={styles.seeAll}>See all</Text>
+            </TouchableOpacity>
+          )}
         </View>
         {myJobs.length === 0 ? (
-          <View style={styles.emptyState}>
+          <View style={styles.emptyCard}>
             <Text style={styles.emptyIcon}>☰</Text>
-            <Text style={styles.emptyText}>No jobs yet</Text>
+            <Text style={styles.emptyTitle}>No jobs yet</Text>
+            <Text style={styles.emptyText}>Browse available jobs to get started</Text>
             <TouchableOpacity
-              style={styles.button}
+              style={styles.emptyButton}
               onPress={() => setActiveTab('available')}
+              activeOpacity={0.7}
             >
-              <Text style={styles.buttonText}>Browse Jobs</Text>
+              <Text style={styles.emptyButtonText}>Browse Jobs</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -971,11 +1014,16 @@ export default function ArtisanDashboard() {
               key={job.id}
               style={styles.jobCard}
               onPress={() => router.push(`/(tabs)/job-detail?id=${job.id}`)}
+              activeOpacity={0.7}
             >
-              <View style={styles.jobHeader}>
-                <Text style={styles.jobIcon}>{getCategoryIcon(job.serviceCategory)}</Text>
-                <View style={styles.jobInfo}>
-                  <Text style={styles.jobTitle}>{job.title}</Text>
+              <View style={styles.jobCardContent}>
+                <View style={styles.jobCardHeader}>
+                  <View style={styles.jobCardLeft}>
+                    <Text style={styles.jobTitle}>{job.title}</Text>
+                    {job.clientName && (
+                      <Text style={styles.jobClient}>Client: {job.clientName}</Text>
+                    )}
+                  </View>
                   <View
                     style={[
                       styles.statusBadge,
@@ -987,39 +1035,28 @@ export default function ArtisanDashboard() {
                     </Text>
                   </View>
                 </View>
+                <Text style={styles.jobDate}>{formatDate(job.createdAt)}</Text>
               </View>
             </TouchableOpacity>
           ))
         )}
       </View>
 
-      {/* Quick Actions */}
-      <View style={styles.quickActions}>
-        <TouchableOpacity
-          style={styles.quickActionCard}
-          onPress={() => setActiveTab('available')}
-        >
-          <Text style={styles.quickActionIcon}>◉</Text>
-          <Text style={styles.quickActionText}>Available Jobs</Text>
-          <Text style={styles.quickActionSubtext}>{availableJobs.length} jobs</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.quickActionCard}
-          onPress={() => setActiveTab('wallet')}
-        >
-          <Text style={styles.quickActionIcon}>$</Text>
-          <Text style={styles.quickActionText}>Cash Out</Text>
-          <Text style={styles.quickActionSubtext}>Withdraw earnings</Text>
-        </TouchableOpacity>
-      </View>
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 
   const renderAvailableJobs = () => (
-    <ScrollView style={styles.tabContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Available Jobs</Text>
-        <Text style={styles.subtitle}>Browse and accept job opportunities</Text>
+    <ScrollView 
+      style={styles.tabContent} 
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.welcomeSection}>
+        <View>
+          <Text style={styles.greeting}>Available Jobs</Text>
+          <Text style={styles.subtitle}>Browse and accept job opportunities</Text>
+        </View>
       </View>
 
       {/* Location Info */}
@@ -1051,51 +1088,56 @@ export default function ArtisanDashboard() {
       </View>
 
       {availableJobs.length === 0 ? (
-        <View style={styles.emptyState}>
+        <View style={styles.emptyCard}>
           <Text style={styles.emptyIcon}>○</Text>
-          <Text style={styles.emptyText}>No jobs nearby</Text>
-          <Text style={styles.emptySubtext}>
+          <Text style={styles.emptyTitle}>No jobs nearby</Text>
+          <Text style={styles.emptyText}>
             Try refreshing your location or updating your state in Profile
           </Text>
         </View>
       ) : (
-        availableJobs.map((job) => (
-          <View key={job.id} style={styles.jobCard}>
-            <View style={styles.jobHeader}>
-              <Text style={styles.jobIcon}>{getCategoryIcon(job.serviceCategory)}</Text>
-              <View style={styles.jobInfo}>
-                <Text style={styles.jobTitle}>{job.title}</Text>
-                {job.description && (
-                  <Text style={styles.jobDescription} numberOfLines={2}>
-                    {job.description}
-                  </Text>
-                )}
-                {job.serviceAddressText && (
-                  <Text style={styles.addressText} numberOfLines={1}>
-                    📍 {job.serviceAddressText}
-                  </Text>
-                )}
-                {jobDistances[job.id] !== undefined && (
-                  <View style={styles.distanceBadge}>
-                    <Text style={styles.distanceText}>
-                      📏 {formatDistance(jobDistances[job.id])} away
-                    </Text>
+        <View style={styles.section}>
+          {availableJobs.map((job) => (
+            <View key={job.id} style={styles.jobCard}>
+              <View style={styles.jobCardContent}>
+                <View style={styles.jobCardHeader}>
+                  <View style={styles.jobCardLeft}>
+                    <Text style={styles.jobTitle}>{job.title}</Text>
+                    {job.description && (
+                      <Text style={styles.jobDescription} numberOfLines={2}>
+                        {job.description}
+                      </Text>
+                    )}
+                    {job.serviceAddressText && (
+                      <Text style={styles.addressText} numberOfLines={1}>
+                        {job.serviceAddressText}
+                      </Text>
+                    )}
+                    {jobDistances[job.id] !== undefined && (
+                      <View style={styles.distanceBadge}>
+                        <Text style={styles.distanceText}>
+                          {formatDistance(jobDistances[job.id])} away
+                        </Text>
+                      </View>
+                    )}
+                    {job.clientName && (
+                      <Text style={styles.jobClient}>Client: {job.clientName}</Text>
+                    )}
                   </View>
-                )}
-                {job.clientName && (
-                  <Text style={styles.clientName}>Client: {job.clientName}</Text>
-                )}
+                </View>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={() => acceptJob(job.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.acceptButtonText}>Accept Job</Text>
+                </TouchableOpacity>
               </View>
             </View>
-            <TouchableOpacity
-              style={styles.acceptButton}
-              onPress={() => acceptJob(job.id)}
-            >
-              <Text style={styles.acceptButtonText}>Accept Job</Text>
-            </TouchableOpacity>
-          </View>
-        ))
+          ))}
+        </View>
       )}
+      <View style={styles.bottomSpacer} />
     </ScrollView>
   );
 
@@ -1172,10 +1214,16 @@ export default function ArtisanDashboard() {
   );
 
   const renderWallet = () => (
-    <ScrollView style={styles.tabContent} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>Wallet</Text>
-        <Text style={styles.subtitle}>Manage your earnings and cash out</Text>
+    <ScrollView 
+      style={styles.tabContent} 
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.welcomeSection}>
+        <View>
+          <Text style={styles.greeting}>Wallet</Text>
+          <Text style={styles.subtitle}>Manage your earnings and cash out</Text>
+        </View>
       </View>
 
       {/* Wallet Stats */}
@@ -1279,9 +1327,10 @@ export default function ArtisanDashboard() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Transaction History</Text>
         {transactions.length === 0 ? (
-          <View style={styles.emptyState}>
+          <View style={styles.emptyCard}>
             <Text style={styles.emptyIcon}>☰</Text>
-            <Text style={styles.emptyText}>No transactions yet</Text>
+            <Text style={styles.emptyTitle}>No transactions yet</Text>
+            <Text style={styles.emptyText}>Your transaction history will appear here</Text>
           </View>
         ) : (
           transactions.map((transaction) => (
@@ -1631,7 +1680,7 @@ export default function ArtisanDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#000000',
   },
   loadingContainer: {
     flex: 1,
@@ -1645,13 +1694,14 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   headerContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: '#1F2937',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 4,
+    paddingTop: 50,
   },
   hamburgerButton: {
     padding: 12,
@@ -1661,7 +1711,7 @@ const styles = StyleSheet.create({
   },
   hamburgerIcon: {
     fontSize: 24,
-    color: '#111827',
+    color: '#FFFFFF',
   },
   mainTabBar: {
     flex: 1,
@@ -1680,23 +1730,23 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   mainTabActive: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#1F2937',
   },
   mainTabIcon: {
     fontSize: 20,
     marginBottom: 4,
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
   mainTabIconActive: {
-    color: '#2563EB',
+    color: '#FFFFFF',
   },
   mainTabLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: '#9CA3AF',
     fontWeight: '500',
   },
   mainTabLabelActive: {
-    color: '#2563EB',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   headerBadge: {
@@ -1718,84 +1768,87 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     flex: 1,
+    backgroundColor: '#000000',
+  },
+  welcomeSection: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   header: {
-    padding: 16,
+    paddingHorizontal: 16,
     paddingTop: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    paddingBottom: 16,
   },
   greeting: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: '600',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 8,
+  ratingBadge: {
+    backgroundColor: '#1F2937',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     alignSelf: 'flex-start',
   },
-  ratingLabel: {
+  ratingText: {
     fontSize: 12,
-    color: '#92400E',
-    marginRight: 6,
-  },
-  ratingValue: {
-    fontSize: 14,
+    color: '#FBBF24',
     fontWeight: '600',
-    color: '#92400E',
   },
   statsGrid: {
     flexDirection: 'row',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     gap: 12,
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   statIcon: {
     fontSize: 24,
+    color: '#111827',
     marginBottom: 8,
   },
   statValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#111827',
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
     color: '#6B7280',
+    fontWeight: '500',
   },
   card: {
-    margin: 16,
-    marginTop: 0,
+    marginHorizontal: 16,
+    marginBottom: 16,
     padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 4,
     elevation: 3,
   },
   cardTitle: {
@@ -1814,9 +1867,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  availabilityInfo: {
+    flex: 1,
+  },
   section: {
-    padding: 16,
-    paddingTop: 0,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -1825,29 +1881,44 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   seeAll: {
     fontSize: 14,
-    color: '#2563EB',
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: '500',
+    opacity: 0.7,
+  },
+  emptyCard: {
+    backgroundColor: '#1F2937',
+    borderRadius: 12,
+    padding: 32,
+    alignItems: 'center',
   },
   emptyState: {
     alignItems: 'center',
     padding: 40,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    margin: 16,
+    backgroundColor: '#1F2937',
+    borderRadius: 12,
+    marginHorizontal: 16,
   },
   emptyIcon: {
     fontSize: 48,
+    color: '#6B7280',
     marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 8,
   },
   emptyText: {
     fontSize: 16,
-    color: '#6B7280',
+    color: '#9CA3AF',
+    textAlign: 'center',
     marginBottom: 8,
     fontWeight: '500',
   },
@@ -1856,16 +1927,54 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
   },
+  emptyButton: {
+    backgroundColor: '#2563EB',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  emptyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   jobCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 2,
     elevation: 2,
+  },
+  jobCardContent: {
+    padding: 16,
+  },
+  jobCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  jobCardLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
+  jobTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  jobClient: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  jobDate: {
+    fontSize: 12,
+    color: '#9CA3AF',
   },
   jobHeader: {
     flexDirection: 'row',
@@ -1878,12 +1987,6 @@ const styles = StyleSheet.create({
   },
   jobInfo: {
     flex: 1,
-  },
-  jobTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
   },
   jobDescription: {
     fontSize: 14,
@@ -1982,15 +2085,27 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 12,
   },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 12,
+  },
   quickActionCard: {
     flex: 1,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   quickActionIcon: {
-    fontSize: 32,
+    fontSize: 28,
+    color: '#111827',
     marginBottom: 8,
   },
   quickActionText: {
@@ -1998,11 +2113,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111827',
     marginBottom: 4,
+    textAlign: 'center',
   },
   quickActionSubtext: {
     fontSize: 12,
     color: '#6B7280',
     textAlign: 'center',
+  },
+  bottomSpacer: {
+    height: 20,
   },
   locationActions: {
     flexDirection: 'row',

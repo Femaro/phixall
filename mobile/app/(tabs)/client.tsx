@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  TextInput,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthState } from '@/hooks/useAuthState';
@@ -122,165 +123,267 @@ export default function ClientDashboard() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-    >
-      <View style={styles.header}>
-        <Text style={styles.greeting}>
-          Welcome {userName ? userName.split(' ')[0] : 'back'}!
-        </Text>
-        <Text style={styles.subtitle}>Manage your facility services</Text>
-        {clientAverageRating !== null && (
-          <View style={styles.ratingContainer}>
-            <Text style={styles.ratingLabel}>Your Rating:</Text>
-            <Text style={styles.ratingValue}>
-              {'★'.repeat(Math.round(clientAverageRating))} {clientAverageRating.toFixed(1)}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Wallet Balance</Text>
-        <Text style={styles.balance}>₦{wallet.balance.toLocaleString()}</Text>
+    <View style={styles.container}>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
         <TouchableOpacity
-          style={styles.button}
-          onPress={() => router.push('/(tabs)/wallet')}
+          style={styles.searchBar}
+          onPress={() => router.push('/(tabs)/request')}
+          activeOpacity={0.7}
         >
-          <Text style={styles.buttonText}>Manage Wallet</Text>
+          <Text style={styles.searchIcon}>☰</Text>
+          <Text style={styles.searchPlaceholder}>Request service</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Recent Jobs</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/jobs')}>
-            <Text style={styles.seeAll}>See All</Text>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Welcome Section */}
+        <View style={styles.welcomeSection}>
+          <Text style={styles.greeting}>
+            {userName ? `Hi, ${userName.split(' ')[0]}` : 'Welcome back'}
+          </Text>
+          {clientAverageRating !== null && (
+            <View style={styles.ratingBadge}>
+              <Text style={styles.ratingText}>
+                {'★'.repeat(Math.round(clientAverageRating))} {clientAverageRating.toFixed(1)}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Wallet Card */}
+        <TouchableOpacity
+          style={styles.walletCard}
+          onPress={() => router.push('/(tabs)/wallet')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.walletHeader}>
+            <Text style={styles.walletLabel}>Wallet Balance</Text>
+            <Text style={styles.walletArrow}>→</Text>
+          </View>
+          <Text style={styles.walletAmount}>₦{wallet.balance.toLocaleString()}</Text>
+        </TouchableOpacity>
+
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => router.push('/(tabs)/jobs')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.quickActionIcon}>☰</Text>
+            <Text style={styles.quickActionLabel}>My Jobs</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => router.push('/(tabs)/wallet')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.quickActionIcon}>$</Text>
+            <Text style={styles.quickActionLabel}>Wallet</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => router.push('/(auth)/onboarding')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.quickActionIcon}>⚙</Text>
+            <Text style={styles.quickActionLabel}>Become Phixer</Text>
           </TouchableOpacity>
         </View>
 
-        {jobs.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>☰</Text>
-            <Text style={styles.emptyText}>No jobs yet</Text>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => router.push('/(tabs)/request')}
-            >
-              <Text style={styles.buttonText}>Request Service</Text>
-            </TouchableOpacity>
+        {/* Recent Jobs Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Jobs</Text>
+            {jobs.length > 0 && (
+              <TouchableOpacity onPress={() => router.push('/(tabs)/jobs')}>
+                <Text style={styles.seeAll}>See all</Text>
+              </TouchableOpacity>
+            )}
           </View>
-        ) : (
-          jobs.slice(0, 5).map((job) => (
-            <TouchableOpacity
-              key={job.id}
-              style={styles.jobCard}
-              onPress={() => router.push(`/(tabs)/job-detail?id=${job.id}`)}
-            >
-              <View style={styles.jobHeader}>
-                <Text style={styles.jobTitle}>{job.title}</Text>
-                <View
-                  style={[
-                    styles.statusBadge,
-                    { backgroundColor: getStatusColor(job.status) + '20' },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.statusText,
-                      { color: getStatusColor(job.status) },
-                    ]}
-                  >
-                    {job.status}
-                  </Text>
+
+          {jobs.length === 0 ? (
+            <View style={styles.emptyCard}>
+              <Text style={styles.emptyIcon}>☰</Text>
+              <Text style={styles.emptyTitle}>No jobs yet</Text>
+              <Text style={styles.emptyText}>Request a service to get started</Text>
+            </View>
+          ) : (
+            jobs.slice(0, 5).map((job) => (
+              <TouchableOpacity
+                key={job.id}
+                style={styles.jobCard}
+                onPress={() => router.push(`/(tabs)/job-detail?id=${job.id}`)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.jobCardContent}>
+                  <View style={styles.jobCardHeader}>
+                    <View style={styles.jobCardLeft}>
+                      <Text style={styles.jobTitle}>{job.title}</Text>
+                      {job.artisanName && (
+                        <Text style={styles.jobPhixer}>Phixer: {job.artisanName}</Text>
+                      )}
+                    </View>
+                    <View
+                      style={[
+                        styles.statusBadge,
+                        { backgroundColor: getStatusColor(job.status) + '15' },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.statusText,
+                          { color: getStatusColor(job.status) },
+                        ]}
+                      >
+                        {job.status}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={styles.jobDate}>{formatDate(job.createdAt)}</Text>
                 </View>
-              </View>
-              {job.artisanName && (
-                <Text style={styles.artisanName}>Artisan: {job.artisanName}</Text>
-              )}
-              <Text style={styles.jobDate}>Created: {formatDate(job.createdAt)}</Text>
-            </TouchableOpacity>
-          ))
-        )}
-      </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
 
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.primaryButton]}
-          onPress={() => router.push('/(tabs)/request')}
-        >
-          <Text style={styles.primaryButtonText}>+ Request New Service</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, styles.phixerButton]}
-          onPress={() => router.push('/(auth)/onboarding')}
-        >
-          <Text style={styles.phixerButtonText}>⚙ Become a Phixer</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
 
       <SupportChat role="client" />
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: '#000000',
   },
-  header: {
-    padding: 24,
-    paddingTop: 60,
-    backgroundColor: '#fff',
+  searchContainer: {
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    backgroundColor: '#000000',
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  searchIcon: {
+    fontSize: 20,
+    color: '#6B7280',
+    marginRight: 12,
+  },
+  searchPlaceholder: {
+    flex: 1,
+    fontSize: 16,
+    color: '#9CA3AF',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  welcomeSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 20,
   },
   greeting: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 4,
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  card: {
-    margin: 16,
-    padding: 20,
-    backgroundColor: '#fff',
+  ratingBadge: {
+    backgroundColor: '#1F2937',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 16,
+  },
+  ratingText: {
+    fontSize: 12,
+    color: '#FBBF24',
+    fontWeight: '600',
+  },
+  walletCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 12,
+    padding: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 4,
     elevation: 3,
   },
-  cardTitle: {
+  walletHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  walletLabel: {
     fontSize: 14,
     color: '#6B7280',
+    fontWeight: '500',
+  },
+  walletArrow: {
+    fontSize: 18,
+    color: '#6B7280',
+  },
+  walletAmount: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    marginBottom: 24,
+    gap: 12,
+  },
+  quickActionCard: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  quickActionIcon: {
+    fontSize: 24,
+    color: '#111827',
     marginBottom: 8,
   },
-  balance: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: '#2563EB',
-    borderRadius: 12,
-    padding: 14,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  quickActionLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontWeight: '500',
+    textAlign: 'center',
   },
   section: {
-    padding: 16,
+    paddingHorizontal: 16,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -290,112 +393,86 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   seeAll: {
     fontSize: 14,
-    color: '#2563EB',
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontWeight: '500',
+    opacity: 0.7,
   },
-  emptyState: {
+  emptyCard: {
+    backgroundColor: '#1F2937',
+    borderRadius: 12,
+    padding: 32,
     alignItems: 'center',
-    padding: 40,
-    backgroundColor: '#fff',
-    borderRadius: 16,
   },
   emptyIcon: {
     fontSize: 48,
-    marginBottom: 16,
-  },
-  emptyText: {
-    fontSize: 16,
     color: '#6B7280',
     marginBottom: 16,
   },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
+  },
   jobCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 2,
     elevation: 2,
   },
-  jobHeader: {
+  jobCardContent: {
+    padding: 16,
+  },
+  jobCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 8,
   },
+  jobCardLeft: {
+    flex: 1,
+    marginRight: 12,
+  },
   jobTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    flex: 1,
+    marginBottom: 4,
+  },
+  jobPhixer: {
+    fontSize: 13,
+    color: '#6B7280',
   },
   statusBadge: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 8,
+    borderRadius: 8,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     textTransform: 'capitalize',
-  },
-  artisanName: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
   },
   jobDate: {
     fontSize: 12,
     color: '#9CA3AF',
   },
-  actionsContainer: {
-    padding: 16,
-    paddingTop: 0,
-    gap: 12,
-  },
-  primaryButton: {
-    margin: 0,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  phixerButton: {
-    backgroundColor: '#7C3AED',
-    margin: 0,
-  },
-  phixerButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    padding: 8,
-    backgroundColor: '#FEF3C7',
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-  },
-  ratingLabel: {
-    fontSize: 12,
-    color: '#92400E',
-    marginRight: 6,
-  },
-  ratingValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#92400E',
+  bottomSpacer: {
+    height: 20,
   },
 });
 

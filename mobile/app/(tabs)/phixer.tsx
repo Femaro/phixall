@@ -169,16 +169,31 @@ export default function ArtisanDashboard() {
   const MIN_CASHOUT = 1000;
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
-    const { db } = getFirebase();
+    let isMounted = true;
+
+    try {
+      const { db } = getFirebase();
+      if (!db) {
+        console.error('Firebase database not initialized');
+        setLoading(false);
+        return;
+      }
 
     // Load profile
     const loadProfile = async () => {
       try {
         const profileDoc = await getDoc(doc(db, 'profiles', user.uid));
+        if (!isMounted) return;
+        
         if (profileDoc.exists()) {
           const profileData = profileDoc.data() as Profile;
+          if (!isMounted) return;
+          
           setProfile(profileData);
           profileStateRef.current = profileData.state || null;
           setAvailable(profileData.available ?? false);
@@ -216,13 +231,18 @@ export default function ArtisanDashboard() {
             setArtisanLocation(profileData.coordinates);
           }
         } else {
+          if (!isMounted) return;
           const name = user.displayName || user.email?.split('@')[0] || 'User';
           setUserName(name);
+          setLoading(false);
         }
       } catch (error) {
         console.error('Error loading profile:', error);
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          const name = user.displayName || user.email?.split('@')[0] || 'User';
+          setUserName(name);
+          setLoading(false);
+        }
       }
     };
 
@@ -248,26 +268,41 @@ export default function ArtisanDashboard() {
 
     // Load wallet
     const walletRef = doc(db, 'wallets', user.uid);
-    const unsubscribeWallet = onDocSnapshot(walletRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
+    const unsubscribeWallet = onDocSnapshot(
+      walletRef,
+      (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          setWallet({
+            balance: data.balance || 0,
+            totalEarnings: data.totalEarnings || 0,
+            totalCashout: data.totalCashout || 0,
+            pendingBalance: data.pendingBalance || 0,
+          });
+        } else {
+          // Create wallet if it doesn't exist
+          setDoc(walletRef, {
+            balance: 0,
+            totalEarnings: 0,
+            totalCashout: 0,
+            pendingBalance: 0,
+            createdAt: serverTimestamp(),
+          }).catch((error) => {
+            console.error('Error creating wallet:', error);
+          });
+        }
+      },
+      (error) => {
+        console.error('Error loading wallet:', error);
+        // Set default wallet values on error
         setWallet({
-          balance: data.balance || 0,
-          totalEarnings: data.totalEarnings || 0,
-          totalCashout: data.totalCashout || 0,
-          pendingBalance: data.pendingBalance || 0,
-        });
-      } else {
-        // Create wallet if it doesn't exist
-        setDoc(walletRef, {
           balance: 0,
           totalEarnings: 0,
           totalCashout: 0,
           pendingBalance: 0,
-          createdAt: serverTimestamp(),
         });
       }
-    });
+    );
 
     // Load transactions
     const transactionsQuery = query(
@@ -275,13 +310,62 @@ export default function ArtisanDashboard() {
       where('userId', '==', user.uid),
       orderBy('createdAt', 'desc')
     );
-    const unsubscribeTransactions = onSnapshot(transactionsQuery, (snapshot) => {
-      const transactionsData: Transaction[] = [];
-      snapshot.forEach((doc) => {
-        transactionsData.push({ id: doc.id, ...doc.data() } as Transaction);
-      });
-      setTransactions(transactionsData);
-    });
+    const unsubscribeTransactions = onSnapshot(
+      transactionsQuery,
+      (snapshot) => {
+        if (!isMounted) return;
+        const transactionsData: Transaction[] = [];
+        snapshot.forEach((doc) => {
+          try {
+            transactionsData.push({ id: doc.id, ...doc.data() } as Transaction);
+          } catch (error) {
+            console.error('Error processing transaction:', error);
+          }
+        });
+        setTransactions(transactionsData);
+      },
+      (error) => {
+        console.error('Error loading transactions:', error);
+        // If index is missing, try query without orderBy
+        if (isMounted) {
+          if (error.code === 'failed-precondition') {
+            const simpleQuery = query(
+              collection(db, 'transactions'),
+              where('userId', '==', user.uid)
+            );
+            onSnapshot(
+              simpleQuery,
+              (snapshot) => {
+                if (!isMounted) return;
+                const transactionsData: Transaction[] = [];
+                snapshot.forEach((doc) => {
+                  try {
+                    transactionsData.push({ id: doc.id, ...doc.data() } as Transaction);
+                  } catch (err) {
+                    console.error('Error processing transaction:', err);
+                  }
+                });
+                // Sort manually
+                transactionsData.sort((a, b) => {
+                  const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
+                  const bTime = b.createdAt?.toDate?.()?.getTime() || 0;
+                  return bTime - aTime;
+                });
+                setTransactions(transactionsData);
+              },
+              (err) => {
+                console.error('Error loading transactions (fallback):', err);
+                if (isMounted) {
+                  setTransactions([]);
+                }
+              }
+            );
+          } else {
+            setTransactions([]);
+          }
+        }
+      }
+    );
 
     // Load available jobs
     const availableJobsQuery = query(
@@ -290,45 +374,103 @@ export default function ArtisanDashboard() {
       orderBy('createdAt', 'desc')
     );
 
-    const unsubscribeAvailable = onSnapshot(availableJobsQuery, (snapshot) => {
-      const jobsData: Job[] = [];
-      const distances: Record<string, number> = {};
+    const unsubscribeAvailable = onSnapshot(
+      availableJobsQuery,
+      (snapshot) => {
+        if (!isMounted) return;
+        const jobsData: Job[] = [];
+        const distances: Record<string, number> = {};
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (!data.phixerId && !data.artisanId) {
-          const jobData = { id: doc.id, ...data } as Job;
+        snapshot.forEach((doc) => {
+          try {
+            const data = doc.data();
+            if (!data.phixerId && !data.artisanId) {
+              const jobData = { id: doc.id, ...data } as Job;
 
-          // Filter by state (use profile state if available)
-          const artisanState = profileStateRef.current;
-          if (artisanState && jobData.serviceState) {
-            if (jobData.serviceState.toLowerCase().trim() !== artisanState.toLowerCase().trim()) {
-              return;
+              // Filter by state (use profile state if available)
+              const artisanState = profileStateRef.current;
+              if (artisanState && jobData.serviceState) {
+                if (jobData.serviceState.toLowerCase().trim() !== artisanState.toLowerCase().trim()) {
+                  return;
+                }
+              }
+
+              // Calculate and filter by distance
+              if (artisanLocation && jobData.serviceAddress?.lat && jobData.serviceAddress?.lng) {
+                try {
+                  const dist = calculateDistance(
+                    artisanLocation.lat,
+                    artisanLocation.lng,
+                    jobData.serviceAddress.lat,
+                    jobData.serviceAddress.lng
+                  );
+
+                  if (dist > 32) {
+                    return; // Skip jobs beyond 20 miles
+                  }
+
+                  distances[jobData.id] = dist;
+                } catch (distError) {
+                  console.error('Error calculating distance:', distError);
+                }
+              }
+
+              jobsData.push(jobData);
             }
+          } catch (error) {
+            console.error('Error processing job:', error);
           }
-
-          // Calculate and filter by distance
-          if (artisanLocation && jobData.serviceAddress?.lat && jobData.serviceAddress?.lng) {
-            const dist = calculateDistance(
-              artisanLocation.lat,
-              artisanLocation.lng,
-              jobData.serviceAddress.lat,
-              jobData.serviceAddress.lng
-            );
-
-            if (dist > 32) {
-              return; // Skip jobs beyond 20 miles
-            }
-
-            distances[jobData.id] = dist;
-          }
-
-          jobsData.push(jobData);
+        });
+        if (isMounted) {
+          setAvailableJobs(jobsData);
+          setJobDistances(distances);
         }
-      });
-      setAvailableJobs(jobsData);
-      setJobDistances(distances);
-    });
+      },
+      (error) => {
+        console.error('Error loading available jobs:', error);
+        // If index is missing, try query without orderBy
+        if (isMounted) {
+          if (error.code === 'failed-precondition') {
+            const simpleQuery = query(
+              collection(db, 'jobs'),
+              where('status', '==', 'requested')
+            );
+            onSnapshot(
+              simpleQuery,
+              (snapshot) => {
+                if (!isMounted) return;
+                const jobsData: Job[] = [];
+                snapshot.forEach((doc) => {
+                  try {
+                    const data = doc.data();
+                    if (!data.phixerId && !data.artisanId) {
+                      jobsData.push({ id: doc.id, ...data } as Job);
+                    }
+                  } catch (err) {
+                    console.error('Error processing job:', err);
+                  }
+                });
+                // Sort manually
+                jobsData.sort((a, b) => {
+                  const aTime = a.createdAt?.toDate?.()?.getTime() || 0;
+                  const bTime = b.createdAt?.toDate?.()?.getTime() || 0;
+                  return bTime - aTime;
+                });
+                setAvailableJobs(jobsData);
+              },
+              (err) => {
+                console.error('Error loading available jobs (fallback):', err);
+                if (isMounted) {
+                  setAvailableJobs([]);
+                }
+              }
+            );
+          } else {
+            setAvailableJobs([]);
+          }
+        }
+      }
+    );
 
     // Load my jobs
     const myJobsQuery = query(
@@ -357,29 +499,114 @@ export default function ArtisanDashboard() {
       setMyJobs(Array.from(uniqueMap.values()));
     };
 
-    const unsubscribeMyJobs = onSnapshot(myJobsQuery, (snapshot) => {
-      phixerJobsRef.current = [];
-      snapshot.forEach((doc) => {
-        phixerJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
-      });
-      mergeAndSetMyJobs();
-    });
+    const unsubscribeMyJobs = onSnapshot(
+      myJobsQuery,
+      (snapshot) => {
+        if (!isMounted) return;
+        phixerJobsRef.current = [];
+        snapshot.forEach((doc) => {
+          try {
+            phixerJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+          } catch (error) {
+            console.error('Error processing phixer job:', error);
+          }
+        });
+        if (isMounted) {
+          mergeAndSetMyJobs();
+        }
+      },
+      (error) => {
+        console.error('Error loading phixer jobs:', error);
+        // Try without orderBy if index is missing
+        if (isMounted && error.code === 'failed-precondition') {
+          const simpleQuery = query(
+            collection(db, 'jobs'),
+            where('phixerId', '==', user.uid)
+          );
+          onSnapshot(
+            simpleQuery,
+            (snapshot) => {
+              if (!isMounted) return;
+              phixerJobsRef.current = [];
+              snapshot.forEach((doc) => {
+                try {
+                  phixerJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+                } catch (err) {
+                  console.error('Error processing job:', err);
+                }
+              });
+              if (isMounted) {
+                mergeAndSetMyJobs();
+              }
+            },
+            (err) => {
+              console.error('Error loading phixer jobs (fallback):', err);
+            }
+          );
+        }
+      }
+    );
 
-    const unsubscribeLegacyJobs = onSnapshot(legacyJobsQuery, (snapshot) => {
-      artisanJobsRef.current = [];
-      snapshot.forEach((doc) => {
-        artisanJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
-      });
-      mergeAndSetMyJobs();
-    });
+    const unsubscribeLegacyJobs = onSnapshot(
+      legacyJobsQuery,
+      (snapshot) => {
+        if (!isMounted) return;
+        artisanJobsRef.current = [];
+        snapshot.forEach((doc) => {
+          try {
+            artisanJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+          } catch (error) {
+            console.error('Error processing artisan job:', error);
+          }
+        });
+        if (isMounted) {
+          mergeAndSetMyJobs();
+        }
+      },
+      (error) => {
+        console.error('Error loading artisan jobs:', error);
+        // Try without orderBy if index is missing
+        if (isMounted && error.code === 'failed-precondition') {
+          const simpleQuery = query(
+            collection(db, 'jobs'),
+            where('artisanId', '==', user.uid)
+          );
+          onSnapshot(
+            simpleQuery,
+            (snapshot) => {
+              if (!isMounted) return;
+              artisanJobsRef.current = [];
+              snapshot.forEach((doc) => {
+                try {
+                  artisanJobsRef.current.push({ id: doc.id, ...doc.data() } as Job);
+                } catch (err) {
+                  console.error('Error processing job:', err);
+                }
+              });
+              if (isMounted) {
+                mergeAndSetMyJobs();
+              }
+            },
+            (err) => {
+              console.error('Error loading artisan jobs (fallback):', err);
+            }
+          );
+        }
+      }
+    );
 
-    return () => {
-      unsubscribeWallet();
-      unsubscribeTransactions();
-      unsubscribeAvailable();
-      unsubscribeMyJobs();
-      unsubscribeLegacyJobs();
-    };
+      return () => {
+        isMounted = false;
+        unsubscribeWallet();
+        unsubscribeTransactions();
+        unsubscribeAvailable();
+        unsubscribeMyJobs();
+        unsubscribeLegacyJobs();
+      };
+    } catch (error) {
+      console.error('Error initializing phixer dashboard:', error);
+      setLoading(false);
+    }
   }, [user, artisanLocation]);
 
   const toggleAvailability = async () => {
@@ -653,11 +880,11 @@ export default function ArtisanDashboard() {
       <View style={styles.header}>
         <Text style={styles.greeting}>Welcome {userName ? userName.split(' ')[0] : 'back'}!</Text>
         <Text style={styles.subtitle}>Manage your jobs and earnings</Text>
-        {artisanAverageRating !== null && (
+        {artisanAverageRating !== null && artisanAverageRating !== undefined && (
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingLabel}>Your Rating:</Text>
             <Text style={styles.ratingValue}>
-              {'⭐'.repeat(Math.round(artisanAverageRating))} {artisanAverageRating.toFixed(1)}
+              {'⭐'.repeat(Math.round(artisanAverageRating || 0))} {(artisanAverageRating || 0).toFixed(1)}
             </Text>
           </View>
         )}

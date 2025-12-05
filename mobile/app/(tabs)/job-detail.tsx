@@ -522,7 +522,7 @@ export default function JobDetailScreen() {
             <Text style={styles.sectionTitle}>Client Review</Text>
             <View style={styles.reviewContainer}>
               <Text style={styles.reviewRating}>
-                {'⭐'.repeat(job.clientReview.rating || 0)}
+                {'★'.repeat(job.clientReview.rating || 0)}
               </Text>
               {job.clientReview.feedback && (
                 <Text style={styles.reviewFeedback}>{job.clientReview.feedback}</Text>

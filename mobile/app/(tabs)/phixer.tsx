@@ -884,7 +884,7 @@ export default function ArtisanDashboard() {
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingLabel}>Your Rating:</Text>
             <Text style={styles.ratingValue}>
-              {'⭐'.repeat(Math.round(artisanAverageRating || 0))} {(artisanAverageRating || 0).toFixed(1)}
+              {'★'.repeat(Math.round(artisanAverageRating || 0))} {(artisanAverageRating || 0).toFixed(1)}
             </Text>
           </View>
         )}

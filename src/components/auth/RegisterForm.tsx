@@ -2,7 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { getFirebase } from '@/lib/firebaseClient';
 import { validatePassword, getPasswordStrength, type PasswordValidation } from '@/lib/authUtils';
 
@@ -83,7 +83,7 @@ export default function RegisterForm({
         email: formData.email,
         role: formData.role,
         emailVerified: false,
-        createdAt: new Date().toISOString(),
+        createdAt: serverTimestamp(),
       });
 
       // Show verification message instead of redirecting

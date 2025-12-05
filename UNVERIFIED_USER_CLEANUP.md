@@ -1,214 +1,195 @@
 # Unverified User Cleanup System
 
-This system automatically deletes user accounts that register but don't verify their email within a specified period (default: 48 hours).
+This system automatically deletes user accounts that register but don't verify their email within a specified period.
+
+## Overview
+
+When users register on Phixall, they receive an email verification link. If they don't verify their email within the specified period (default: 7 days), their account and associated data are automatically deleted to keep the database clean.
 
 ## How It Works
 
-1. When a user registers, their profile is created with `emailVerified: false` and a `createdAt` timestamp
-2. A scheduled cron job runs every 6 hours to check for unverified users
-3. Users who registered more than 48 hours ago (configurable) and haven't verified their email are deleted
-4. Both the Firebase Auth user and Firestore profile are removed
+1. **Registration**: When a user registers, their profile is created with:
+   - `emailVerified: false`
+   - `createdAt: serverTimestamp()` (Firestore timestamp)
+
+2. **Cleanup Job**: A scheduled job runs daily (configured via Vercel Cron) that:
+   - Finds all profiles with `emailVerified: false`
+   - Checks if `createdAt` is older than the cleanup period
+   - Deletes the user from:
+     - Firebase Authentication
+     - Firestore `profiles` collection
+     - Related data (wallets, onboarding data)
 
 ## Configuration
 
-### 1. Set Cleanup Secret Token (Optional but Recommended)
+### Environment Variables
 
-For security, set a secret token in your environment variables:
+Add to your `.env.local` (development) and Vercel (production):
 
-**Vercel:**
-- Go to Settings → Environment Variables
-- Add: `CLEANUP_SECRET_TOKEN` = `your-random-secret-token-here`
-- Select all environments (Production, Preview, Development)
-
-**Local (.env.local):**
 ```bash
-CLEANUP_SECRET_TOKEN=your-random-secret-token-here
+# Optional: Override default cleanup period (in days)
+UNVERIFIED_USER_CLEANUP_DAYS=7
+
+# Optional: Secret token to protect the cleanup endpoint
+CRON_SECRET=your-secret-token-here
 ```
 
-### 2. Cron Job Configuration
+### Vercel Cron Configuration
 
-The cron job is already configured in `vercel.json` to run every 6 hours:
+The cleanup job is configured in `vercel.json` to run daily at 2 AM UTC:
 
 ```json
 {
   "crons": [
     {
       "path": "/api/admin/cleanup-unverified-users",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
 ```
 
-**Schedule Format:** `"0 */6 * * *"` means "every 6 hours at minute 0"
-- To run every 12 hours: `"0 */12 * * *"`
-- To run daily at midnight: `"0 0 * * *"`
-- To run every 4 hours: `"0 */4 * * *"`
+To change the schedule, update the `schedule` field using [cron syntax](https://crontab.guru/).
 
-### 3. Update Cron Path with Token (If Using Token)
+## Manual Execution
 
-If you set `CLEANUP_SECRET_TOKEN`, update `vercel.json`:
+You can manually trigger the cleanup job:
 
-```json
-{
-  "crons": [
-    {
-      "path": "/api/admin/cleanup-unverified-users?token=YOUR_SECRET_TOKEN",
-      "schedule": "0 */6 * * *"
-    }
-  ]
-}
-```
+### Via API (with authentication)
 
-⚠️ **Note:** This exposes the token in the config file. For better security, consider using Vercel's environment variables in the endpoint logic instead.
-
-## API Endpoint
-
-### Endpoint
-`GET /api/admin/cleanup-unverified-users` or `POST /api/admin/cleanup-unverified-users`
-
-### Parameters
-
-**Query Parameters (GET) or Body (POST):**
-- `hours` (optional): Number of hours to wait before deleting (default: 48)
-- `dryRun` (optional): If `true`, only reports what would be deleted without actually deleting
-- `token` (optional): Authentication token (required if `CLEANUP_SECRET_TOKEN` is set in production)
-
-### Examples
-
-**Dry run (test what would be deleted):**
 ```bash
-curl "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?dryRun=true&hours=48"
+curl -X POST https://your-domain.vercel.app/api/admin/cleanup-unverified-users \
+  -H "Authorization: Bearer your-cron-secret"
 ```
 
-**Manual cleanup (delete users older than 24 hours):**
+### Via API (with custom days)
+
 ```bash
-curl -X POST "https://your-domain.vercel.app/api/admin/cleanup-unverified-users" \
-  -H "Content-Type: application/json" \
-  -d '{"hours": 24, "token": "your-secret-token"}'
+curl -X POST "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?days=14" \
+  -H "Authorization: Bearer your-cron-secret"
 ```
 
-**With Authorization header:**
+### Via GET (for testing)
+
 ```bash
-curl "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?hours=48" \
-  -H "Authorization: Bearer your-secret-token"
+curl "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?days=7"
 ```
 
-### Response Format
+## Response Format
 
-**Success:**
+### Success Response
+
 ```json
 {
   "success": true,
-  "message": "Cleanup completed. Deleted 5 unverified users.",
+  "message": "Cleanup completed. Deleted 5 unverified user(s)",
   "deletedCount": 5,
-  "failedCount": 0,
-  "thresholdHours": 48
+  "totalFound": 5,
+  "cutoffDate": "2025-01-15T02:00:00.000Z",
+  "days": 7,
+  "deletedUsers": ["userId1", "userId2", ...],
+  "errors": null
 }
 ```
 
-**Dry Run:**
-```json
-{
-  "success": true,
-  "message": "[DRY RUN] Would delete 5 unverified users",
-  "deletedCount": 5,
-  "users": [
-    {"uid": "user1", "email": "user1@example.com"},
-    {"uid": "user2", "email": "user2@example.com"}
-  ],
-  "dryRun": true
-}
-```
-
-**No users to delete:**
-```json
-{
-  "success": true,
-  "message": "No unverified users found to clean up",
-  "deletedCount": 0,
-  "dryRun": false
-}
-```
-
-## Customization
-
-### Change Default Time Period
-
-To change the default from 48 hours to a different value, update the endpoint:
-
-```typescript
-const hoursThreshold = parseInt(
-  body.hours || searchParams.get('hours') || '72', // Changed to 72 hours
-  10
-);
-```
-
-### Change Cron Schedule
-
-Edit `vercel.json` to change how often the cleanup runs:
+### Error Response
 
 ```json
 {
-  "crons": [
-    {
-      "path": "/api/admin/cleanup-unverified-users",
-      "schedule": "0 */12 * * *"  // Every 12 hours instead of 6
-    }
-  ]
+  "success": false,
+  "error": "Error message here"
 }
 ```
+
+## What Gets Deleted
+
+When an unverified user is cleaned up, the following data is deleted:
+
+1. **Firebase Authentication**: User account
+2. **Firestore `profiles` collection**: User profile document
+3. **Firestore `wallets` collection**: User wallet (if exists)
+4. **Firestore `phixer_onboarding` collection**: Onboarding data (if exists)
+
+## Security
+
+The cleanup endpoint can be protected with a `CRON_SECRET` environment variable. When set, requests must include:
+
+```
+Authorization: Bearer <CRON_SECRET>
+```
+
+Vercel Cron automatically includes this header when configured.
 
 ## Monitoring
 
-### Check Cleanup Status
+Check Vercel logs to monitor cleanup job execution:
 
-1. Go to Vercel Dashboard → Your Project → Functions
-2. Look for cron job executions
-3. Check logs for cleanup results
+1. Go to Vercel Dashboard → Your Project → Logs
+2. Filter by the cleanup endpoint path
+3. Review execution logs and any errors
 
-### Manual Testing
+## Customization
 
-Test the cleanup endpoint manually:
+### Change Cleanup Period
 
+**Option 1: Environment Variable**
 ```bash
-# Dry run to see what would be deleted
-curl "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?dryRun=true"
-
-# Actually run cleanup
-curl "https://your-domain.vercel.app/api/admin/cleanup-unverified-users?token=your-token"
+UNVERIFIED_USER_CLEANUP_DAYS=14
 ```
 
-## Security Considerations
+**Option 2: Query Parameter**
+```
+/api/admin/cleanup-unverified-users?days=14
+```
 
-1. **Token Protection**: Always set `CLEANUP_SECRET_TOKEN` in production to prevent unauthorized access
-2. **Cron Security**: Vercel cron jobs run from trusted sources, but adding a token provides extra security
-3. **Rate Limiting**: The endpoint processes deletions in batches to avoid overwhelming the system
+### Change Schedule
+
+Edit `vercel.json`:
+
+```json
+{
+  "crons": [
+    {
+      "path": "/api/admin/cleanup-unverified-users",
+      "schedule": "0 3 * * *"  // 3 AM UTC instead of 2 AM
+    }
+  ]
+}
+```
 
 ## Troubleshooting
 
-### Cleanup Not Running
+### Cleanup not running
 
-1. Check Vercel cron job status in the dashboard
-2. Verify `vercel.json` is properly configured
-3. Check function logs for errors
+1. **Check Vercel Cron is enabled**: Vercel Cron is available on Pro plans and above
+2. **Check logs**: Review Vercel deployment logs for errors
+3. **Manual test**: Try calling the endpoint manually to verify it works
 
-### Users Not Being Deleted
+### Users not being deleted
 
-1. Verify users have `emailVerified: false` in their profile
-2. Check that `createdAt` timestamp is older than the threshold
-3. Run a dry run to see what would be deleted: `?dryRun=true`
+1. **Check `emailVerified` field**: Ensure it's set to `false` for unverified users
+2. **Check `createdAt` field**: Ensure it's a valid Firestore Timestamp or ISO string
+3. **Check cutoff date**: Verify the cutoff date calculation is correct
 
-### Permission Errors
+### Permission errors
 
-1. Ensure Firebase Admin SDK is properly configured
-2. Verify `FIREBASE_SERVICE_ACCOUNT_KEY` is set in Vercel
-3. Check that the service account has permissions to delete users
+1. **Check Firebase Admin SDK**: Ensure `FIREBASE_SERVICE_ACCOUNT_KEY` is configured
+2. **Check permissions**: Service account must have permission to delete users
 
-## Related Files
+## Testing
 
-- `src/app/api/admin/cleanup-unverified-users/route.ts` - Cleanup endpoint
-- `vercel.json` - Cron job configuration
-- `src/lib/firebaseAdmin.ts` - Firebase Admin SDK initialization
-- `src/components/auth/RegisterForm.tsx` - User registration logic
+To test the cleanup manually:
+
+1. Create a test user account
+2. Don't verify the email
+3. Wait or manually set `createdAt` to an old date
+4. Call the cleanup endpoint manually
+5. Verify the user is deleted
+
+## Notes
+
+- The cleanup job handles both Firestore Timestamp and ISO string formats for `createdAt` (for backward compatibility)
+- The job filters unverified users in memory after querying (to handle different timestamp formats)
+- Errors during deletion of individual users are logged but don't stop the cleanup process
+- The response includes a list of deleted user IDs (limited to first 10 for response size)
 

@@ -13,11 +13,23 @@ service cloud.firestore {
       return profileDoc != null ? profileDoc.data : null;
     }
     
-    // Helper function to check if user is admin
+    // Helper function to check if user is admin (any admin role)
     function isAdmin() {
+      let profileData = getUserProfileData();
       return isAuthenticated() && 
-             getUserProfileData() != null &&
-             getUserProfileData().role == 'admin';
+             profileData != null &&
+             (profileData.role == 'admin' ||
+              profileData.role == 'full_admin' ||
+              profileData.role == 'manager' ||
+              profileData.role == 'billing_finance');
+    }
+    
+    // Helper function to check if user is full admin
+    function isFullAdmin() {
+      let profileData = getUserProfileData();
+      return isAuthenticated() && 
+             profileData != null &&
+             (profileData.role == 'admin' || profileData.role == 'full_admin');
     }
     
     // Helper function to check if user is the owner

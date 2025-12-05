@@ -1,8 +1,10 @@
 ﻿import { getFirebase } from './firebaseClient';
 import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, Timestamp, setDoc, increment } from 'firebase/firestore';
 
+import { isAdminRole } from '@/types/adminRoles';
+
 /**
- * Check if a user has admin role
+ * Check if a user has admin role (any admin role)
  */
 export async function isUserAdmin(userId: string): Promise<boolean> {
   try {
@@ -13,7 +15,7 @@ export async function isUserAdmin(userId: string): Promise<boolean> {
     if (profileDocs.empty) return false;
     
     const profile = profileDocs.docs[0].data();
-    return profile.role === 'admin';
+    return isAdminRole(profile.role);
   } catch (error) {
     console.error('Error checking admin status:', error);
     return false;

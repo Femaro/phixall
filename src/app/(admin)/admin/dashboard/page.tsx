@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
-import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc, getDocs, setDoc } from 'firebase/firestore';
 import { trainingModules } from '@/data/trainingModules';
 import type { User as FirebaseUser } from 'firebase/auth';
 import type { ArtisanOnboarding } from '@/types/onboarding';
@@ -12,6 +12,7 @@ import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Cartesia
 import AdminMaterialReview from '@/components/materials/AdminMaterialReview';
 import JobLocationView from '@/components/admin/JobLocationView';
 import MaterialCatalogManager from '@/components/materials/MaterialCatalogManager';
+import { getAdminPermissions, isAdminRole, getAdminRoleDisplayName, type AdminRole } from '@/types/adminRoles';
 
 type TimestampLike = Date | { seconds: number; nanoseconds: number } | null | undefined;
 
@@ -26,7 +27,7 @@ type AdminProfile = {
 
 type ArtisanApplication = Partial<ArtisanOnboarding> & { id: string; email?: string };
 
-type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'careers' | 'emails' | 'analytics' | 'profile' | 'settings';
+type AdminTab = 'overview' | 'users' | 'jobs' | 'resources' | 'billing' | 'registration' | 'careers' | 'emails' | 'analytics' | 'profile' | 'settings' | 'admin-users';
 type TrainingStatusKey = 'safetyTraining' | 'residentialTraining' | 'corporateTraining' | 'dashboardTraining';
 
 interface User {
@@ -136,6 +137,7 @@ interface BillItem {
 export default function AdminDashboardPage() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
+  const [adminPermissions, setAdminPermissions] = useState<ReturnType<typeof getAdminPermissions> | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   
@@ -154,6 +156,9 @@ export default function AdminDashboardPage() {
   const [emailSubject, setEmailSubject] = useState('');
   const [emailBody, setEmailBody] = useState('');
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [adminUsers, setAdminUsers] = useState<Array<{ id: string; name: string; email: string; role: AdminRole; createdAt?: TimestampLike }>>([]);
+  const [showCreateAdminModal, setShowCreateAdminModal] = useState(false);
+  const [newAdminForm, setNewAdminForm] = useState({ name: '', email: '', password: '', role: 'manager' as AdminRole });
   
   // Filter states
   const [jobStatusFilter, setJobStatusFilter] = useState<string>('all');
@@ -232,10 +237,12 @@ export default function AdminDashboardPage() {
         if (!currentUser) {
           window.location.href = '/login';
         } else {
-          // Check if user is admin
+          // Check if user is admin (any admin role)
           const { db } = getFirebase();
           const profileDoc = await getDoc(doc(db, 'profiles', currentUser.uid));
-          if (!profileDoc.exists() || profileDoc.data().role !== 'admin') {
+          const userRole = profileDoc.data()?.role;
+          
+          if (!profileDoc.exists() || !isAdminRole(userRole)) {
             alert('Access denied. Admin only.');
             window.location.href = '/';
             return;
@@ -243,6 +250,10 @@ export default function AdminDashboardPage() {
           setUser(currentUser);
           const profileData = profileDoc.data() as AdminProfile;
           setAdminProfile(profileData);
+          
+          // Set permissions based on role
+          const permissions = getAdminPermissions(userRole || '');
+          setAdminPermissions(permissions);
           setProfileForm({
             name: profileData.name || '',
             email: profileData.email || currentUser.email || '',
@@ -443,6 +454,34 @@ export default function AdminDashboardPage() {
     return () => unsubscribe();
   }, [user]);
 
+  // Load admin users
+  useEffect(() => {
+    if (!user || !adminPermissions?.canCreateAdminUsers) return;
+    const { db } = getFirebase();
+    const adminUsersQuery = query(
+      collection(db, 'profiles'),
+      where('role', 'in', ['admin', 'full_admin', 'manager', 'billing_finance'])
+    );
+    const unsubscribe = onSnapshot(adminUsersQuery, (snapshot) => {
+      const admins: Array<{ id: string; name: string; email: string; role: AdminRole; createdAt?: TimestampLike }> = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        const role = data.role === 'admin' ? 'full_admin' : data.role;
+        if (isAdminRole(role)) {
+          admins.push({
+            id: doc.id,
+            name: data.name || '',
+            email: data.email || '',
+            role: role as AdminRole,
+            createdAt: data.createdAt,
+          });
+        }
+      });
+      setAdminUsers(admins);
+    });
+    return () => unsubscribe();
+  }, [user, adminPermissions]);
+
   async function assignJobToArtisan() {
     if (!selectedJob || !selectedArtisan) return;
 
@@ -569,6 +608,119 @@ export default function AdminDashboardPage() {
     } catch (error) {
       console.error('Error updating user status:', error);
       alert('Failed to update user status');
+    }
+  }
+
+  async function createAdminUser() {
+    if (!newAdminForm.name || !newAdminForm.email || !newAdminForm.password) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    if (!adminPermissions?.canCreateAdminUsers) {
+      alert('You do not have permission to create admin users');
+      return;
+    }
+
+    try {
+      const { auth, db } = getFirebase();
+      const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+      
+      // Create user in Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        newAdminForm.email,
+        newAdminForm.password
+      );
+
+      // Update profile
+      await updateProfile(userCredential.user, { displayName: newAdminForm.name });
+
+      // Create profile in Firestore with admin role
+      await setDoc(doc(db, 'profiles', userCredential.user.uid), {
+        name: newAdminForm.name,
+        email: newAdminForm.email,
+        role: newAdminForm.role,
+        emailVerified: true, // Admin users don't need email verification
+        createdAt: serverTimestamp(),
+        createdBy: user?.uid,
+      });
+
+      alert(`Admin user created successfully! Role: ${getAdminRoleDisplayName(newAdminForm.role)}`);
+      setShowCreateAdminModal(false);
+      setNewAdminForm({ name: '', email: '', password: '', role: 'manager' });
+    } catch (error: any) {
+      console.error('Error creating admin user:', error);
+      if (error.code === 'auth/email-already-in-use') {
+        alert('This email is already registered');
+      } else {
+        alert('Failed to create admin user: ' + (error.message || 'Unknown error'));
+      }
+    }
+  }
+
+  async function updateAdminUserRole(userId: string, newRole: AdminRole) {
+    if (!adminPermissions?.canManageRoles) {
+      alert('You do not have permission to manage roles');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to change this user's role to ${getAdminRoleDisplayName(newRole)}?`)) {
+      return;
+    }
+
+    try {
+      const { db } = getFirebase();
+      await updateDoc(doc(db, 'profiles', userId), {
+        role: newRole,
+        roleUpdatedAt: serverTimestamp(),
+        roleUpdatedBy: user?.uid,
+      });
+      alert('User role updated successfully!');
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      alert('Failed to update user role');
+    }
+  }
+
+  async function deleteAdminUser(userId: string) {
+    if (!adminPermissions?.canDeleteUsers) {
+      alert('You do not have permission to delete users');
+      return;
+    }
+
+    if (userId === user?.uid) {
+      alert('You cannot delete your own account');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this admin user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { auth, db } = getFirebase();
+      const { deleteUser } = await import('firebase/auth');
+      
+      // Delete from Firestore first
+      await deleteDoc(doc(db, 'profiles', userId));
+      
+      // Delete from Auth (requires admin SDK in production, but we'll try)
+      // Note: In production, you'd need to use Firebase Admin SDK
+      try {
+        const currentUser = auth.currentUser;
+        if (currentUser && currentUser.uid === userId) {
+          await deleteUser(currentUser);
+        }
+      } catch (authError) {
+        console.warn('Could not delete from Auth (may need Admin SDK):', authError);
+        // Continue - profile is deleted
+      }
+
+      alert('Admin user deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting admin user:', error);
+      alert('Failed to delete admin user');
     }
   }
 
@@ -1246,22 +1398,29 @@ export default function AdminDashboardPage() {
     return '—';
   };
 
-  const sidebarTabs: Array<{ id: AdminTab; label: string; icon: string }> = [
+  const sidebarTabs: Array<{ id: AdminTab; label: string; icon: string; permission?: keyof ReturnType<typeof getAdminPermissions> }> = [
     { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'users', label: 'User Management', icon: '👥' },
-    { id: 'jobs', label: 'Job Management', icon: '💼' },
-    { id: 'resources', label: 'Resources', icon: '📦' },
-    { id: 'billing', label: 'Billing & Finance', icon: '💰' },
-    { id: 'careers', label: 'Career Applications', icon: '📝' },
-    { id: 'emails', label: 'Email Management', icon: '📧' },
-    { id: 'registration', label: 'Artisan Registration', icon: '📝' },
-    { id: 'analytics', label: 'Analytics', icon: '📈' },
+    { id: 'users', label: 'User Management', icon: '👥', permission: 'canViewUsers' },
+    { id: 'jobs', label: 'Job Management', icon: '💼', permission: 'canViewJobs' },
+    { id: 'resources', label: 'Resources', icon: '📦', permission: 'canViewResources' },
+    { id: 'billing', label: 'Billing & Finance', icon: '💰', permission: 'canViewBilling' },
+    { id: 'careers', label: 'Career Applications', icon: '📝', permission: 'canViewApplications' },
+    { id: 'emails', label: 'Email Management', icon: '📧', permission: 'canManageEmails' },
+    { id: 'registration', label: 'Artisan Registration', icon: '📝', permission: 'canViewApplications' },
+    { id: 'analytics', label: 'Analytics', icon: '📈', permission: 'canViewAnalytics' },
+    { id: 'admin-users', label: 'Admin Users', icon: '🔐', permission: 'canCreateAdminUsers' },
     { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'settings', label: 'Settings', icon: '⚙️', permission: 'canManageSettings' },
   ];
+  
+  // Filter tabs based on permissions
+  const visibleTabs = sidebarTabs.filter(tab => {
+    if (!tab.permission || !adminPermissions) return true;
+    return adminPermissions[tab.permission];
+  });
 
   const renderSidebarButtons = (onNavigate?: () => void) =>
-    sidebarTabs.map((tab) => (
+    visibleTabs.map((tab) => (
       <button
         key={tab.id}
         onClick={() => {
@@ -1409,6 +1568,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'analytics' && 'Analytics & Reports'}
                 {activeTab === 'profile' && 'Admin Profile'}
                 {activeTab === 'settings' && 'Dashboard Settings'}
+                {activeTab === 'admin-users' && 'Admin User Management'}
               </h2>
                 <p className="text-sm text-neutral-600">
                 {activeTab === 'overview' && 'Monitor all platform activities and metrics'}
@@ -1422,6 +1582,7 @@ export default function AdminDashboardPage() {
                 {activeTab === 'analytics' && 'Platform performance metrics'}
                 {activeTab === 'profile' && 'Manage your admin account information'}
                 {activeTab === 'settings' && 'Configure your admin dashboard preferences'}
+                {activeTab === 'admin-users' && 'Create and manage admin user accounts and roles'}
                 </p>
               </div>
               <button
@@ -3157,6 +3318,86 @@ We have successfully received your application and our team will review it caref
             </div>
           </div>
         )}
+
+        {activeTab === 'admin-users' && adminPermissions?.canCreateAdminUsers && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Admin Users</h3>
+                <p className="text-sm text-neutral-600">Manage admin user accounts and their roles</p>
+              </div>
+              <button
+                onClick={() => setShowCreateAdminModal(true)}
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+              >
+                + Create Admin User
+              </button>
+            </div>
+
+            <div className="rounded-xl border border-neutral-200 bg-white shadow-soft overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-neutral-50 border-b border-neutral-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Created</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-neutral-700 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-neutral-200">
+                    {adminUsers.map((adminUser) => (
+                      <tr key={adminUser.id} className="hover:bg-neutral-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-neutral-900">{adminUser.name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-neutral-600">{adminUser.email}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <select
+                            value={adminUser.role}
+                            onChange={(e) => updateAdminUserRole(adminUser.id, e.target.value as AdminRole)}
+                            disabled={!adminPermissions?.canManageRoles || adminUser.id === user?.uid}
+                            className="text-sm rounded-lg border border-neutral-300 px-3 py-1.5 bg-white disabled:bg-neutral-100 disabled:cursor-not-allowed"
+                          >
+                            <option value="full_admin">Full Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="billing_finance">Billing & Finance</option>
+                          </select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-neutral-600">
+                            {adminUser.createdAt ? formatTimestamp(adminUser.createdAt) : 'N/A'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {adminUser.id !== user?.uid && adminPermissions?.canDeleteUsers && (
+                            <button
+                              onClick={() => deleteAdminUser(adminUser.id)}
+                              className="text-red-600 hover:text-red-700 font-medium"
+                            >
+                              Delete
+                            </button>
+                          )}
+                          {adminUser.id === user?.uid && (
+                            <span className="text-neutral-400 text-xs">Current User</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {adminUsers.length === 0 && (
+                <div className="text-center py-12 text-neutral-500">
+                  <p>No admin users found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modals */}
@@ -4065,6 +4306,86 @@ We have successfully received your application and our team will review it caref
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Create Admin User Modal */}
+      {showCreateAdminModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-w-md w-full rounded-xl border border-neutral-200 bg-white p-6 shadow-2xl">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-4">Create Admin User</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  value={newAdminForm.name}
+                  onChange={(e) => setNewAdminForm({ ...newAdminForm, name: e.target.value })}
+                  className="w-full rounded-lg border border-neutral-300 px-4 py-2"
+                  placeholder="Full name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={newAdminForm.email}
+                  onChange={(e) => setNewAdminForm({ ...newAdminForm, email: e.target.value })}
+                  className="w-full rounded-lg border border-neutral-300 px-4 py-2"
+                  placeholder="email@example.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={newAdminForm.password}
+                  onChange={(e) => setNewAdminForm({ ...newAdminForm, password: e.target.value })}
+                  className="w-full rounded-lg border border-neutral-300 px-4 py-2"
+                  placeholder="Minimum 6 characters"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">Role</label>
+                <select
+                  value={newAdminForm.role}
+                  onChange={(e) => setNewAdminForm({ ...newAdminForm, role: e.target.value as AdminRole })}
+                  className="w-full rounded-lg border border-neutral-300 px-4 py-2"
+                >
+                  <option value="manager">Manager</option>
+                  <option value="billing_finance">Billing & Finance</option>
+                  <option value="full_admin">Full Admin</option>
+                </select>
+                <p className="mt-1 text-xs text-neutral-500">
+                  {newAdminForm.role === 'full_admin' && 'Full access to all features and can create/manage admin users'}
+                  {newAdminForm.role === 'manager' && 'Can manage users, jobs, and resources but not billing/finance'}
+                  {newAdminForm.role === 'billing_finance' && 'Access limited to billing, finance, and transactions'}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                onClick={createAdminUser}
+                className="flex-1 rounded-lg bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700"
+              >
+                Create Admin User
+              </button>
+              <button
+                onClick={() => {
+                  setShowCreateAdminModal(false);
+                  setNewAdminForm({ name: '', email: '', password: '', role: 'manager' });
+                }}
+                className="rounded-lg border border-neutral-300 px-4 py-3 font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

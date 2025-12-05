@@ -196,7 +196,8 @@ function LoginContent() {
       if (profileSnap.exists()) {
         const role = profileSnap.data().role;
         const normalizedRole = typeof role === 'string' ? role : String(role);
-        if (normalizedRole === 'admin') {
+        // Check if user is any admin role
+        if (normalizedRole === 'admin' || normalizedRole === 'full_admin' || normalizedRole === 'manager' || normalizedRole === 'billing_finance') {
           router.push('/admin/dashboard');
         } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
           router.push('/phixer/dashboard');
@@ -376,7 +377,8 @@ function LoginContent() {
       if (profileSnap.exists()) {
         const role = profileSnap.data().role;
         const normalizedRole = typeof role === 'string' ? role : String(role);
-        if (normalizedRole === 'admin') {
+        // Check if user is any admin role
+        if (normalizedRole === 'admin' || normalizedRole === 'full_admin' || normalizedRole === 'manager' || normalizedRole === 'billing_finance') {
           router.push('/admin/dashboard');
         } else if (normalizedRole === 'Phixer' || normalizedRole === 'phixer' || normalizedRole === 'artisan') {
           router.push('/phixer/dashboard');

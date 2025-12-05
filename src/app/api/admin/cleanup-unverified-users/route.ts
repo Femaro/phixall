@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         try {
           const walletRef = firestore.collection('wallets').doc(userId);
           const walletSnap = await walletRef.get();
-          if (walletSnap.exists()) {
+          if (walletSnap.exists) {
             await walletRef.delete();
             console.log(`Deleted wallet: ${userId}`);
           }
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
         try {
           const onboardingRef = firestore.collection('phixer_onboarding').doc(userId);
           const onboardingSnap = await onboardingRef.get();
-          if (onboardingSnap.exists()) {
+          if (onboardingSnap.exists) {
             await onboardingRef.delete();
             console.log(`Deleted onboarding data: ${userId}`);
           }
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     };
 
-    console.log(`Cleanup completed: ${deletedUsers.length}/${unverifiedUsers.size} users deleted`);
+    console.log(`Cleanup completed: ${deletedUsers.length}/${unverifiedUsers.length} users deleted`);
 
     return NextResponse.json(result);
   } catch (error: any) {

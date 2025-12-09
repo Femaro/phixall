@@ -2056,7 +2056,7 @@ export default function ArtisanDashboardPage() {
                         )}
                         {job.status === 'in-progress' && (
                           <Link
-                            href={`/artisan/job-completion/${job.id}`}
+                            href={`/phixer/job-completion/${job.id}`}
                             className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 text-center"
                           >
                             Complete Job

@@ -593,7 +593,17 @@ export default function JobDetailScreen() {
             <>
               <TouchableOpacity
                 style={[styles.actionButton, styles.primaryButton]}
-                onPress={() => router.push(`/(tabs)/job-completion?jobId=${job.id}`)}
+                onPress={() => {
+                  try {
+                    router.push({
+                      pathname: '/(tabs)/job-completion',
+                      params: { jobId: job.id },
+                    });
+                  } catch (error) {
+                    console.error('Navigation error:', error);
+                    Alert.alert('Error', 'Failed to navigate to completion form. Please try again.');
+                  }
+                }}
                 disabled={updating}
               >
                 <Text style={styles.actionButtonText}>Complete Job</Text>

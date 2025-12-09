@@ -124,18 +124,6 @@ export default function ClientDashboard() {
 
   return (
     <View style={styles.container}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TouchableOpacity
-          style={styles.searchBar}
-          onPress={() => router.push('/(tabs)/request')}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.searchIcon}>☰</Text>
-          <Text style={styles.searchPlaceholder}>Request service</Text>
-        </TouchableOpacity>
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -153,6 +141,18 @@ export default function ClientDashboard() {
               </Text>
             </View>
           )}
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <TouchableOpacity
+            style={styles.searchBar}
+            onPress={() => router.push('/(tabs)/request')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.searchIcon}>☰</Text>
+            <Text style={styles.searchPlaceholder}>Request service</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Wallet Card */}
@@ -185,14 +185,6 @@ export default function ClientDashboard() {
           >
             <Text style={styles.quickActionIcon}>$</Text>
             <Text style={styles.quickActionLabel}>Wallet</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.quickActionCard}
-            onPress={() => router.push('/(auth)/onboarding')}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.quickActionIcon}>⚙</Text>
-            <Text style={styles.quickActionLabel}>Become Phixer</Text>
           </TouchableOpacity>
         </View>
 
@@ -263,36 +255,31 @@ export default function ClientDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   searchContainer: {
-    paddingTop: 50,
     paddingHorizontal: 16,
     paddingBottom: 16,
-    backgroundColor: '#000000',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   searchIcon: {
     fontSize: 20,
-    color: '#6B7280',
+    color: '#2563EB',
     marginRight: 12,
   },
   searchPlaceholder: {
     flex: 1,
     fontSize: 16,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   scrollView: {
     flex: 1,
@@ -302,23 +289,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
   },
   greeting: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#111827',
   },
   ratingBadge: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#FEF3C7',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   ratingText: {
     fontSize: 12,
-    color: '#FBBF24',
+    color: '#92400E',
     fontWeight: '600',
   },
   walletCard: {
@@ -394,34 +381,35 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#111827',
   },
   seeAll: {
     fontSize: 14,
-    color: '#FFFFFF',
-    fontWeight: '500',
-    opacity: 0.7,
+    color: '#2563EB',
+    fontWeight: '600',
   },
   emptyCard: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     padding: 32,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   emptyIcon: {
     fontSize: 48,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#6B7280',
     textAlign: 'center',
   },
   jobCard: {

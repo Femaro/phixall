@@ -204,7 +204,7 @@ export function SupportChat({ role }: SupportChatProps) {
         onPress={() => setOpen(true)}
         activeOpacity={0.8}
       >
-        <Text style={styles.stickyButtonText}>◉</Text>
+        <Text style={styles.stickyButtonText}>💬</Text>
         {sessionStatus === 'pending-agent' && (
           <View style={styles.badge} />
         )}
@@ -321,9 +321,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 50,
     right: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: '#2563EB',
     justifyContent: 'center',
     alignItems: 'center',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   stickyButtonText: {
-    fontSize: 20,
+    fontSize: 24,
     color: '#fff',
   },
   badge: {

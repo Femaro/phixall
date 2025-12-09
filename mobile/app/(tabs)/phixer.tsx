@@ -1680,7 +1680,7 @@ export default function ArtisanDashboard() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
   },
   loadingContainer: {
     flex: 1,
@@ -1694,9 +1694,9 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   headerContainer: {
-    backgroundColor: '#000000',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
+    borderBottomColor: '#E5E7EB',
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
@@ -1711,7 +1711,7 @@ const styles = StyleSheet.create({
   },
   hamburgerIcon: {
     fontSize: 24,
-    color: '#FFFFFF',
+    color: '#111827',
   },
   mainTabBar: {
     flex: 1,
@@ -1730,23 +1730,23 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   mainTabActive: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#EFF6FF',
   },
   mainTabIcon: {
     fontSize: 20,
     marginBottom: 4,
-    color: '#9CA3AF',
+    color: '#6B7280',
   },
   mainTabIconActive: {
-    color: '#FFFFFF',
+    color: '#2563EB',
   },
   mainTabLabel: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: '#6B7280',
     fontWeight: '500',
   },
   mainTabLabelActive: {
-    color: '#FFFFFF',
+    color: '#2563EB',
     fontWeight: '600',
   },
   headerBadge: {
@@ -1892,39 +1892,43 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   emptyCard: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     padding: 32,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   emptyState: {
     alignItems: 'center',
     padding: 40,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#F9FAFB',
     borderRadius: 12,
     marginHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   emptyIcon: {
     fontSize: 48,
-    color: '#6B7280',
+    color: '#9CA3AF',
     marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#111827',
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 16,
-    color: '#9CA3AF',
+    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 8,
     fontWeight: '500',
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#6B7280',
     textAlign: 'center',
   },
   emptyButton: {

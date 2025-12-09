@@ -1883,13 +1883,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#111827',
   },
   seeAll: {
     fontSize: 14,
-    color: '#FFFFFF',
-    fontWeight: '500',
-    opacity: 0.7,
+    color: '#2563EB',
+    fontWeight: '600',
   },
   emptyCard: {
     backgroundColor: '#F9FAFB',

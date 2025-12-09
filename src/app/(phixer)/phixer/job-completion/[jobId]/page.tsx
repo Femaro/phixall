@@ -49,25 +49,26 @@ export default function JobCompletionPage() {
           const jobDoc = await getDoc(doc(db, 'jobs', jobId));
           if (jobDoc.exists()) {
             const jobData = jobDoc.data();
-            if (jobData.artisanId !== currentUser.uid) {
+            const phixerId = jobData.phixerId || jobData.artisanId;
+            if (phixerId !== currentUser.uid) {
               alert('You are not authorized to complete this job.');
-              router.push('/artisan/dashboard');
+              router.push('/phixer/dashboard');
               return;
             }
             if (jobData.status !== 'in-progress') {
               alert('This job is not in progress.');
-              router.push('/artisan/dashboard');
+              router.push('/phixer/dashboard');
               return;
             }
             setJob(jobData);
           } else {
             alert('Job not found.');
-            router.push('/artisan/dashboard');
+            router.push('/phixer/dashboard');
           }
         } catch (error) {
           console.error('Error loading job:', error);
           alert('Failed to load job details.');
-          router.push('/artisan/dashboard');
+          router.push('/phixer/dashboard');
         } finally {
           setLoading(false);
         }
@@ -233,7 +234,7 @@ export default function JobCompletionPage() {
       });
 
       alert('Completion form submitted successfully! You will be notified when admin approves it.');
-      router.push('/artisan/dashboard');
+      router.push('/phixer/dashboard');
     } catch (error) {
       console.error('Error submitting completion form:', error);
       alert('Failed to submit completion form. Please try again.');

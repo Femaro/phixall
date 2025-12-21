@@ -1,51 +1,15 @@
+'use client';
+
 import Link from 'next/link';
-import { Metadata } from 'next';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
 import StructuredData from '@/components/seo/StructuredData';
 import { organizationSchema, servicesSchema } from '@/lib/structuredData';
 
-export const metadata: Metadata = {
-  title: 'Professional Facility Management & Maintenance Services in Nigeria',
-  description: 'Connect with verified, skilled artisans for plumbing, electrical, HVAC, carpentry, and more. Trusted facility management platform serving 500+ businesses across Nigeria. Get instant quotes and 24/7 support.',
-  keywords: [
-    'facility management Nigeria',
-    'maintenance services Lagos',
-    'professional artisans',
-    'plumbing services',
-    'electrical repairs',
-    'HVAC maintenance',
-    'building maintenance',
-    'skilled technicians',
-    'verified artisans',
-    'facility services',
-  ],
-  openGraph: {
-    title: 'Phixall - Professional Facility Management Made Simple',
-    description: 'Connect with verified artisans for all your facility maintenance needs. Trusted by 500+ businesses across Nigeria.',
-    url: '/',
-    siteName: 'Phixall',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Phixall Facility Management Platform',
-      }
-    ],
-    locale: 'en_NG',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Phixall - Professional Facility Management',
-    description: 'Connect with verified artisans for all your maintenance needs. Trusted by 500+ businesses.',
-    images: ['/og-image.png'],
-  },
-  alternates: {
-    canonical: '/',
-  },
-};
+// Note: Metadata export removed for client component - consider using metadata API in layout
 
 export default function Home() {
+  const isUS = useIsUSUser();
+  
   return (
     <>
       <StructuredData data={[organizationSchema, ...servicesSchema]} />

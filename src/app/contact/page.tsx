@@ -1,35 +1,13 @@
+'use client';
+
 import Link from 'next/link';
-import { Metadata } from 'next';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { getPhonePlaceholder } from '@/lib/phoneUtils';
+import { getBusinessHours, getTimezoneAbbreviation } from '@/lib/dateTimeUtils';
 import StructuredData from '@/components/seo/StructuredData';
 import { organizationSchema, generateBreadcrumbSchema } from '@/lib/structuredData';
 
-export const metadata: Metadata = {
-  title: 'Contact Us - Get in Touch with Our Team',
-  description: 'Have questions about Phixall facility management services? Contact our support team via phone, email, or visit our office. We\'re available 24/7 for emergency support.',
-  keywords: [
-    'contact Phixall',
-    'facility management support',
-    'customer service',
-    'get help',
-    'support contact',
-  ],
-  openGraph: {
-    title: 'Contact Phixall - We\'re Here to Help',
-    description: 'Have questions? Reach out to our team. We\'re available 24/7 for emergency support.',
-    url: '/contact',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Contact Phixall',
-      }
-    ],
-  },
-  alternates: {
-    canonical: '/contact',
-  },
-};
+// Note: Metadata export removed for client component - consider using metadata API in layout
 
 const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'Home', url: '/' },
@@ -37,6 +15,10 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 ]);
 
 export default function ContactPage() {
+  const isUS = useIsUSUser();
+  const businessHours = getBusinessHours(isUS);
+  const timezone = getTimezoneAbbreviation(isUS);
+  
   return (
     <>
       <StructuredData data={[organizationSchema, breadcrumbSchema]} />
@@ -107,7 +89,7 @@ export default function ContactPage() {
                       id="phone"
                       name="phone"
                       className="mt-2 w-full border-2 border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                      placeholder="+234 XXX XXX XXXX"
+                      placeholder={isUS ? "+1 (555) 123-4567" : "+234 XXX XXX XXXX"}
                     />
                   </div>
                   <div>
@@ -217,8 +199,8 @@ export default function ContactPage() {
                         Available 24/7 for urgent matters and emergencies
                       </p>
                       <div className="mt-3 space-y-1">
-                        <a href="tel:+234XXXXXXXXX" className="block text-brand-600 hover:text-brand-700">
-                          +234 XXX XXX XXXX
+                        <a href={isUS ? "tel:+15551234567" : "tel:+234XXXXXXXXX"} className="block text-brand-600 hover:text-brand-700">
+                          {isUS ? "+1 (555) 123-4567" : "+234 XXX XXX XXXX"}
                         </a>
                         <p className="text-sm text-neutral-600">Monday - Sunday, 24/7</p>
                       </div>
@@ -238,8 +220,8 @@ export default function ContactPage() {
                         For safety emergencies or urgent situations during active jobs
                       </p>
                       <div className="mt-3 space-y-1">
-                        <a href="tel:+234XXXXXXXXX" className="block text-lg font-bold text-red-600 hover:text-red-700">
-                          +234 XXX XXX XXXX
+                        <a href={isUS ? "tel:+15551234567" : "tel:+234XXXXXXXXX"} className="block text-lg font-bold text-red-600 hover:text-red-700">
+                          {isUS ? "+1 (555) 123-4567" : "+234 XXX XXX XXXX"}
                         </a>
                         <p className="text-sm text-neutral-600">Available 24/7</p>
                       </div>
@@ -249,17 +231,44 @@ export default function ContactPage() {
               </div>
 
               {/* Office Address */}
-              <div className="mt-8 border border-neutral-200 bg-neutral-50 p-6">
-                <h3 className="font-bold text-neutral-900">Office Address</h3>
-                <p className="mt-2 text-neutral-700">
-                  Phixall Technical Company Limited
-                  <br />
-                  Lagos, Nigeria
-                </p>
-                <p className="mt-4 text-sm text-neutral-600">
-                  <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM WAT
-                </p>
-              </div>
+              {isUS ? (
+                <div className="mt-8 space-y-4">
+                  <div className="border border-neutral-200 bg-neutral-50 p-6">
+                    <h3 className="font-bold text-neutral-900">Claeva International LLC</h3>
+                    <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                    <p className="mt-2 text-neutral-700">
+                      United States
+                    </p>
+                    <p className="mt-4 text-sm text-neutral-600">
+                      <strong>Business Hours:</strong> Monday - Friday, {businessHours.open} - {businessHours.close} {timezone}
+                    </p>
+                  </div>
+                  <div className="border border-neutral-200 bg-neutral-50 p-6">
+                    <h3 className="font-bold text-neutral-900">International Operations</h3>
+                    <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                    <p className="mt-2 text-neutral-700">
+                      Phixall Technical Company Limited
+                      <br />
+                      Lagos, Nigeria
+                    </p>
+                    <p className="mt-4 text-sm text-neutral-600">
+                      <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM WAT
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-8 border border-neutral-200 bg-neutral-50 p-6">
+                  <h3 className="font-bold text-neutral-900">Office Address</h3>
+                  <p className="mt-2 text-neutral-700">
+                    Phixall Technical Company Limited
+                    <br />
+                    Lagos, Nigeria
+                  </p>
+                  <p className="mt-4 text-sm text-neutral-600">
+                    <strong>Business Hours:</strong> Monday - Friday, {businessHours.open} - {businessHours.close} {businessHours.timezone}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

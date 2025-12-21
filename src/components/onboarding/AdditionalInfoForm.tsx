@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { ArtisanOnboarding, ARTISAN_CATEGORIES, SKILL_LEVELS, ID_TYPES, NIGERIAN_STATES } from '@/types/onboarding';
+import { ArtisanOnboarding, ARTISAN_CATEGORIES, SKILL_LEVELS, ID_TYPES, NIGERIAN_STATES, US_STATES, US_ID_TYPES } from '@/types/onboarding';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { getPhonePlaceholder } from '@/lib/phoneUtils';
 
 interface Props {
   user: any;
@@ -13,6 +15,7 @@ interface Props {
 }
 
 export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: Props) {
+  const isUS = useIsUSUser();
   const [formData, setFormData] = useState(onboarding.additionalInfo);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -114,7 +117,14 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
     if (!formData.idType) newErrors.idType = 'Please select ID type';
     if (!formData.idNumber.trim()) newErrors.idNumber = 'ID number is required';
     if (!formData.idFileUrl) newErrors.idFileUrl = 'Please upload your ID document';
-    if (!formData.bvn.trim() || formData.bvn.length !== 11) newErrors.bvn = 'Valid 11-digit BVN is required';
+    if (!isUS) {
+      if (!formData.bvn.trim() || formData.bvn.length !== 11) newErrors.bvn = 'Valid 11-digit BVN is required';
+    } else {
+      // For US users, validate SSN last 4 if that's the ID type
+      if (formData.idType === 'ssn-last4' && (!formData.bvn.trim() || formData.bvn.length !== 4)) {
+        newErrors.bvn = 'Please enter last 4 digits of SSN';
+      }
+    }
     if (!formData.address.trim()) newErrors.address = 'Address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.state) newErrors.state = 'Please select your state';
@@ -210,7 +220,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                 value={formData.phoneNumber}
                 onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
                 className={`w-full rounded-lg border ${errors.phoneNumber ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
-                placeholder="+234 800 000 0000"
+                placeholder={getPhonePlaceholder(isUS)}
               />
               {errors.phoneNumber && <p className="mt-1 text-sm text-red-500">{errors.phoneNumber}</p>}
             </div>
@@ -234,15 +244,15 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
 
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-2">
-                State <span className="text-red-500">*</span>
+                {isUS ? 'State' : 'State'} <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.state}
                 onChange={(e) => handleInputChange('state', e.target.value)}
                 className={`w-full rounded-lg border ${errors.state ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
               >
-                <option value="">Select state</option>
-                {NIGERIAN_STATES.map(state => (
+                <option value="">Select {isUS ? 'state' : 'state'}</option>
+                {(isUS ? US_STATES : NIGERIAN_STATES).map(state => (
                   <option key={state} value={state}>{state}</option>
                 ))}
               </select>
@@ -263,6 +273,22 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
               {errors.city && <p className="mt-1 text-sm text-red-500">{errors.city}</p>}
             </div>
 
+            {isUS && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  ZIP Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.zipCode || ''}
+                  onChange={(e) => handleInputChange('zipCode', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  className={`w-full rounded-lg border ${errors.zipCode ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
+                  placeholder="12345 or 12345-6789"
+                  maxLength={10}
+                />
+                {errors.zipCode && <p className="mt-1 text-sm text-red-500">{errors.zipCode}</p>}
+              </div>
+            )}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-neutral-700 mb-2">
                 Address <span className="text-red-500">*</span>
@@ -272,7 +298,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 rows={2}
                 className={`w-full rounded-lg border ${errors.address ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
-                placeholder="Enter your full address"
+                placeholder={isUS ? "Enter your street address" : "Enter your full address"}
               />
               {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
             </div>
@@ -468,7 +494,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                   value={ref.phoneNumber}
                   onChange={(e) => updateReference(index, 'phoneNumber', e.target.value)}
                   className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                  placeholder="Phone number *"
+                  placeholder={getPhonePlaceholder(isUS)}
                   required
                 />
                 <input
@@ -506,7 +532,7 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
                 className={`w-full rounded-lg border ${errors.idType ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
               >
                 <option value="">Select ID type</option>
-                {ID_TYPES.map(type => (
+                {(isUS ? US_ID_TYPES : ID_TYPES).map(type => (
                   <option key={type.value} value={type.value}>{type.label}</option>
                 ))}
               </select>
@@ -548,21 +574,40 @@ export default function AdditionalInfoForm({ user, onboarding, setOnboarding }: 
               {errors.idFileUrl && <p className="mt-1 text-sm text-red-500">{errors.idFileUrl}</p>}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-2">
-                BVN (Bank Verification Number) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                maxLength={11}
-                value={formData.bvn}
-                onChange={(e) => handleInputChange('bvn', e.target.value.replace(/\D/g, ''))}
-                className={`w-full rounded-lg border ${errors.bvn ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
-                placeholder="Enter 11-digit BVN"
-              />
-              {errors.bvn && <p className="mt-1 text-sm text-red-500">{errors.bvn}</p>}
-              <p className="mt-1 text-xs text-neutral-500">Your BVN is kept secure and only used for verification</p>
-            </div>
+            {!isUS && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  BVN (Bank Verification Number) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={11}
+                  value={formData.bvn}
+                  onChange={(e) => handleInputChange('bvn', e.target.value.replace(/\D/g, '').slice(0, 11))}
+                  className={`w-full rounded-lg border ${errors.bvn ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
+                  placeholder="Enter 11-digit BVN"
+                />
+                {errors.bvn && <p className="mt-1 text-sm text-red-500">{errors.bvn}</p>}
+                <p className="mt-1 text-xs text-neutral-500">Your BVN is kept secure and only used for verification</p>
+              </div>
+            )}
+            {isUS && formData.idType === 'ssn-last4' && (
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  SSN (Last 4 Digits) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  value={formData.bvn}
+                  onChange={(e) => handleInputChange('bvn', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  className={`w-full rounded-lg border ${errors.bvn ? 'border-red-500' : 'border-neutral-300'} px-4 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20`}
+                  placeholder="Enter last 4 digits"
+                />
+                {errors.bvn && <p className="mt-1 text-sm text-red-500">{errors.bvn}</p>}
+                <p className="mt-1 text-xs text-neutral-500">Only the last 4 digits are required for verification</p>
+              </div>
+            )}
           </div>
         </div>
 

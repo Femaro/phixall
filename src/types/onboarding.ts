@@ -26,10 +26,11 @@ export interface ArtisanOnboarding {
       relationship: string;
       companyName?: string;
     }>;
-    idType: 'national-id' | 'drivers-license' | 'voters-card' | 'passport' | '';
+    idType: 'national-id' | 'drivers-license' | 'voters-card' | 'passport' | 'state-id' | 'ssn-last4' | '';
     idNumber: string;
     idFileUrl: string;
-    bvn: string;
+    bvn: string; // BVN for international users, SSN last 4 for US (when idType is ssn-last4)
+    zipCode?: string; // ZIP code for US users
     address: string;
     city: string;
     state: string;
@@ -71,6 +72,17 @@ export interface ArtisanOnboarding {
   reviewedAt?: Date;
   reviewedBy?: string;
   reviewNotes?: string;
+  
+  // Background Check (US users only)
+  checkrBackgroundCheck?: {
+    candidateId: string;
+    reportId: string;
+    invitationId?: string;
+    initiatedAt?: Date;
+    status: 'pending' | 'clear' | 'consider' | 'suspended' | 'canceled' | 'error';
+    completedAt?: Date;
+    reportData?: any; // Full Checkr report data
+  };
   
   createdAt: Date;
   updatedAt: Date;
@@ -142,12 +154,29 @@ export const ID_TYPES = [
   { value: 'passport', label: 'International Passport' }
 ];
 
+export const US_ID_TYPES = [
+  { value: 'drivers-license', label: "Driver's License" },
+  { value: 'state-id', label: 'State ID' },
+  { value: 'passport', label: 'Passport' },
+  { value: 'ssn-last4', label: 'SSN (Last 4 Digits)' }
+];
+
 export const NIGERIAN_STATES = [
   'Abia', 'Adamawa', 'Akwa Ibom', 'Anambra', 'Bauchi', 'Bayelsa', 'Benue', 'Borno',
   'Cross River', 'Delta', 'Ebonyi', 'Edo', 'Ekiti', 'Enugu', 'FCT', 'Gombe', 'Imo',
   'Jigawa', 'Kaduna', 'Kano', 'Katsina', 'Kebbi', 'Kogi', 'Kwara', 'Lagos', 'Nasarawa',
   'Niger', 'Ogun', 'Ondo', 'Osun', 'Oyo', 'Plateau', 'Rivers', 'Sokoto', 'Taraba',
   'Yobe', 'Zamfara'
+];
+
+export const US_STATES = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+  'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+  'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri',
+  'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina',
+  'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming',
+  'District of Columbia'
 ];
 
 

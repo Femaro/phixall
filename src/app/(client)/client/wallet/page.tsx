@@ -6,7 +6,8 @@ import { onAuthStateChanged, User } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { getFirebase } from '@/lib/firebaseClient';
 import PaymentButton from '@/components/payments/PaymentButton';
-import { formatCurrency } from '@/lib/paystackClient';
+import { formatCurrency, getCurrency } from '@/lib/paystackClient';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
 
 interface Transaction {
   id: string;
@@ -19,6 +20,9 @@ interface Transaction {
 
 export default function WalletPage() {
   const router = useRouter();
+  const isUS = useIsUSUser();
+  const currency = getCurrency(isUS);
+  const currencySymbol = currency === 'USD' ? '$' : '₦';
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(0);
@@ -94,7 +98,7 @@ export default function WalletPage() {
     setTimeout(() => setShowError(false), 5000);
   };
 
-  const quickAmounts = [1000, 5000, 10000, 20000, 50000];
+  const quickAmounts = isUS ? [10, 25, 50, 100, 250] : [1000, 5000, 10000, 20000, 50000];
 
   if (loading) {
     return (
@@ -129,7 +133,7 @@ export default function WalletPage() {
         {/* Balance Card */}
         <div className="mb-6 rounded-lg bg-gradient-to-r from-brand-600 to-brand-700 p-8 text-white shadow-lg">
           <p className="text-sm uppercase opacity-90">Available Balance</p>
-          <p className="mt-2 text-4xl font-bold">{formatCurrency(balance)}</p>
+          <p className="mt-2 text-4xl font-bold">{formatCurrency(balance, currency)}</p>
         </div>
 
         {/* Fund Wallet Section */}
@@ -138,7 +142,7 @@ export default function WalletPage() {
           
           <div className="mb-4">
             <label htmlFor="amount" className="block text-sm font-medium text-neutral-700">
-              Enter Amount (₦)
+              Enter Amount ({currencySymbol})
             </label>
             <input
               type="number"
@@ -146,7 +150,7 @@ export default function WalletPage() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              min="100"
+              min={isUS ? "1" : "100"}
               className="mt-1 block w-full rounded-lg border border-neutral-300 px-4 py-3 text-lg focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
             />
           </div>
@@ -161,13 +165,13 @@ export default function WalletPage() {
                   onClick={() => setAmount(quickAmount.toString())}
                   className="rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-brand-600 hover:bg-brand-50 hover:text-brand-600"
                 >
-                  {formatCurrency(quickAmount)}
+                  {formatCurrency(quickAmount, currency)}
                 </button>
               ))}
             </div>
           </div>
 
-          {user && amount && parseFloat(amount) >= 100 && (
+          {user && amount && parseFloat(amount) >= (isUS ? 1 : 100) && (
             <PaymentButton
               email={user.email || ''}
               amount={parseFloat(amount)}
@@ -179,8 +183,10 @@ export default function WalletPage() {
             />
           )}
 
-          {amount && parseFloat(amount) < 100 && (
-            <p className="text-sm text-red-600">Minimum amount is ₦100</p>
+          {amount && parseFloat(amount) < (isUS ? 1 : 100) && (
+            <p className="text-sm text-red-600">
+              Minimum amount is {currencySymbol}{(isUS ? 1 : 100)}
+            </p>
           )}
         </div>
 
@@ -218,7 +224,7 @@ export default function WalletPage() {
                       }`}
                     >
                       {transaction.type === 'payout' ? '-' : '+'}
-                      {formatCurrency(transaction.amount)}
+                      {formatCurrency(transaction.amount, currency)}
                     </p>
                     <span
                       className={`text-xs font-medium ${

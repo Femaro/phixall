@@ -5,9 +5,9 @@ import { generateBreadcrumbSchema } from '@/lib/structuredData';
 
 export const metadata: Metadata = {
   title: 'For Phixers - Grow Your Business & Earn More',
-  description: 'Join Nigeria\'s fastest-growing network of verified Phixers. Get matched with high-quality jobs, build your reputation, earn competitive rates. Perfect for plumbers, electricians, HVAC technicians, and more.',
+  description: 'Join a fast-growing network of verified Phixers worldwide. Get matched with high-quality jobs, build your reputation, earn competitive rates. Perfect for plumbers, electricians, HVAC technicians, and more.',
   keywords: [
-    'Phixer jobs Nigeria',
+    'Phixer jobs',
     'skilled technician jobs',
     'plumber jobs',
     'electrician jobs',
@@ -15,10 +15,12 @@ export const metadata: Metadata = {
     'Phixer network',
     'grow Phixer business',
     'earn more as Phixer',
+    'facility management jobs',
+    'handyman jobs',
   ],
   openGraph: {
     title: 'Phixall for Phixers - Grow Your Business',
-    description: 'Join Nigeria\'s fastest-growing network of verified Phixers. Get matched with quality jobs and earn competitive rates.',
+    description: 'Join a fast-growing network of verified Phixers worldwide. Get matched with quality jobs and earn competitive rates.',
     url: '/phixers',
     images: [
       {
@@ -58,7 +60,7 @@ export default function ArtisansPage() {
                 <span className="text-gradient"> Phixall</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-neutral-600">
-                Join Nigeria&apos;s fastest-growing network of verified Phixers. Get matched with high-quality jobs, build your reputation, and earn more doing what you love.
+                Join a fast-growing network of verified Phixers worldwide. Get matched with high-quality jobs, build your reputation, and earn more doing what you love.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 

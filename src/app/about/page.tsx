@@ -1,36 +1,10 @@
-import Link from 'next/link';
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'About Us - Our Mission & What Makes a Phixer',
-  description: "Learn about Phixall's mission to revolutionize facility management in Africa. Discover who our Phixers are - verified, skilled professionals transforming the maintenance industry.",
-  keywords: [
-    'about Phixall',
-    'facility management company',
-    'Phixer network Nigeria',
-    'who is a Phixer',
-    'company mission',
-    'maintenance platform',
-  ],
-  openGraph: {
-    title: 'About Phixall - Revolutionizing Facility Management',
-    description: "Building Africa's leading platform for on-demand facility maintenance. Meet our team and learn our story.",
-    url: '/about',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Phixall - Meet Our Phixers',
-      }
-    ],
-  },
-  alternates: {
-    canonical: '/about',
-  },
-};
+import Link from 'next/link';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
 
 export default function AboutPage() {
+  const isUS = useIsUSUser();
   return (
     <main className="min-h-screen bg-white">
       {/* Hero */}
@@ -46,7 +20,11 @@ export default function AboutPage() {
               <span className="text-gradient"> Management</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              We&apos;re building Africa&apos;s leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers.
+              {isUS ? (
+                <>Phixall, a product of Claeva International LLC, is a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers. We serve customers in the United States and worldwide.</>
+              ) : (
+                <>We&apos;re building a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers.</>
+              )}
             </p>
           </div>
         </div>
@@ -68,7 +46,11 @@ export default function AboutPage() {
                   We saw firsthand how difficult it was for facility owners to find trustworthy artisans, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
                 </p>
                 <p>
-                  Today, Phixall serves over 500 facilities across Nigeria, completing more than 10,000 jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.
+                  {isUS ? (
+                    <>Today, Phixall, a product of Claeva International LLC, serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers. International operations are conducted by Phixall Technical Company Limited under license from Claeva International LLC.</>
+                  ) : (
+                    <>Today, Phixall serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.</>
+                  )}
                 </p>
               </div>
             </div>
@@ -103,7 +85,11 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Mission</h3>
               <p className="mt-4 text-neutral-600">
-                To empower facilities and Phixers across Africa with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service.
+                {isUS ? (
+                  <>To empower facilities and Phixers worldwide with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service in the United States and beyond.</>
+                ) : (
+                  <>To empower facilities and Phixers worldwide with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service.</>
+                )}
               </p>
             </div>
             <div className="rounded-2xl border border-neutral-200 bg-white p-10 shadow-soft">
@@ -115,7 +101,11 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Vision</h3>
               <p className="mt-4 text-neutral-600">
-                To become the leading facility management platform across Africa, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.
+                {isUS ? (
+                  <>To become the leading facility management platform globally, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance, whether in the United States or around the world.</>
+                ) : (
+                  <>To become the leading facility management platform globally, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.</>
+                )}
               </p>
             </div>
           </div>
@@ -184,7 +174,7 @@ export default function AboutPage() {
               Who is a Phixer?
             </h2>
             <p className="mt-4 text-lg text-neutral-600">
-              The skilled professionals transforming facility management across Africa
+              The skilled professionals transforming facility management worldwide
             </p>
           </div>
           

@@ -1,4 +1,9 @@
-﻿export default function PrivacyPage() {
+﻿'use client';
+
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+
+export default function PrivacyPage() {
+  const isUS = useIsUSUser();
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-24">
@@ -9,7 +14,11 @@
           <section>
             <h2 className="text-2xl font-bold text-neutral-900">1. Introduction</h2>
             <p className="mt-4 text-neutral-700">
-              Phixall Technical Company Limited (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).
+              {isUS ? (
+                <>Phixall is a product of Claeva International LLC (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). Claeva International LLC operates Phixall in the United States. Outside the United States, Phixall is operated by Phixall Technical Company Limited under license from Claeva International LLC. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).</>
+              ) : (
+                <>Phixall Technical Company Limited (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).</>
+              )}
             </p>
           </section>
 
@@ -91,6 +100,11 @@
 
           <section>
             <h2 className="text-2xl font-bold text-neutral-900">6. Your Rights and Choices</h2>
+            <p className="mt-4 text-neutral-700">
+              Depending on your location, you may have additional rights under applicable privacy laws:
+            </p>
+            
+            <h3 className="mt-6 text-xl font-semibold text-neutral-900">6.1 General Rights (All Users)</h3>
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li><strong>Access:</strong> Request a copy of your personal data</li>
               <li><strong>Correction:</strong> Update or correct inaccurate information</li>
@@ -99,8 +113,33 @@
               <li><strong>Location Services:</strong> Disable location tracking in your device settings</li>
               <li><strong>Cookies:</strong> Manage cookie preferences through your browser</li>
             </ul>
-            <p className="mt-4 text-neutral-700">
-              To exercise these rights, contact us at privacy@phixall.com.
+
+            {isUS && (
+              <>
+                <h3 className="mt-6 text-xl font-semibold text-neutral-900">6.2 California Privacy Rights (CCPA)</h3>
+                <p className="mt-4 text-neutral-700">
+                  If you are a California resident, you have additional rights under the California Consumer Privacy Act (CCPA):
+                </p>
+                <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
+                  <li><strong>Right to Know:</strong> Request information about the categories and specific pieces of personal information we collect, use, disclose, and sell</li>
+                  <li><strong>Right to Delete:</strong> Request deletion of your personal information, subject to certain exceptions</li>
+                  <li><strong>Right to Opt-Out:</strong> Opt-out of the sale of your personal information (we do not sell personal information)</li>
+                  <li><strong>Right to Non-Discrimination:</strong> We will not discriminate against you for exercising your privacy rights</li>
+                  <li><strong>Right to Data Portability:</strong> Request a copy of your personal information in a portable format</li>
+                </ul>
+                <p className="mt-4 text-neutral-700">
+                  To exercise your California privacy rights, contact us at privacy@phixall.com or use the contact information provided below.
+                </p>
+
+                <h3 className="mt-6 text-xl font-semibold text-neutral-900">6.3 Other US State Privacy Rights</h3>
+                <p className="mt-4 text-neutral-700">
+                  Residents of other US states with comprehensive privacy laws (such as Virginia, Colorado, Connecticut) may have similar rights. Contact us to learn more about your specific rights.
+                </p>
+              </>
+            )}
+
+            <p className="mt-6 text-neutral-700">
+              To exercise any of these rights, contact us at privacy@phixall.com.
             </p>
           </section>
 
@@ -137,11 +176,34 @@
             <p className="mt-4 text-neutral-700">
               If you have questions or concerns about this Privacy Policy, please contact us:
             </p>
-            <ul className="mt-4 space-y-2 text-neutral-700">
-              <li><strong>Email:</strong> privacy@phixall.com</li>
-              <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
-              <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
-            </ul>
+            {isUS ? (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900">Claeva International LLC</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                  <ul className="mt-2 space-y-1 text-neutral-700">
+                    <li><strong>Email:</strong> privacy@phixall.com</li>
+                    <li><strong>Address:</strong> Claeva International LLC, United States</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900">International Operations</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                  <ul className="mt-2 space-y-1 text-neutral-700">
+                    <li><strong>Email:</strong> privacy@phixall.com</li>
+                    <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
+                    <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <ul className="mt-4 space-y-2 text-neutral-700">
+                <li><strong>Company:</strong> Phixall Technical Company Limited</li>
+                <li><strong>Email:</strong> privacy@phixall.com</li>
+                <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
+                <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
+              </ul>
+            )}
           </section>
         </div>
       </div>

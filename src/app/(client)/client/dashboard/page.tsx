@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { getPhonePlaceholder } from '@/lib/phoneUtils';
 import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -114,6 +116,7 @@ export default function ClientDashboardPage() {
 function ClientDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isUS = useIsUSUser();
   const paystackReference = searchParams.get('reference');
   const cancelledPayment = searchParams.get('cancelled');
   const [title, setTitle] = useState('');
@@ -747,7 +750,7 @@ function ClientDashboardContent() {
     addressAutocomplete.getPlacePredictions(
       {
         input: value,
-        componentRestrictions: { country: ['ng'] },
+        componentRestrictions: { country: isUS ? ['us'] : ['ng'] },
       },
       (predictions, status) => {
         if (status !== window.google.maps.places.PlacesServiceStatus.OK || !predictions) {
@@ -2223,7 +2226,7 @@ function ClientDashboardContent() {
                       value={profileForm.phone}
                       onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                       className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                      placeholder="+234 800 000 0000"
+                      placeholder={isUS ? "+1 (555) 123-4567" : "+234 800 000 0000"}
                     />
                   </div>
 

@@ -81,27 +81,51 @@ export function generateReference(): string {
 }
 
 /**
- * Convert amount from Naira to Kobo
+ * Convert amount from Naira to Kobo (deprecated - use toMinorUnit)
+ * @deprecated Use toMinorUnit instead
  */
 export function toKobo(amount: number): number {
   return Math.round(amount * 100);
 }
 
 /**
- * Convert amount from Kobo to Naira
+ * Convert amount from Kobo to Naira (deprecated - use fromMinorUnit)
+ * @deprecated Use fromMinorUnit instead
  */
 export function toNaira(amount: number): number {
   return amount / 100;
 }
 
 /**
- * Format currency for display
+ * Format currency for display based on location
  */
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-NG', {
+export function formatCurrency(amount: number, currency: 'USD' | 'NGN' = 'NGN'): string {
+  const locale = currency === 'USD' ? 'en-US' : 'en-NG';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'NGN',
+    currency: currency,
   }).format(amount);
+}
+
+/**
+ * Get currency based on user location
+ */
+export function getCurrency(isUS: boolean | null): 'USD' | 'NGN' {
+  return isUS === true ? 'USD' : 'NGN';
+}
+
+/**
+ * Convert amount to minor unit (cents for USD, kobo for NGN)
+ */
+export function toMinorUnit(amount: number, currency: 'USD' | 'NGN'): number {
+  return Math.round(amount * 100);
+}
+
+/**
+ * Convert amount from minor unit (cents to USD, kobo to NGN)
+ */
+export function fromMinorUnit(amount: number, currency: 'USD' | 'NGN'): number {
+  return amount / 100;
 }
 
 // Extend Window interface for Paystack

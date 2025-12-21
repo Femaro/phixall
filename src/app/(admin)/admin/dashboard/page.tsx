@@ -2525,6 +2525,74 @@ export default function AdminDashboardPage() {
                             </div>
                           )}
 
+                          {application.checkrBackgroundCheck && (
+                            <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <h4 className="text-sm font-semibold text-neutral-900">Background Check (Checkr)</h4>
+                                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                  application.checkrBackgroundCheck.status === 'clear' ? 'bg-green-100 text-green-700' :
+                                  application.checkrBackgroundCheck.status === 'consider' ? 'bg-amber-100 text-amber-700' :
+                                  application.checkrBackgroundCheck.status === 'suspended' ? 'bg-red-100 text-red-700' :
+                                  application.checkrBackgroundCheck.status === 'pending' ? 'bg-blue-100 text-blue-700' :
+                                  'bg-neutral-100 text-neutral-700'
+                                }`}>
+                                  {application.checkrBackgroundCheck.status || 'pending'}
+                                </span>
+                              </div>
+                              <div className="mt-3 space-y-2 text-sm">
+                                <div className="flex items-center justify-between">
+                                  <span className="text-neutral-600">Report ID:</span>
+                                  <span className="font-mono text-xs text-neutral-900">{application.checkrBackgroundCheck.reportId}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-neutral-600">Candidate ID:</span>
+                                  <span className="font-mono text-xs text-neutral-900">{application.checkrBackgroundCheck.candidateId}</span>
+                                </div>
+                                {application.checkrBackgroundCheck.initiatedAt && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-neutral-600">Initiated:</span>
+                                    <span className="text-neutral-900">{formatTimestamp(application.checkrBackgroundCheck.initiatedAt)}</span>
+                                  </div>
+                                )}
+                                {application.checkrBackgroundCheck.completedAt && (
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-neutral-600">Completed:</span>
+                                    <span className="text-neutral-900">{formatTimestamp(application.checkrBackgroundCheck.completedAt)}</span>
+                                  </div>
+                                )}
+                                <div className="mt-3 pt-3 border-t border-neutral-200">
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        const response = await fetch(`/api/checkr/report?reportId=${application.checkrBackgroundCheck.reportId}`);
+                                        const result = await response.json();
+                                        if (result.success) {
+                                          // Update the report data in Firestore
+                                          const { db } = getFirebase();
+                                          await updateDoc(doc(db, 'phixer_onboarding', application.id), {
+                                            'checkrBackgroundCheck.reportData': result.data,
+                                            'checkrBackgroundCheck.status': result.data.status,
+                                            'checkrBackgroundCheck.completedAt': result.data.completed_at ? new Date(result.data.completed_at) : null,
+                                            updatedAt: serverTimestamp(),
+                                          });
+                                          alert('Background check report updated');
+                                        } else {
+                                          alert('Failed to fetch report: ' + result.error);
+                                        }
+                                      } catch (error) {
+                                        console.error('Error fetching Checkr report:', error);
+                                        alert('Failed to fetch background check report');
+                                      }
+                                    }}
+                                    className="w-full rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+                                  >
+                                    {application.checkrBackgroundCheck.status === 'pending' ? 'Refresh Report Status' : 'View Full Report'}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
                           {trainingState && (
                             <div className="mt-4 rounded-lg border border-neutral-200 bg-white p-4">
                               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

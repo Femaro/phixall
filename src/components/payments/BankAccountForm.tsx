@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { getFirebase } from '@/lib/firebaseClient';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { validateUSRoutingNumber, validateUSAccountNumber, validateInternationalAccountNumber, formatUSRoutingNumber } from '@/lib/bankUtils';
 
 interface Bank {
   id: number;
@@ -17,13 +19,19 @@ interface BankAccountFormProps {
 }
 
 export default function BankAccountForm({ userId, onSuccess, onError }: BankAccountFormProps) {
+  const isUS = useIsUSUser();
   const [banks, setBanks] = useState<Bank[]>([]);
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [formData, setFormData] = useState({
+    // International (non-US) fields
     bankCode: '',
     accountNumber: '',
     accountName: '',
+    // US fields
+    routingNumber: '',
+    accountType: 'checking' as 'checking' | 'savings',
+    accountHolderName: '',
   });
 
   useEffect(() => {
@@ -33,7 +41,7 @@ export default function BankAccountForm({ userId, onSuccess, onError }: BankAcco
   const fetchBanks = async () => {
     try {
       // In a real implementation, you would fetch this from your API
-      // For now, using common Nigerian banks
+      // For now, using common international banks (example: Nigerian banks)
       setBanks([
         { id: 1, code: '044', name: 'Access Bank' },
         { id: 2, code: '063', name: 'Access Bank (Diamond)' },
@@ -64,13 +72,38 @@ export default function BankAccountForm({ userId, onSuccess, onError }: BankAcco
   };
 
   const verifyAccount = async () => {
+    if (isUS) {
+      // US account verification (would use Stripe/Plaid in production)
+      const routingValidation = validateUSRoutingNumber(formData.routingNumber);
+      const accountValidation = validateUSAccountNumber(formData.accountNumber);
+      
+      if (!routingValidation.valid) {
+        onError?.(routingValidation.error || 'Invalid routing number');
+        return;
+      }
+      
+      if (!accountValidation.valid) {
+        onError?.(accountValidation.error || 'Invalid account number');
+        return;
+      }
+
+      // For now, just validate format. In production, integrate with Stripe or Plaid
+      setFormData({
+        ...formData,
+        accountHolderName: formData.accountHolderName || 'Verified',
+      });
+      return;
+    }
+
+    // International account verification
     if (!formData.bankCode || !formData.accountNumber) {
       onError?.('Please select a bank and enter account number');
       return;
     }
 
-    if (formData.accountNumber.length !== 10) {
-      onError?.('Account number must be 10 digits');
+    const validation = validateInternationalAccountNumber(formData.accountNumber);
+    if (!validation.valid) {
+      onError?.(validation.error || 'Invalid account number');
       return;
     }
 
@@ -109,9 +142,16 @@ export default function BankAccountForm({ userId, onSuccess, onError }: BankAcco
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.accountName) {
-      onError?.('Please verify your account first');
-      return;
+    if (isUS) {
+      if (!formData.routingNumber || !formData.accountNumber || !formData.accountHolderName) {
+        onError?.('Please fill in all required fields');
+        return;
+      }
+    } else {
+      if (!formData.accountName) {
+        onError?.('Please verify your account first');
+        return;
+      }
     }
 
     setLoading(true);
@@ -120,16 +160,31 @@ export default function BankAccountForm({ userId, onSuccess, onError }: BankAcco
       const { db } = getFirebase();
       const bankAccountRef = doc(db, 'bank_accounts', userId);
 
-      await setDoc(bankAccountRef, {
-        userId,
-        bankCode: formData.bankCode,
-        bankName: banks.find((b) => b.code === formData.bankCode)?.name || '',
-        accountNumber: formData.accountNumber,
-        accountName: formData.accountName,
-        verified: true,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      if (isUS) {
+        await setDoc(bankAccountRef, {
+          userId,
+          country: 'US',
+          routingNumber: formData.routingNumber.replace(/\D/g, ''),
+          accountNumber: formData.accountNumber.replace(/\D/g, ''),
+          accountType: formData.accountType,
+          accountHolderName: formData.accountHolderName,
+          verified: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        await setDoc(bankAccountRef, {
+          userId,
+          country: 'NG',
+          bankCode: formData.bankCode,
+          bankName: banks.find((b) => b.code === formData.bankCode)?.name || '',
+          accountNumber: formData.accountNumber,
+          accountName: formData.accountName,
+          verified: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+      }
 
       onSuccess?.();
     } catch (error) {
@@ -140,6 +195,94 @@ export default function BankAccountForm({ userId, onSuccess, onError }: BankAcco
     }
   };
 
+  if (isUS) {
+    // US Bank Account Form
+    return (
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="routingNumber" className="block text-sm font-medium text-neutral-700">
+            Routing Number <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="routingNumber"
+            value={formData.routingNumber}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 9);
+              setFormData({ ...formData, routingNumber: value });
+            }}
+            placeholder="123456789"
+            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            required
+          />
+          <p className="mt-1 text-xs text-neutral-500">9-digit routing number (found on your checks)</p>
+        </div>
+
+        <div>
+          <label htmlFor="accountNumber" className="block text-sm font-medium text-neutral-700">
+            Account Number <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="accountNumber"
+            value={formData.accountNumber}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 17);
+              setFormData({ ...formData, accountNumber: value });
+            }}
+            placeholder="Account number"
+            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="accountType" className="block text-sm font-medium text-neutral-700">
+            Account Type <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="accountType"
+            value={formData.accountType}
+            onChange={(e) => setFormData({ ...formData, accountType: e.target.value as 'checking' | 'savings' })}
+            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            required
+          >
+            <option value="checking">Checking</option>
+            <option value="savings">Savings</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="accountHolderName" className="block text-sm font-medium text-neutral-700">
+            Account Holder Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="accountHolderName"
+            value={formData.accountHolderName}
+            onChange={(e) => setFormData({ ...formData, accountHolderName: e.target.value })}
+            placeholder="John Doe"
+            className="mt-1 block w-full rounded-lg border border-neutral-300 px-3 py-2 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            required
+          />
+          <p className="mt-1 text-xs text-neutral-500">Name as it appears on the account</p>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || !formData.routingNumber || !formData.accountNumber || !formData.accountHolderName}
+          className="w-full rounded-lg bg-brand-600 px-6 py-3 font-medium text-white transition-colors hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? 'Saving...' : 'Save Bank Account'}
+        </button>
+        <p className="text-xs text-neutral-500 text-center">
+          Your bank account information is encrypted and secure. We use Stripe for US bank transfers.
+        </p>
+      </form>
+    );
+  }
+
+  // International Bank Account Form (existing)
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>

@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useState, FormEvent } from 'react';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { getPhonePlaceholder } from '@/lib/phoneUtils';
 import StructuredData from '@/components/seo/StructuredData';
 import { organizationSchema, generateBreadcrumbSchema } from '@/lib/structuredData';
 
@@ -43,6 +45,7 @@ const jobPostingSchema = {
 };
 
 export default function CareersPage() {
+  const isUS = useIsUSUser();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -132,7 +135,7 @@ export default function CareersPage() {
                 <span className="text-gradient"> Facility Management</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-                Join Phixall and help revolutionize how Africa manages facilities. We&apos;re looking for passionate, driven individuals to grow with us.
+                Join Phixall and help revolutionize how facilities are managed worldwide. We&apos;re looking for passionate, driven individuals to grow with us.
               </p>
             </div>
           </div>
@@ -393,7 +396,7 @@ export default function CareersPage() {
                         name="phone"
                         required
                         className="w-full border-2 border-neutral-300 bg-white px-4 py-3 text-neutral-900 placeholder-neutral-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                        placeholder="+234 800 000 0000"
+                        placeholder={isUS ? "+1 (555) 123-4567" : "+234 800 000 0000"}
                       />
                     </div>
 

@@ -2,18 +2,18 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Careers at Phixall - Join Our Team',
-  description: 'Join Phixall and help revolutionize facility management in Africa. Explore career opportunities and open positions with our growing team.',
+  description: 'Join Phixall and help revolutionize facility management worldwide. Explore career opportunities and open positions with our growing team.',
   keywords: [
     'Phixall careers',
     'jobs at Phixall',
     'facility management jobs',
-    'Nigeria jobs',
+    'international jobs',
     'remote jobs',
     'administrative jobs',
   ],
   openGraph: {
     title: 'Careers at Phixall - Join Our Team',
-    description: 'Explore career opportunities with Phixall. We\'re building Africa\'s leading platform for facility management.',
+    description: 'Explore career opportunities with Phixall. We\'re building a leading platform for facility management worldwide.',
     url: '/careers',
     images: [
       {

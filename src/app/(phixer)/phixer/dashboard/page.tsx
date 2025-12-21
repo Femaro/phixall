@@ -4,6 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { getPhonePlaceholder } from '@/lib/phoneUtils';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { SupportChat } from '@/components/support/SupportChat';
@@ -130,6 +132,7 @@ interface Wallet {
 }
 
 export default function ArtisanDashboardPage() {
+  const isUS = useIsUSUser();
   const [available, setAvailable] = useState(false);
   const [availableJobs, setAvailableJobs] = useState<Job[]>([]);
   const [myJobs, setMyJobs] = useState<Job[]>([]);
@@ -2129,7 +2132,7 @@ export default function ArtisanDashboardPage() {
                       value={profileForm.phone}
                       onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
                       className="w-full rounded-lg border border-neutral-300 px-4 py-2 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
-                      placeholder="+234 800 000 0000"
+                      placeholder={isUS ? "+1 (555) 123-4567" : "+234 800 000 0000"}
                     />
                   </div>
 

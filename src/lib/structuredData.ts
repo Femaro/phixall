@@ -4,17 +4,27 @@ export const organizationSchema: WithContext<Organization> = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Phixall',
-  description: 'Professional facility management and maintenance services connecting clients with verified skilled artisans across Nigeria.',
+  legalName: 'Claeva International LLC',
+  description: 'Phixall, a product of Claeva International LLC, provides professional facility management and maintenance services connecting clients with verified skilled artisans. Serving customers in the United States and worldwide.',
   url: 'https://phixall.vercel.app',
   logo: 'https://phixall.vercel.app/logo.png',
   image: 'https://phixall.vercel.app/og-image.png',
   email: 'info@phixall.com',
   telephone: '+234-800-000-0000',
-  address: {
-    '@type': 'PostalAddress',
-    addressCountry: 'NG',
-    addressLocality: 'Lagos',
-  },
+  address: [
+    {
+      '@type': 'PostalAddress',
+      addressCountry: 'US',
+      addressLocality: 'United States',
+      name: 'Claeva International LLC',
+    },
+    {
+      '@type': 'PostalAddress',
+      addressCountry: 'NG',
+      addressLocality: 'Lagos',
+      name: 'Phixall Technical Company Limited',
+    },
+  ],
   sameAs: [
     'https://x.com/phixallng',
     'https://www.linkedin.com/company/phixall',
@@ -38,17 +48,33 @@ export const organizationSchema: WithContext<Organization> = {
       jobTitle: 'Head of Operations',
     },
   ],
-  contactPoint: {
-    '@type': 'ContactPoint',
-    telephone: '+234-800-000-0000',
-    contactType: 'Customer Service',
-    email: 'support@phixall.com',
-    availableLanguage: ['English', 'Yoruba', 'Igbo', 'Hausa'],
-  },
-  areaServed: {
-    '@type': 'Country',
-    name: 'Nigeria',
-  },
+  contactPoint: [
+    {
+      '@type': 'ContactPoint',
+      telephone: '+234-800-000-0000',
+      contactType: 'Customer Service',
+      email: 'support@phixall.com',
+      availableLanguage: ['English', 'Yoruba', 'Igbo', 'Hausa'],
+      areaServed: 'NG',
+    },
+    {
+      '@type': 'ContactPoint',
+      contactType: 'Customer Service',
+      email: 'support@phixall.com',
+      availableLanguage: ['English'],
+      areaServed: 'US',
+    },
+  ],
+  areaServed: [
+    {
+      '@type': 'Country',
+      name: 'United States',
+    },
+    {
+      '@type': 'Country',
+      name: 'Nigeria',
+    },
+  ],
   slogan: 'Professional Facility Management Made Simple',
 };
 
@@ -62,10 +88,16 @@ export const servicesSchema: WithContext<Service>[] = [
       '@type': 'Organization',
       name: 'Phixall',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Nigeria',
-    },
+    areaServed: [
+      {
+        '@type': 'Country',
+        name: 'United States',
+      },
+      {
+        '@type': 'Country',
+        name: 'Nigeria',
+      },
+    ],
     serviceType: 'Plumbing',
   },
   {
@@ -77,10 +109,16 @@ export const servicesSchema: WithContext<Service>[] = [
       '@type': 'Organization',
       name: 'Phixall',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Nigeria',
-    },
+    areaServed: [
+      {
+        '@type': 'Country',
+        name: 'United States',
+      },
+      {
+        '@type': 'Country',
+        name: 'Nigeria',
+      },
+    ],
     serviceType: 'Electrical',
   },
   {
@@ -92,10 +130,16 @@ export const servicesSchema: WithContext<Service>[] = [
       '@type': 'Organization',
       name: 'Phixall',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Nigeria',
-    },
+    areaServed: [
+      {
+        '@type': 'Country',
+        name: 'United States',
+      },
+      {
+        '@type': 'Country',
+        name: 'Nigeria',
+      },
+    ],
     serviceType: 'HVAC',
   },
   {
@@ -107,10 +151,16 @@ export const servicesSchema: WithContext<Service>[] = [
       '@type': 'Organization',
       name: 'Phixall',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Nigeria',
-    },
+    areaServed: [
+      {
+        '@type': 'Country',
+        name: 'United States',
+      },
+      {
+        '@type': 'Country',
+        name: 'Nigeria',
+      },
+    ],
     serviceType: 'Carpentry',
   },
   {
@@ -122,10 +172,16 @@ export const servicesSchema: WithContext<Service>[] = [
       '@type': 'Organization',
       name: 'Phixall',
     },
-    areaServed: {
-      '@type': 'Country',
-      name: 'Nigeria',
-    },
+    areaServed: [
+      {
+        '@type': 'Country',
+        name: 'United States',
+      },
+      {
+        '@type': 'Country',
+        name: 'Nigeria',
+      },
+    ],
     serviceType: 'Painting',
   },
 ];

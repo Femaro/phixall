@@ -6,7 +6,7 @@ export const defaultMetadata: Metadata = {
     default: 'Phixall - Professional Facility Management & Maintenance Services',
     template: '%s | Phixall'
   },
-  description: 'Connect with verified, skilled artisans for all your facility maintenance needs. Professional plumbing, electrical, HVAC, and more. Trusted by businesses across Nigeria.',
+  description: 'Phixall, a product of Claeva International LLC, connects you with verified, skilled artisans for all your facility maintenance needs. Professional plumbing, electrical, HVAC, and more. Serving customers in the United States and worldwide.',
   keywords: [
     'facility management',
     'maintenance services',
@@ -15,11 +15,14 @@ export const defaultMetadata: Metadata = {
     'electrical services',
     'HVAC services',
     'professional artisans',
-    'Nigeria facility management',
+    'US facility management',
+    'United States facility management',
+    'global facility management',
     'building maintenance',
     'preventive maintenance',
     'emergency repairs',
-    'skilled technicians'
+    'skilled technicians',
+    'Claeva International LLC'
   ],
   authors: [{ name: 'Phixall' }],
   creator: 'Phixall',
@@ -31,11 +34,11 @@ export const defaultMetadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_NG',
+    locale: 'en_US',
     url: '/',
     siteName: 'Phixall',
     title: 'Phixall - Professional Facility Management & Maintenance Services',
-    description: 'Connect with verified, skilled artisans for all your facility maintenance needs. Professional services across Nigeria.',
+    description: 'Phixall, a product of Claeva International LLC, connects you with verified, skilled artisans for all your facility maintenance needs. Serving customers in the United States and worldwide.',
     images: [
       {
         url: '/og-image.png',

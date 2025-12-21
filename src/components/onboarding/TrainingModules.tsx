@@ -6,6 +6,7 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { ArtisanOnboarding, TrainingProgressState } from '@/types/onboarding';
 import { trainingModules } from '@/data/trainingModules';
 import Image from 'next/image';
+import { isUSUserClient } from '@/lib/location';
 
 interface Props {
   user: any;
@@ -21,6 +22,46 @@ const moduleKeyMap: Record<string, TrainingSectionKeys> = {
   'corporate-training': 'corporateTraining',
   'dashboard-training': 'dashboardTraining',
 };
+
+/**
+ * Initiate background check for US artisan (non-blocking)
+ */
+async function initiateUSBackgroundCheck(userId: string, onboarding: ArtisanOnboarding) {
+  if (!onboarding.additionalInfo?.completed) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/checkr/initiate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userId,
+        artisanData: {
+          isUS: true,
+          fullName: onboarding.additionalInfo.fullName,
+          email: onboarding.email,
+          phoneNumber: onboarding.additionalInfo.phoneNumber,
+          zipCode: onboarding.additionalInfo.zipCode,
+          state: onboarding.additionalInfo.state,
+          idType: onboarding.additionalInfo.idType,
+          idNumber: onboarding.additionalInfo.idNumber,
+          bvn: onboarding.additionalInfo.bvn, // SSN last 4 for US
+        },
+      }),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to initiate background check');
+    }
+  } catch (error) {
+    console.error('Background check initiation error:', error);
+    throw error;
+  }
+}
 
 export default function TrainingModules({ user, onboarding, setOnboarding }: Props) {
   const defaultProgress = useMemo<TrainingProgressState>(() => {
@@ -178,6 +219,23 @@ export default function TrainingModules({ user, onboarding, setOnboarding }: Pro
         updates.status = 'under-review';
         updates.currentStep = 3;
         updates.submittedAt = serverTimestamp();
+        
+        // Initiate Checkr background check for US users
+        // This will be handled asynchronously via API route
+        // We'll trigger it here but not block on it
+        try {
+          const isUS = isUSUserClient();
+          if (isUS && onboarding.additionalInfo?.completed) {
+            // Trigger background check in background (don't await)
+            initiateUSBackgroundCheck(user.uid, onboarding).catch((error) => {
+              console.error('Background check initiation failed:', error);
+              // Non-blocking - application still submitted
+            });
+          }
+        } catch (error) {
+          console.error('Error checking user location for background check:', error);
+          // Non-blocking - continue with submission
+        }
       }
 
       await updateDoc(onboardingRef, updates);

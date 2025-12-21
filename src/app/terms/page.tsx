@@ -1,4 +1,9 @@
-﻿export default function TermsPage() {
+﻿'use client';
+
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+
+export default function TermsPage() {
+  const isUS = useIsUSUser();
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-24">
@@ -109,7 +114,11 @@
           <section>
             <h2 className="text-2xl font-bold text-neutral-900">7. Intellectual Property</h2>
             <p className="mt-4 text-neutral-700">
-              All content, trademarks, logos, and intellectual property on the Phixall platform are owned by or licensed to Phixall Technical Company Limited. You may not use, copy, reproduce, or distribute any content without our express written permission.
+              {isUS ? (
+                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Claeva International LLC. Phixall is a product of Claeva International LLC. Phixall Technical Company Limited operates Phixall outside the United States under license from Claeva International LLC. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
+              ) : (
+                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Technical Company Limited. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
+              )}
             </p>
           </section>
 
@@ -144,8 +153,9 @@
             <ul className="mt-4 list-disc space-y-2 pl-6 text-neutral-700">
               <li>Any disputes between users should first be reported through our platform</li>
               <li>Phixall will attempt to mediate disputes in good faith</li>
-              <li>Disputes not resolved through mediation shall be governed by Nigerian law</li>
-              <li>Venue for legal proceedings shall be Lagos, Nigeria</li>
+              <li>For users in the United States: Disputes not resolved through mediation shall be governed by the laws of the State of Delaware, United States, without regard to conflict of law principles. Venue for legal proceedings shall be in the state or federal courts located in Delaware, United States.</li>
+              <li>For users outside the United States: Disputes not resolved through mediation shall be governed by the laws of the jurisdiction where Phixall Technical Company Limited operates. Venue for legal proceedings shall be determined by applicable law in that jurisdiction.</li>
+              <li>You agree to waive any right to a jury trial and to participate in class action lawsuits, where permitted by applicable law</li>
             </ul>
           </section>
 
@@ -168,11 +178,34 @@
             <p className="mt-4 text-neutral-700">
               For questions about these Terms, please contact us:
             </p>
-            <ul className="mt-4 space-y-2 text-neutral-700">
-              <li><strong>Email:</strong> legal@phixall.com</li>
-              <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
-              <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
-            </ul>
+            {isUS ? (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900">Claeva International LLC</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                  <ul className="mt-2 space-y-1 text-neutral-700">
+                    <li><strong>Email:</strong> legal@phixall.com</li>
+                    <li><strong>Address:</strong> Claeva International LLC, United States</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-neutral-900">International Operations</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                  <ul className="mt-2 space-y-1 text-neutral-700">
+                    <li><strong>Email:</strong> legal@phixall.com</li>
+                    <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
+                    <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <ul className="mt-4 space-y-2 text-neutral-700">
+                <li><strong>Company:</strong> Phixall Technical Company Limited</li>
+                <li><strong>Email:</strong> legal@phixall.com</li>
+                <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
+                <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
+              </ul>
+            )}
           </section>
         </div>
       </div>

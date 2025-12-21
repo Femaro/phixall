@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { initializePaystackPayment, toKobo, formatCurrency } from '@/lib/paystackClient';
+import { initializePaystackPayment, toMinorUnit, formatCurrency, getCurrency } from '@/lib/paystackClient';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
 
 interface PaymentButtonProps {
   email: string;
@@ -27,6 +28,8 @@ export default function PaymentButton({
   children,
 }: PaymentButtonProps) {
   const [loading, setLoading] = useState(false);
+  const isUS = useIsUSUser();
+  const currency = getCurrency(isUS);
 
   const handlePayment = async () => {
     setLoading(true);
@@ -53,10 +56,15 @@ export default function PaymentButton({
         throw new Error(result.error || 'Failed to initialize payment');
       }
 
-      // Open Paystack popup
+      // Open Paystack popup (only for non-US users, US users should use Stripe)
+      if (isUS) {
+        throw new Error('Stripe payment integration required for US users');
+      }
+      
       const paymentResponse: any = await initializePaystackPayment({
         email,
-        amount: toKobo(amount),
+        amount: toMinorUnit(amount, 'NGN'),
+        currency: 'NGN',
         reference: result.data.reference,
         metadata: {
           jobId,
@@ -100,7 +108,7 @@ export default function PaymentButton({
           Processing...
         </span>
       ) : (
-        children || `Pay ${formatCurrency(amount)}`
+        children || `Pay ${formatCurrency(amount, currency)}`
       )}
     </button>
   );

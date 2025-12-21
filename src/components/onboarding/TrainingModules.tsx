@@ -6,7 +6,7 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { ArtisanOnboarding, TrainingProgressState } from '@/types/onboarding';
 import { trainingModules } from '@/data/trainingModules';
 import Image from 'next/image';
-import { isUSUserClient } from '@/lib/location';
+import { isUSUser } from '@/lib/location';
 
 interface Props {
   user: any;
@@ -224,7 +224,7 @@ export default function TrainingModules({ user, onboarding, setOnboarding }: Pro
         // This will be handled asynchronously via API route
         // We'll trigger it here but not block on it
         try {
-          const isUS = isUSUserClient();
+          const isUS = isUSUser();
           if (isUS && onboarding.additionalInfo?.completed) {
             // Trigger background check in background (don't await)
             initiateUSBackgroundCheck(user.uid, onboarding).catch((error) => {

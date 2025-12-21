@@ -5,6 +5,8 @@
  * This integration is used for US artisan background checks during onboarding.
  */
 
+import { Buffer } from 'buffer';
+
 const CHECKR_API_BASE = 'https://api.checkr.com/v1';
 
 export interface CheckrCandidate {

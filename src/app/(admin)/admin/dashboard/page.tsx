@@ -2563,6 +2563,10 @@ export default function AdminDashboardPage() {
                                 <div className="mt-3 pt-3 border-t border-neutral-200">
                                   <button
                                     onClick={async () => {
+                                      if (!application.checkrBackgroundCheck?.reportId) {
+                                        alert('Background check report ID not available');
+                                        return;
+                                      }
                                       try {
                                         const response = await fetch(`/api/checkr/report?reportId=${application.checkrBackgroundCheck.reportId}`);
                                         const result = await response.json();

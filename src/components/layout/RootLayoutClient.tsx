@@ -26,6 +26,9 @@ export default function RootLayoutClient({
                       pathname === '/phixer' ||
                       pathname === '/admin';
 
+  // Check if current path is US corporate site (has its own layout)
+  const isUSCorporateSite = pathname?.startsWith('/us');
+
   // Get user role for inactivity timer configuration
   useEffect(() => {
     if (!isDashboard) return;
@@ -58,12 +61,12 @@ export default function RootLayoutClient({
 
   return (
     <>
-      {!isDashboard && <Topbar />}
-      {!isDashboard && <Navbar />}
+      {!isDashboard && !isUSCorporateSite && <Topbar />}
+      {!isDashboard && !isUSCorporateSite && <Navbar />}
       <InactivityGuard role={userRole}>
         {children}
       </InactivityGuard>
-      {!isDashboard && <Footer />}
+      {!isDashboard && !isUSCorporateSite && <Footer />}
     </>
   );
 }

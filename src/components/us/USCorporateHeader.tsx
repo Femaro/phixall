@@ -2,13 +2,53 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Logo from '@/app/logo.png';
 
 export default function USCorporateHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
+  
+  const servicesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const industriesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleServicesEnter = () => {
+    if (servicesTimeoutRef.current) {
+      clearTimeout(servicesTimeoutRef.current);
+    }
+    setServicesOpen(true);
+  };
+
+  const handleServicesLeave = () => {
+    servicesTimeoutRef.current = setTimeout(() => {
+      setServicesOpen(false);
+    }, 150);
+  };
+
+  const handleIndustriesEnter = () => {
+    if (industriesTimeoutRef.current) {
+      clearTimeout(industriesTimeoutRef.current);
+    }
+    setIndustriesOpen(true);
+  };
+
+  const handleIndustriesLeave = () => {
+    industriesTimeoutRef.current = setTimeout(() => {
+      setIndustriesOpen(false);
+    }, 150);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (servicesTimeoutRef.current) {
+        clearTimeout(servicesTimeoutRef.current);
+      }
+      if (industriesTimeoutRef.current) {
+        clearTimeout(industriesTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white shadow-sm">
@@ -28,10 +68,12 @@ export default function USCorporateHeader() {
           {/* Desktop Navigation */}
           <div className="hidden items-center gap-8 lg:flex">
             {/* Services Dropdown */}
-            <div className="relative">
+            <div 
+              className="relative"
+              onMouseEnter={handleServicesEnter}
+              onMouseLeave={handleServicesLeave}
+            >
               <button
-                onMouseEnter={() => setServicesOpen(true)}
-                onMouseLeave={() => setServicesOpen(false)}
                 className="flex items-center gap-1 text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-colors hover:text-[#3498db]"
               >
                 Services
@@ -42,8 +84,6 @@ export default function USCorporateHeader() {
               
               {servicesOpen && (
                 <div
-                  onMouseEnter={() => setServicesOpen(true)}
-                  onMouseLeave={() => setServicesOpen(false)}
                   className="absolute left-0 top-full mt-2 w-80 border border-neutral-200 bg-white shadow-xl"
                 >
                   <div className="grid gap-1 p-4">
@@ -89,10 +129,12 @@ export default function USCorporateHeader() {
             </div>
 
             {/* Industries Dropdown */}
-            <div className="relative">
+            <div 
+              className="relative"
+              onMouseEnter={handleIndustriesEnter}
+              onMouseLeave={handleIndustriesLeave}
+            >
               <button
-                onMouseEnter={() => setIndustriesOpen(true)}
-                onMouseLeave={() => setIndustriesOpen(false)}
                 className="flex items-center gap-1 text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-colors hover:text-[#3498db]"
               >
                 Industries
@@ -103,8 +145,6 @@ export default function USCorporateHeader() {
               
               {industriesOpen && (
                 <div
-                  onMouseEnter={() => setIndustriesOpen(true)}
-                  onMouseLeave={() => setIndustriesOpen(false)}
                   className="absolute left-0 top-full mt-2 w-64 border border-neutral-200 bg-white shadow-xl"
                 >
                   <div className="grid gap-1 p-4">

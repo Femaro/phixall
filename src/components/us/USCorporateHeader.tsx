@@ -56,12 +56,8 @@ export default function USCorporateHeader() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <Link href="/us" className="flex items-center gap-3">
-              <Image src={Logo} alt="Phixall" width={48} height={48} className="drop-shadow-lg" />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-neutral-900">PHIXALL.US</span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Enterprise Solutions</span>
-              </div>
+            <Link href="/us" className="flex items-center">
+              <Image src={Logo} alt="Phixall" width={64} height={64} />
             </Link>
           </div>
 

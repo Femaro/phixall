@@ -12,12 +12,8 @@ export default function USCorporateFooter() {
         <div className="grid gap-12 lg:grid-cols-5">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <Link href="/us" className="flex items-center gap-3">
-              <Image src={Logo} alt="Phixall" width={56} height={56} className="drop-shadow-lg" />
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-neutral-900">PHIXALL.US</span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Enterprise Solutions</span>
-              </div>
+            <Link href="/us" className="flex items-center">
+              <Image src={Logo} alt="Phixall" width={72} height={72} />
             </Link>
             <p className="mt-6 text-sm leading-relaxed text-neutral-600">
               Phixall, powered by Phixall Facility Management LLC, provides comprehensive facility management services for commercial, industrial, and residential properties across the United States. ISO 9001, OSHA, and EPA certified.

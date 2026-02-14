@@ -88,7 +88,7 @@ export default function SuppliesProcurementPage() {
             {[
               {
                 category: 'HVAC & Refrigeration',
-                icon: '❄️',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>',
                 items: [
                   'Air filters (all sizes)',
                   'Refrigerant gases',
@@ -102,7 +102,7 @@ export default function SuppliesProcurementPage() {
               },
               {
                 category: 'Electrical Supplies',
-                icon: '⚡',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
                 items: [
                   'Circuit breakers',
                   'Wiring and cables',
@@ -116,7 +116,7 @@ export default function SuppliesProcurementPage() {
               },
               {
                 category: 'Plumbing Supplies',
-                icon: '🔧',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
                 items: [
                   'Pipes and fittings',
                   'Valves and actuators',
@@ -186,7 +186,7 @@ export default function SuppliesProcurementPage() {
               },
               {
                 category: 'Industrial Supplies',
-                icon: '⚙️',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>',
                 items: [
                   'Bearings and bushings',
                   'Lubricants and oils',
@@ -200,7 +200,7 @@ export default function SuppliesProcurementPage() {
               },
               {
                 category: 'Office & Facility',
-                icon: '📋',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>',
                 items: [
                   'Office supplies',
                   'Break room supplies',
@@ -215,7 +215,7 @@ export default function SuppliesProcurementPage() {
             ].map((category) => (
               <div key={category.category} className="border-2 border-neutral-200 bg-white p-6">
                 <div className="flex items-start gap-3">
-                  <div className="text-4xl">{category.icon}</div>
+                  <div className="mx-auto w-fit">{category.icon}</div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-neutral-900">{category.category}</h3>
                     <ul className="mt-3 space-y-1.5">
@@ -249,7 +249,7 @@ export default function SuppliesProcurementPage() {
               {
                 title: 'Electrical Equipment',
                 brands: ['Siemens', 'Square D', 'Allen-Bradley', 'GE', 'Eaton', 'Schneider', 'ABB', 'Cutler-Hammer'],
-                icon: '⚡'
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>'
               },
               {
                 title: 'Plumbing Fixtures',
@@ -264,7 +264,7 @@ export default function SuppliesProcurementPage() {
             ].map((equipment) => (
               <div key={equipment.title} className="border-2 border-neutral-200 p-8">
                 <div className="flex items-center gap-3">
-                  <div className="text-4xl">{equipment.icon}</div>
+                  <div className="mx-auto w-fit">{equipment.icon}</div>
                   <h3 className="text-xl font-bold text-neutral-900">{equipment.title}</h3>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">

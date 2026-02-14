@@ -99,7 +99,7 @@ export default function OffshoreMarinePage() {
               },
               {
                 title: 'Marine Equipment Services',
-                icon: '⚓',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a2 2 0 110 4 2 2 0 010-4z" /></svg>',
                 services: [
                   'Mooring system maintenance',
                   'Winch and capstan service',
@@ -170,7 +170,7 @@ export default function OffshoreMarinePage() {
             ].map((category) => (
               <div key={category.title} className="border-2 border-neutral-200 bg-white p-8">
                 <div className="flex items-start gap-4">
-                  <div className="text-5xl">{category.icon}</div>
+                  <div>{category.icon}</div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-neutral-900">{category.title}</h3>
                     <ul className="mt-4 space-y-2">
@@ -215,7 +215,7 @@ export default function OffshoreMarinePage() {
               },
               {
                 title: 'USCG Compliance',
-                icon: '📋',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>',
                 description: 'Full compliance support for Coast Guard regulations, documentation, inspection preparation, and audit support.'
               },
               {
@@ -230,7 +230,7 @@ export default function OffshoreMarinePage() {
               }
             ].map((capability) => (
               <div key={capability.title} className="border-2 border-neutral-200 p-6">
-                <div className="text-4xl">{capability.icon}</div>
+                <div className="mx-auto w-fit">{capability.icon}</div>
                 <h3 className="mt-4 text-lg font-bold text-neutral-900">{capability.title}</h3>
                 <p className="mt-2 text-sm text-neutral-600">{capability.description}</p>
               </div>
@@ -313,13 +313,13 @@ export default function OffshoreMarinePage() {
 
           <div className="mt-12 grid gap-8 md:grid-cols-4">
             {[
-              { icon: '⚡', title: 'Equipment Failure', time: '< 2 hours' },
-              { icon: '🔥', title: 'Fire Suppression', time: 'Immediate' },
+              { icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>', title: 'Equipment Failure', time: '< 2 hours' },
+              { icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" /></svg>', title: 'Fire Suppression', time: 'Immediate' },
               { icon: '⚠️', title: 'Structural Damage', time: '< 3 hours' },
               { icon: '🛑', title: 'Environmental Spill', time: 'Immediate' }
             ].map((emergency) => (
               <div key={emergency.title} className="border border-white/20 bg-white/10 p-6 text-center backdrop-blur-sm">
-                <div className="text-5xl">{emergency.icon}</div>
+                <div>{emergency.icon}</div>
                 <h3 className="mt-3 font-bold text-white">{emergency.title}</h3>
                 <div className="mt-2 text-sm text-cyan-300">Response: {emergency.time}</div>
               </div>

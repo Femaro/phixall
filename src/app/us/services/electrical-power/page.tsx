@@ -30,7 +30,7 @@ export default function ElectricalPowerPage() {
             {[
               {
                 title: 'Power Distribution',
-                icon: '⚡',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>',
                 services: ['Main service panels', 'Switchgear maintenance', 'Circuit breaker service', 'Power factor correction', 'Load balancing', 'Transformer maintenance', 'Busway systems', 'Cable tray systems']
               },
               {
@@ -45,7 +45,7 @@ export default function ElectricalPowerPage() {
               },
               {
                 title: 'Industrial Electrical',
-                icon: '🏭',
+                icon: '<svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>',
                 services: ['Motor control centers', 'Variable frequency drives (VFD)', 'Industrial wiring', 'Machine electrical service', '480V three-phase systems', 'Control panel maintenance', 'Grounding systems', 'Arc flash studies']
               },
               {
@@ -61,7 +61,7 @@ export default function ElectricalPowerPage() {
             ].map((category) => (
               <div key={category.title} className="border-2 border-neutral-200 bg-white p-8">
                 <div className="flex items-start gap-4">
-                  <div className="text-5xl">{category.icon}</div>
+                  <div>{category.icon}</div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-neutral-900">{category.title}</h3>
                     <ul className="mt-4 space-y-2">

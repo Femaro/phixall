@@ -115,6 +115,13 @@ export function getCurrency(isUS: boolean | null): 'USD' | 'NGN' {
 }
 
 /**
+ * Get security deposit amount based on currency
+ */
+export function getSecurityDeposit(currency: 'USD' | 'NGN'): number {
+  return currency === 'USD' ? 50 : 1000; // $50 for US, ₦1000 for others
+}
+
+/**
  * Convert amount to minor unit (cents for USD, kobo for NGN)
  */
 export function toMinorUnit(amount: number, currency: 'USD' | 'NGN'): number {

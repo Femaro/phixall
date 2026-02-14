@@ -61,8 +61,34 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Deposit already held (₦1,000) - this is part of the final amount
-    const depositHeld = 1000;
+    // Deposit already held - get from job document or use default based on currency
+    // Check if job has deposit field, otherwise determine from client location
+    let depositHeld = jobData.deposit || 1000; // Default to NGN 1000 for backward compatibility
+    
+    // If deposit not set, try to determine from client profile
+    if (!jobData.deposit) {
+      const clientProfileRef = doc(db, 'profiles', clientId);
+      const clientProfileDoc = await getDoc(clientProfileRef);
+      if (clientProfileDoc.exists()) {
+        const clientProfile = clientProfileDoc.data();
+        // Check if client is US-based
+        const isUS = clientProfile.state && (
+          ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+           'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
+           'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+           'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+           'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+           'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+           'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+           'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+           'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+           'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia'].some(
+             state => state.toLowerCase() === clientProfile.state.toLowerCase()
+           )
+        );
+        depositHeld = isUS ? 50 : 1000; // $50 for US, ₦1000 for others
+      }
+    }
     
     // Calculate amounts
     // finalAmount already includes service amount + materials

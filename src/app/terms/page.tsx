@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useIsUSUser } from '@/hooks/useIsUSUser';
 
@@ -115,7 +115,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-neutral-900">7. Intellectual Property</h2>
             <p className="mt-4 text-neutral-700">
               {isUS ? (
-                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Claeva International LLC. Phixall is a product of Claeva International LLC. Phixall Technical Company Limited operates Phixall outside the United States under license from Claeva International LLC. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
+                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Facility Management LLC. Phixall is powered by Phixall Facility Management LLC. Phixall Technical Company Limited operates Phixall outside the United States under license from Phixall Facility Management LLC. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
               ) : (
                 <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Technical Company Limited. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
               )}
@@ -181,16 +181,16 @@ export default function TermsPage() {
             {isUS ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">Claeva International LLC</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                  <h3 className="text-lg font-semibold text-neutral-900">Phixall Facility Management LLC</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Phixall is powered by Phixall Facility Management LLC</p>
                   <ul className="mt-2 space-y-1 text-neutral-700">
                     <li><strong>Email:</strong> legal@phixall.com</li>
-                    <li><strong>Address:</strong> Claeva International LLC, United States</li>
+                    <li><strong>Address:</strong> Phixall Facility Management LLC, United States</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-neutral-900">International Operations</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC</p>
                   <ul className="mt-2 space-y-1 text-neutral-700">
                     <li><strong>Email:</strong> legal@phixall.com</li>
                     <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>

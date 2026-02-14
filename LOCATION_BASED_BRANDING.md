@@ -1,7 +1,7 @@
 # Location-Based Branding Implementation
 
 ## Overview
-Claeva International LLC ownership and branding now displays **only for US users**. Non-US users see Phixall Technical Company Limited branding.
+Phixall Facility Management LLC ownership and branding now displays **only for US users**. Non-US users see Phixall Technical Company Limited branding.
 
 ## Implementation Details
 
@@ -22,26 +22,26 @@ Claeva International LLC ownership and branding now displays **only for US users
 #### 2. **Client Components (Conditional Rendering)**
 
 **Footer** (`src/components/site/Footer.tsx`)
-- US users: "Phixall, a product of Claeva International LLC..."
+- US users: "Phixall, a product of Phixall Facility Management LLC..."
 - Non-US: "Professional facility management platform..."
-- Copyright: US users see Claeva International LLC, non-US see Phixall Technical Company Limited
+- Copyright: US users see Phixall Facility Management LLC, non-US see Phixall Technical Company Limited
 
 **Terms of Service** (`src/app/terms/page.tsx`)
-- US users: Claeva International LLC owns IP, Phixall Technical Company Limited operates under license
+- US users: Phixall Facility Management LLC owns IP, Phixall Technical Company Limited operates under license
 - Non-US: Phixall Technical Company Limited owns IP
-- Contact info: Shows Claeva section for US, Phixall Technical Company Limited for non-US
+- Contact info: Shows Phixall Facility Management section for US, Phixall Technical Company Limited for non-US
 
 **Privacy Policy** (`src/app/privacy/page.tsx`)
-- US users: Introduction mentions Claeva International LLC, includes CCPA rights
+- US users: Introduction mentions Phixall Facility Management LLC, includes CCPA rights
 - Non-US: Introduction mentions Phixall Technical Company Limited only, no CCPA section
 - Contact info: Conditional based on location
 
 **About Page** (`src/app/about/page.tsx`)
-- US users: Mentions Claeva International LLC throughout
-- Non-US: Generic Phixall branding without Claeva mentions
+- US users: Mentions Phixall Facility Management LLC throughout
+- Non-US: Generic Phixall branding without Phixall Facility Management mentions
 
 **Contact Page** (`src/app/contact/page.tsx`)
-- US users: Shows both Claeva International LLC and International Operations sections
+- US users: Shows both Phixall Facility Management LLC and International Operations sections
 - Non-US: Shows only Phixall Technical Company Limited office
 
 **Homepage** (`src/app/page.tsx`)
@@ -92,7 +92,7 @@ To test the location-based branding:
 1. **US User Simulation**
    - Set browser timezone to US (e.g., America/New_York)
    - Set browser language to en-US
-   - Should see Claeva International LLC branding
+   - Should see Phixall Facility Management LLC branding
 
 2. **Non-US User Simulation**
    - Set browser timezone to non-US (e.g., Africa/Lagos)

@@ -17,7 +17,7 @@ export default function Footer() {
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-neutral-600">
               {isUS ? (
-                <>Phixall, a product of Claeva International LLC, is a professional facility management platform connecting clients with skilled artisans. Serving customers in the United States and worldwide.</>
+                <>Phixall, powered by Phixall Facility Management LLC, is a professional facility management platform connecting clients with skilled artisans. Serving customers in the United States and worldwide.</>
               ) : (
                 <>Professional facility management platform connecting clients with skilled artisans. Serving customers worldwide.</>
               )}
@@ -148,7 +148,7 @@ export default function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-center text-sm text-neutral-500 sm:text-left">
               {isUS ? (
-                <>© {new Date().getFullYear()} Claeva International LLC. All rights reserved. Phixall is a product of Claeva International LLC.</>
+                <>© {new Date().getFullYear()} Phixall Facility Management LLC. All rights reserved. Phixall is powered by Phixall Facility Management LLC.</>
               ) : (
                 <>© {new Date().getFullYear()} Phixall Technical Company Limited. All rights reserved.</>
               )}

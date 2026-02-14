@@ -234,8 +234,8 @@ export default function ContactPage() {
               {isUS ? (
                 <div className="mt-8 space-y-4">
                   <div className="border border-neutral-200 bg-neutral-50 p-6">
-                    <h3 className="font-bold text-neutral-900">Claeva International LLC</h3>
-                    <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                    <h3 className="font-bold text-neutral-900">Phixall Facility Management LLC</h3>
+                    <p className="mt-2 text-sm text-neutral-600">Phixall is powered by Phixall Facility Management LLC</p>
                     <p className="mt-2 text-neutral-700">
                       United States
                     </p>
@@ -245,7 +245,7 @@ export default function ContactPage() {
                   </div>
                   <div className="border border-neutral-200 bg-neutral-50 p-6">
                     <h3 className="font-bold text-neutral-900">International Operations</h3>
-                    <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                    <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC</p>
                     <p className="mt-2 text-neutral-700">
                       Phixall Technical Company Limited
                       <br />

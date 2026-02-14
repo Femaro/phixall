@@ -159,8 +159,8 @@ export default function JobApprovalsPage() {
         }
       }
 
-      // Calculate base amount (deposit already held)
-      const depositHeld = 1000;
+      // Calculate base amount (deposit already held) - get from job or use default
+      const depositHeld = jobData?.deposit || 1000;
       const baseServiceAmount = jobData?.amount || 5000;
       const suggestedTotal = baseServiceAmount + materialCost; // Deposit already included in base
 

@@ -4,6 +4,9 @@ import React, { useEffect, useMemo, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { formatCurrency, getCurrency } from '@/lib/paystackClient';
+import { isUSProfile } from '@/lib/location';
 import { collection, query, onSnapshot, orderBy, where, updateDoc, doc, addDoc, serverTimestamp, getDoc, deleteDoc, getDocs, setDoc } from 'firebase/firestore';
 import { trainingModules } from '@/data/trainingModules';
 import type { User as FirebaseUser } from 'firebase/auth';
@@ -135,11 +138,23 @@ interface BillItem {
 }
 
 export default function AdminDashboardPage() {
+  const isUSBrowser = useIsUSUser();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [adminProfile, setAdminProfile] = useState<AdminProfile | null>(null);
   const [adminPermissions, setAdminPermissions] = useState<ReturnType<typeof getAdminPermissions> | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+  
+  // Determine if admin is US-based (browser detection + profile)
+  const isUS = useMemo(() => {
+    if (isUSBrowser === true) return true;
+    if (adminProfile) {
+      return isUSProfile(adminProfile);
+    }
+    return false;
+  }, [isUSBrowser, adminProfile]);
+  
+  const currency = getCurrency(isUS);
   
   // Data states
   const [clients, setClients] = useState<User[]>([]);
@@ -946,7 +961,7 @@ export default function AdminDashboardPage() {
       
       // Get deposit from form
       const depositFromForm = billForm.items
-        .find(item => (item as any).isDeposit === true)?.amount || 1000;
+        .find(item => (item as any).isDeposit === true)?.amount || (selectedJob as any)?.deposit || 1000;
       
       // Total amount = service + materials + deposit
       const totalAmount = serviceAmount + materialCostFromForm + depositFromForm;
@@ -1679,7 +1694,7 @@ export default function AdminDashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total Revenue</p>
-                    <p className="mt-2 text-2xl font-semibold text-neutral-900">₦{stats.totalRevenue.toLocaleString()}</p>
+                    <p className="mt-2 text-2xl font-semibold text-neutral-900">{formatCurrency(stats.totalRevenue, currency)}</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
                     <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1707,7 +1722,7 @@ export default function AdminDashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Resource Value</p>
-                    <p className="mt-2 text-2xl font-semibold text-neutral-900">₦{stats.totalResourceValue.toLocaleString()}</p>
+                    <p className="mt-2 text-2xl font-semibold text-neutral-900">{formatCurrency(stats.totalResourceValue, currency)}</p>
                   </div>
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-neutral-100 text-neutral-600">
                     <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1803,7 +1818,7 @@ export default function AdminDashboardPage() {
                         <p className="text-sm font-medium text-neutral-900">{txn.type}</p>
                       <p className="text-xs text-neutral-500">{formatTimestamp(txn.createdAt)}</p>
                       </div>
-                      <p className="font-semibold text-neutral-900">₦{Math.abs(txn.amount).toLocaleString()}</p>
+                      <p className="font-semibold text-neutral-900">{formatCurrency(Math.abs(txn.amount), currency)}</p>
                     </div>
                   ))}
                 </div>
@@ -1977,7 +1992,7 @@ export default function AdminDashboardPage() {
                           <span className="text-neutral-600"><strong>Artisan:</strong> {job.artisanName}</span>
                         )}
                         {job.budget && (
-                          <span className="font-semibold text-green-600">Budget: ₦{job.budget.toLocaleString()}</span>
+                          <span className="font-semibold text-green-600">Budget: {formatCurrency(job.budget, currency)}</span>
                         )}
                         {job.resources && job.resources.length > 0 && (
                           <span className="text-neutral-600"><strong>Resources:</strong> {job.resources.length} items</span>
@@ -2051,14 +2066,14 @@ export default function AdminDashboardPage() {
                                   <div className="flex items-center justify-between text-xs mb-1">
                                     <span className="text-neutral-600">Service Amount:</span>
                                     <span className="font-medium text-neutral-900">
-                                      ₦{bill.serviceAmount?.toLocaleString() || '0'}
+                                      {formatCurrency(bill.serviceAmount || 0, currency)}
                                     </span>
                                   </div>
                                   {bill.materialCost && bill.materialCost > 0 && (
                                     <div className="flex items-center justify-between text-xs mb-1">
                                       <span className="text-neutral-600">Materials Cost:</span>
                                       <span className="font-medium text-neutral-900">
-                                        ₦{bill.materialCost.toLocaleString()}
+                                        {formatCurrency(bill.materialCost, currency)}
                                       </span>
                                     </div>
                                   )}
@@ -2066,14 +2081,14 @@ export default function AdminDashboardPage() {
                                     <div className="flex items-center justify-between text-xs mb-1">
                                       <span className="text-neutral-600">Deposit (held):</span>
                                       <span className="font-medium text-neutral-900">
-                                        ₦{bill.depositHeld.toLocaleString()}
+                                        {formatCurrency(bill.depositHeld, currency)}
                                       </span>
                                     </div>
                                   )}
                                   <div className="flex items-center justify-between text-sm font-bold mt-2 pt-2 border-t border-neutral-200">
                                     <span className="text-neutral-900">Total Amount:</span>
                                     <span className="text-brand-600">
-                                      ₦{bill.amount?.toLocaleString() || '0'}
+                                      {formatCurrency(bill.amount || 0, currency)}
                                     </span>
                                   </div>
                                 </div>
@@ -2167,7 +2182,8 @@ export default function AdminDashboardPage() {
                               const approvedMaterials = materialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                               
                               const materialCost = approvedMaterials.reduce((sum, m: any) => sum + (m.totalCost || 0), 0);
-                              const depositHeld = 1000; // Fixed deposit
+                              // Get deposit from job document or use default
+                              const depositHeld = (selectedJob as any)?.deposit || 1000;
                               
                               // Auto-set recipient to client
                               const recipientId = job.clientId;
@@ -2671,13 +2687,13 @@ export default function AdminDashboardPage() {
             <div className="grid gap-6 sm:grid-cols-3">
               <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Total Revenue</p>
-                <p className="mt-2 text-3xl font-semibold text-neutral-900">₦{stats.totalRevenue.toLocaleString()}</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{formatCurrency(stats.totalRevenue, currency)}</p>
                 <p className="mt-1 text-xs text-neutral-500">All-time earnings</p>
               </div>
 
               <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-xs font-medium text-neutral-500 uppercase tracking-wide">Pending Payments</p>
-                <p className="mt-2 text-3xl font-semibold text-neutral-900">₦{stats.pendingRevenue.toLocaleString()}</p>
+                <p className="mt-2 text-3xl font-semibold text-neutral-900">{formatCurrency(stats.pendingRevenue, currency)}</p>
                 <p className="mt-1 text-xs text-neutral-500">Awaiting payment</p>
               </div>
 
@@ -2709,7 +2725,7 @@ export default function AdminDashboardPage() {
                         <p className={`font-semibold ${
                           txn.type === 'deposit' || txn.type === 'earning' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {txn.type === 'deposit' || txn.type === 'earning' ? '+' : '-'}₦{Math.abs(txn.amount).toLocaleString()}
+                          {txn.type === 'deposit' || txn.type === 'earning' ? '+' : '-'}{formatCurrency(Math.abs(txn.amount), currency)}
                         </p>
                         <span className={`text-xs ${
                           txn.status === 'completed' ? 'text-green-600' : txn.status === 'pending' ? 'text-yellow-600' : 'text-red-600'
@@ -2741,7 +2757,7 @@ export default function AdminDashboardPage() {
                           {bill.status}
                         </span>
                       </div>
-                      <p className="mt-2 text-lg font-bold text-neutral-900">₦{bill.amount.toLocaleString()}</p>
+                      <p className="mt-2 text-lg font-bold text-neutral-900">{formatCurrency(bill.amount, currency)}</p>
                     </div>
                   ))}
                 </div>
@@ -3093,7 +3109,7 @@ We have successfully received your application and our team will review it caref
               <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
                 <p className="text-sm text-neutral-600">Avg Job Value</p>
                 <p className="mt-2 text-3xl font-bold text-neutral-900">
-                  ₦{stats.completedJobs > 0 ? Math.round(stats.totalRevenue / stats.completedJobs).toLocaleString() : 0}
+                  {formatCurrency(stats.completedJobs > 0 ? Math.round(stats.totalRevenue / stats.completedJobs) : 0, currency)}
                 </p>
                 <p className="mt-1 text-xs text-neutral-500">Per job</p>
               </div>
@@ -3534,7 +3550,7 @@ We have successfully received your application and our team will review it caref
             <p className="mt-2 text-sm text-neutral-600">{selectedJob.title}</p>
             
             <div className="mt-4">
-              <label className="block text-sm font-medium text-neutral-700">Budget Amount (₦)</label>
+              <label className="block text-sm font-medium text-neutral-700">Budget Amount ({currency})</label>
               <input
                 type="number"
                 min="0"
@@ -4026,7 +4042,7 @@ We have successfully received your application and our team will review it caref
                   <div className="col-span-5 text-xs font-semibold text-neutral-600 uppercase tracking-wide">Item Name</div>
                   <div className="col-span-2 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-center">Quantity</div>
                   <div className="col-span-2 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-center">Rate (₦)</div>
-                  <div className="col-span-3 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-right">Amount (₦)</div>
+                  <div className="col-span-3 text-xs font-semibold text-neutral-600 uppercase tracking-wide text-right">Amount ({currency})</div>
                 </div>
                 <div className="space-y-2">
                   {billForm.items.map((item, index) => {

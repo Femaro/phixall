@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useIsUSUser } from '@/hooks/useIsUSUser';
 
@@ -15,7 +15,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-neutral-900">1. Introduction</h2>
             <p className="mt-4 text-neutral-700">
               {isUS ? (
-                <>Phixall is a product of Claeva International LLC (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). Claeva International LLC operates Phixall in the United States. Outside the United States, Phixall is operated by Phixall Technical Company Limited under license from Claeva International LLC. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).</>
+                <>Phixall is powered by Phixall Facility Management LLC (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). Phixall Facility Management LLC operates Phixall in the United States. Outside the United States, Phixall is operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC. We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).</>
               ) : (
                 <>Phixall Technical Company Limited (&quot;Phixall,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform, website, and mobile applications (collectively, the &quot;Services&quot;).</>
               )}
@@ -179,16 +179,16 @@ export default function PrivacyPage() {
             {isUS ? (
               <div className="mt-4 space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">Claeva International LLC</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Claeva International LLC</p>
+                  <h3 className="text-lg font-semibold text-neutral-900">Phixall Facility Management LLC</h3>
+                  <p className="mt-2 text-sm text-neutral-600">Phixall is powered by Phixall Facility Management LLC</p>
                   <ul className="mt-2 space-y-1 text-neutral-700">
                     <li><strong>Email:</strong> privacy@phixall.com</li>
-                    <li><strong>Address:</strong> Claeva International LLC, United States</li>
+                    <li><strong>Address:</strong> Phixall Facility Management LLC, United States</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-neutral-900">International Operations</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Claeva International LLC</p>
+                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC</p>
                   <ul className="mt-2 space-y-1 text-neutral-700">
                     <li><strong>Email:</strong> privacy@phixall.com</li>
                     <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>

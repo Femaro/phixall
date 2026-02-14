@@ -1,8 +1,10 @@
 ﻿'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import StructuredData from '@/components/seo/StructuredData';
 import { generateBreadcrumbSchema } from '@/lib/structuredData';
+import { useIsUSUser } from '@/hooks/useIsUSUser';
+import { formatCurrency, getCurrency } from '@/lib/paystackClient';
 
 const breadcrumbSchema = generateBreadcrumbSchema([
   { name: 'Home', url: '/' },
@@ -11,6 +13,14 @@ const breadcrumbSchema = generateBreadcrumbSchema([
 
 export default function SubscriptionPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const isUS = useIsUSUser();
+  const currency = getCurrency(isUS);
+  
+  // Convert NGN prices to USD (approximate rate: 1 USD = 1500 NGN)
+  const NGN_TO_USD_RATE = 1500;
+  const convertPrice = (ngnPrice: number): number => {
+    return currency === 'USD' ? Math.round(ngnPrice / NGN_TO_USD_RATE) : ngnPrice;
+  };
 
   const plans = [
     {
@@ -21,8 +31,8 @@ export default function SubscriptionPage() {
       borderColor: 'border-amber-200',
       bgColor: 'bg-amber-50',
       textColor: 'text-amber-600',
-      price: 25000,
-      yearlyPrice: 270000, // 10% discount
+      price: convertPrice(25000),
+      yearlyPrice: convertPrice(270000), // 10% discount
       servicesIncluded: [
         'Basic Plumbing Repairs',
         'Electrical Troubleshooting',
@@ -44,8 +54,8 @@ export default function SubscriptionPage() {
       borderColor: 'border-yellow-200',
       bgColor: 'bg-yellow-50',
       textColor: 'text-yellow-600',
-      price: 50000,
-      yearlyPrice: 540000, // 10% discount
+      price: convertPrice(50000),
+      yearlyPrice: convertPrice(540000), // 10% discount
       servicesIncluded: [
         'All Bronze services',
         'HVAC Maintenance',
@@ -69,8 +79,8 @@ export default function SubscriptionPage() {
       borderColor: 'border-purple-200',
       bgColor: 'bg-purple-50',
       textColor: 'text-purple-600',
-      price: 100000,
-      yearlyPrice: 1080000, // 10% discount
+      price: convertPrice(100000),
+      yearlyPrice: convertPrice(1080000), // 10% discount
       servicesIncluded: [
         'All Gold services',
         'Roofing Inspections & Repairs',
@@ -166,13 +176,13 @@ export default function SubscriptionPage() {
                     <h3 className="mt-4 text-2xl font-bold text-neutral-900">{plan.name}</h3>
                     <div className="mt-4">
                       <span className="text-4xl font-bold text-neutral-900">
-                        ₦{price.toLocaleString()}
+                        {formatCurrency(price, currency)}
                       </span>
                       <span className="text-neutral-600">/month</span>
                     </div>
                     {billingCycle === 'yearly' && (
                       <p className="mt-2 text-sm text-neutral-500">
-                        ₦{totalPrice.toLocaleString()} billed annually
+                        {formatCurrency(totalPrice, currency)} billed annually
                       </p>
                     )}
                   </div>

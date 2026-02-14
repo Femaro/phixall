@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { getFirebase } from '@/lib/firebaseClient';
 import { useIsUSUser } from '@/hooks/useIsUSUser';
 import { getPhonePlaceholder } from '@/lib/phoneUtils';
+import { formatCurrency, getCurrency, getSecurityDeposit } from '@/lib/paystackClient';
+import { isUSProfile } from '@/lib/location';
 import { addDoc, collection, serverTimestamp, query, where, onSnapshot, updateDoc, doc, orderBy, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -116,8 +118,21 @@ export default function ClientDashboardPage() {
 function ClientDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const isUS = useIsUSUser();
+  const isUSBrowser = useIsUSUser();
+  const [userProfile, setUserProfile] = useState<ClientProfile | null>(null);
   const paystackReference = searchParams.get('reference');
+  
+  // Determine if user is US-based (browser detection + profile)
+  const isUS = useMemo(() => {
+    if (isUSBrowser === true) return true;
+    if (userProfile) {
+      return isUSProfile(userProfile);
+    }
+    return false;
+  }, [isUSBrowser, userProfile]);
+  
+  const currency = getCurrency(isUS);
+  const securityDeposit = getSecurityDeposit(currency);
   const cancelledPayment = searchParams.get('cancelled');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -140,7 +155,6 @@ function ClientDashboardContent() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallet, setWallet] = useState<Wallet>({ balance: 0, totalDeposits: 0, totalSpent: 0 });
   const [user, setUser] = useState<FirebaseUser | null>(null);
-  const [userProfile, setUserProfile] = useState<ClientProfile | null>(null);
   const [activeTab, setActiveTab] = useState<ClientTab>('overview');
   const [loading, setLoading] = useState(true);
   const [depositAmount, setDepositAmount] = useState('');
@@ -373,15 +387,14 @@ function ClientDashboardContent() {
         return;
       }
 
-      // Check wallet balance - Minimum ₦1000 required
-      const MINIMUM_DEPOSIT = 1000;
+      // Check wallet balance - Minimum deposit required (currency-aware)
       const walletRef = doc(db, 'wallets', currentUser.uid);
       const walletSnap = await getDoc(walletRef);
       const currentBalance = walletSnap.exists() ? (walletSnap.data().balance || 0) : 0;
 
-      if (currentBalance < MINIMUM_DEPOSIT) {
+      if (currentBalance < securityDeposit) {
         setMessage({
-          text: `Insufficient wallet balance. Minimum ₦${MINIMUM_DEPOSIT.toLocaleString()} required to create a service request. Current balance: ₦${currentBalance.toLocaleString()}`,
+          text: `Insufficient wallet balance. Minimum ${formatCurrency(securityDeposit, currency)} required to create a service request. Current balance: ${formatCurrency(currentBalance, currency)}`,
           type: 'error',
         });
         setSubmitting(false);
@@ -439,8 +452,8 @@ function ClientDashboardContent() {
       // Hold deposit in wallet
       const walletData = walletSnap.data() || { heldBalance: 0 };
       await updateDoc(walletRef, {
-        balance: currentBalance - MINIMUM_DEPOSIT,
-        heldBalance: (walletData.heldBalance || 0) + MINIMUM_DEPOSIT,
+        balance: currentBalance - securityDeposit,
+        heldBalance: (walletData.heldBalance || 0) + securityDeposit,
         updatedAt: serverTimestamp(),
       });
 
@@ -469,7 +482,7 @@ function ClientDashboardContent() {
         createdByRole: 'client',
         attachments: attachmentUrls,
         artifact: 'service-request',
-        deposit: MINIMUM_DEPOSIT,
+        deposit: securityDeposit,
         depositHeld: true,
         paymentStatus: 'deposit_held',
         createdAt: serverTimestamp(),
@@ -480,13 +493,13 @@ function ClientDashboardContent() {
         userId: currentUser.uid,
         jobId: jobRef.id,
         type: 'deposit_hold',
-        amount: MINIMUM_DEPOSIT,
+        amount: securityDeposit,
         status: 'completed',
         description: `Deposit held for job: ${title}`,
         createdAt: serverTimestamp(),
       });
 
-      setMessage({ text: `Service request submitted successfully! ₦${MINIMUM_DEPOSIT.toLocaleString()} deposit has been held from your wallet and will be part of the final bill.`, type: 'success' });
+      setMessage({ text: `Service request submitted successfully! ${formatCurrency(securityDeposit, currency)} deposit has been held from your wallet and will be part of the final bill.`, type: 'success' });
       setTitle('');
       setDescription('');
       setServiceCategory('');
@@ -519,7 +532,7 @@ function ClientDashboardContent() {
       }
       const amount = Number(depositAmount);
       if (!Number.isFinite(amount) || amount < 100) {
-        setMessage({ text: 'Minimum deposit is ₦100', type: 'error' });
+        setMessage({ text: `Minimum deposit is ${formatCurrency(currency === 'USD' ? 1 : 100, currency)}`, type: 'error' });
         setProcessingPayment(false);
         return;
       }
@@ -1220,7 +1233,7 @@ function ClientDashboardContent() {
                       <div className="text-4xl">{plan.icon}</div>
                       <h4 className="mt-2 text-lg font-semibold text-neutral-900">{plan.name}</h4>
                       <div className="mt-2">
-                        <p className="text-3xl font-bold text-neutral-900">₦{displayAmount.toLocaleString()}</p>
+                        <p className="text-3xl font-bold text-neutral-900">{formatCurrency(displayAmount, currency)}</p>
                         <p className="text-xs uppercase tracking-wide text-neutral-500">{priceLabel}</p>
                       </div>
                       <div className={`mt-3 rounded-lg px-3 py-2 text-xs font-semibold ${plan.accent}`}>
@@ -1361,7 +1374,7 @@ function ClientDashboardContent() {
                 </svg>
                 <div>
                   <p className="text-xs text-neutral-600">Wallet Balance</p>
-                  <p className="font-bold text-brand-700">₦{wallet.balance.toLocaleString()}</p>
+                  <p className="font-bold text-brand-700">{formatCurrency(wallet.balance, currency)}</p>
                 </div>
               </div>
               <button
@@ -1463,12 +1476,12 @@ function ClientDashboardContent() {
                           <h4 className="font-semibold text-neutral-900">{bill.jobTitle || 'Job Bill'}</h4>
                           <p className="mt-1 text-sm text-neutral-600">{bill.description || 'Bill for job completion'}</p>
                           <div className="mt-2 flex items-center gap-4 text-sm">
-                            <span className="font-semibold text-amber-700">Amount: ₦{bill.amount?.toLocaleString() || '0'}</span>
+                            <span className="font-semibold text-amber-700">Amount: {formatCurrency(bill.amount || 0, currency)}</span>
                             {bill.depositHeld && (
-                              <span className="text-neutral-500">Deposit: ₦{bill.depositHeld.toLocaleString()} (held)</span>
+                              <span className="text-neutral-500">Deposit: {formatCurrency(bill.depositHeld, currency)} (held)</span>
                             )}
                             {bill.materialCost && (
-                              <span className="text-neutral-500">Materials: ₦{bill.materialCost.toLocaleString()}</span>
+                              <span className="text-neutral-500">Materials: {formatCurrency(bill.materialCost, currency)}</span>
                             )}
                           </div>
                         </div>
@@ -1497,7 +1510,7 @@ function ClientDashboardContent() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-neutral-600">Wallet Balance</p>
-                    <p className="mt-1 text-2xl font-bold text-neutral-900">₦{wallet.balance.toLocaleString()}</p>
+                    <p className="mt-1 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.balance, currency)}</p>
                   </div>
                 </div>
               </div>
@@ -1747,19 +1760,19 @@ function ClientDashboardContent() {
               <div className="rounded-xl border border-neutral-200 bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-soft">
                 <div className="text-3xl mb-3">💰</div>
                 <p className="text-sm font-medium text-neutral-600">Available Balance</p>
-                <p className="mt-2 text-3xl font-bold text-neutral-900">₦{wallet.balance.toLocaleString()}</p>
+                <p className="mt-2 text-3xl font-bold text-neutral-900">{formatCurrency(wallet.balance, currency)}</p>
               </div>
 
               <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
                 <div className="text-3xl mb-3">📥</div>
                 <p className="text-sm font-medium text-neutral-600">Total Deposits</p>
-                <p className="mt-2 text-2xl font-bold text-neutral-900">₦{wallet.totalDeposits.toLocaleString()}</p>
+                <p className="mt-2 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.totalDeposits, currency)}</p>
               </div>
 
               <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
                 <div className="text-3xl mb-3">📤</div>
                 <p className="text-sm font-medium text-neutral-600">Total Spent</p>
-                <p className="mt-2 text-2xl font-bold text-neutral-900">₦{wallet.totalSpent.toLocaleString()}</p>
+                <p className="mt-2 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.totalSpent, currency)}</p>
               </div>
             </div>
 
@@ -1771,7 +1784,7 @@ function ClientDashboardContent() {
 
                 <form onSubmit={handleDeposit} className="mt-6 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700">Amount (₦)</label>
+                    <label className={`block text-sm font-medium text-neutral-700`}>Amount ({currency})</label>
                     <input
                       type="number"
                       min="100"
@@ -1782,7 +1795,7 @@ function ClientDashboardContent() {
                       onChange={(e) => setDepositAmount(e.target.value)}
                       required
                     />
-                    <p className="mt-1 text-xs text-neutral-500">Minimum deposit: ₦100</p>
+                    <p className="mt-1 text-xs text-neutral-500">Minimum deposit: {formatCurrency(currency === 'USD' ? 1 : 100, currency)}</p>
                   </div>
 
                   <div className="rounded-lg bg-neutral-50 p-4">
@@ -1851,7 +1864,7 @@ function ClientDashboardContent() {
                         <div className={`text-right font-semibold ${
                           transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {transaction.type === 'deposit' ? '+' : '-'}₦{Math.abs(transaction.amount).toLocaleString()}
+                          {transaction.type === 'deposit' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount), currency)}
                         </div>
                       </div>
                     ))
@@ -2035,12 +2048,12 @@ function ClientDashboardContent() {
                     <div className="flex-1">
                       <p className="font-medium text-yellow-900">Payment Notice</p>
                       <p className="mt-1 text-sm text-yellow-800">
-                        A deposit of <strong>₦1,000</strong> will be held from your wallet when you submit this request.
+                        A deposit of <strong>{formatCurrency(securityDeposit, currency)}</strong> will be held from your wallet when you submit this request.
                         This amount will be part of your final bill upon job completion.
                       </p>
                       <p className="mt-2 text-sm text-yellow-800">
-                        Current wallet balance: <strong>₦{(wallet?.balance || 0).toLocaleString()}</strong>
-                        {wallet && wallet.balance < 1000 && (
+                        Current wallet balance: <strong>{formatCurrency(wallet?.balance || 0, currency)}</strong>
+                        {wallet && wallet.balance < securityDeposit && (
                           <span className="ml-2 text-red-600 font-medium">
                             (Insufficient - Please fund your wallet first)
                           </span>
@@ -2411,7 +2424,7 @@ function ClientDashboardContent() {
                   <div>
                     <h4 className="font-semibold text-amber-900">Deposit Forfeiture Notice</h4>
                     <p className="mt-1 text-sm text-amber-800">
-                      Cancelling this job will result in the forfeiture of your ₦1,000 deposit. This deposit will be used to offset logistics costs incurred as a result of your service request.
+                      Cancelling this job will result in the forfeiture of your {formatCurrency(securityDeposit, currency)} deposit. This deposit will be used to offset logistics costs incurred as a result of your service request.
                     </p>
                   </div>
                 </div>
@@ -2474,18 +2487,18 @@ function ClientDashboardContent() {
                       <span className="text-neutral-700">
                         {item.name} {item.quantity > 1 && `× ${item.quantity}`}
                       </span>
-                      <span className="font-medium text-neutral-900">₦{item.amount?.toLocaleString() || '0'}</span>
+                      <span className="font-medium text-neutral-900">{formatCurrency(item.amount || 0, currency)}</span>
                     </div>
                   ))}
                 </div>
                 <div className="mt-4 pt-4 border-t border-neutral-200">
                   <div className="flex items-center justify-between">
                     <span className="text-base font-semibold text-neutral-900">Total Amount</span>
-                    <span className="text-lg font-bold text-neutral-900">₦{selectedBill.amount?.toLocaleString() || '0'}</span>
+                    <span className="text-lg font-bold text-neutral-900">{formatCurrency(selectedBill.amount || 0, currency)}</span>
                   </div>
                   {selectedBill.depositHeld && (
                     <div className="mt-2 text-xs text-neutral-500">
-                      Note: ₦{selectedBill.depositHeld.toLocaleString()} deposit already held. You will be charged ₦{(selectedBill.amount - selectedBill.depositHeld).toLocaleString()}
+                      Note: {formatCurrency(selectedBill.depositHeld, currency)} deposit already held. You will be charged {formatCurrency(selectedBill.amount - selectedBill.depositHeld, currency)}
                     </div>
                   )}
                 </div>

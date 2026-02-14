@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { getFirebase } from '@/lib/firebaseClient';
 import { useIsUSUser } from '@/hooks/useIsUSUser';
 import { getPhonePlaceholder } from '@/lib/phoneUtils';
+import { formatCurrency, getCurrency } from '@/lib/paystackClient';
+import { isUSProfile } from '@/lib/location';
 import { doc, updateDoc, query, collection, where, onSnapshot, getDocs, orderBy, limit, addDoc, serverTimestamp, getDoc, setDoc } from 'firebase/firestore';
 import type { User as FirebaseUser } from 'firebase/auth';
 import { SupportChat } from '@/components/support/SupportChat';
@@ -132,7 +134,7 @@ interface Wallet {
 }
 
 export default function ArtisanDashboardPage() {
-  const isUS = useIsUSUser();
+  const isUSBrowser = useIsUSUser();
   const [available, setAvailable] = useState(false);
   const [availableJobs, setAvailableJobs] = useState<Job[]>([]);
   const [myJobs, setMyJobs] = useState<Job[]>([]);
@@ -178,7 +180,18 @@ export default function ArtisanDashboardPage() {
   const [jobMaterials, setJobMaterials] = useState<Record<string, MaterialRecommendation[]>>({});
 
   const CASHOUT_FEE_PERCENT = 2.5; // 2.5% fee
-  const MIN_CASHOUT = 1000; // Minimum ₦1,000
+  
+  // Determine if user is US-based (browser detection + profile)
+  const isUS = useMemo(() => {
+    if (isUSBrowser === true) return true;
+    if (profile) {
+      return isUSProfile(profile);
+    }
+    return false;
+  }, [isUSBrowser, profile]);
+  
+  const currency = getCurrency(isUS);
+  const MIN_CASHOUT = currency === 'USD' ? 10 : 1000; // Minimum $10 for US, ₦1,000 for others
 
   useEffect(() => {
     const { auth, db } = getFirebase();
@@ -804,7 +817,7 @@ export default function ArtisanDashboardPage() {
       const amount = parseFloat(cashoutAmount);
       
       if (amount < MIN_CASHOUT) {
-        alert(`Minimum cashout is ₦${MIN_CASHOUT.toLocaleString()}`);
+        alert(`Minimum cashout is ${formatCurrency(MIN_CASHOUT, currency)}`);
         setProcessingCashout(false);
         return;
       }
@@ -856,7 +869,7 @@ export default function ArtisanDashboardPage() {
         totalCashout: wallet.totalCashout + amount,
       });
 
-      alert(`Cashout request submitted! You will receive ₦${netAmount.toLocaleString()} (₦${fee.toFixed(2)} fee deducted)`);
+      alert(`Cashout request submitted! You will receive ${formatCurrency(netAmount, currency)} (${formatCurrency(fee, currency)} fee deducted)`);
       setCashoutAmount('');
     } catch (error) {
       console.error('Error processing cashout:', error);
@@ -1123,7 +1136,7 @@ export default function ArtisanDashboardPage() {
                 </svg>
                 <div>
                   <p className="text-xs text-neutral-600">Wallet Balance</p>
-                  <p className="font-bold text-green-700">₦{wallet.balance.toLocaleString()}</p>
+                  <p className="font-bold text-green-700">{formatCurrency(wallet.balance, currency)}</p>
                 </div>
               </div>
 
@@ -1185,7 +1198,7 @@ export default function ArtisanDashboardPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-neutral-600">Wallet Balance</p>
-                    <p className="mt-1 text-2xl font-bold text-neutral-900">₦{wallet.balance.toLocaleString()}</p>
+                    <p className="mt-1 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.balance, currency)}</p>
                   </div>
                 </div>
               </div>
@@ -1457,19 +1470,19 @@ export default function ArtisanDashboardPage() {
               <div className="rounded-xl border border-neutral-200 bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-soft">
                 <div className="text-3xl mb-3">💰</div>
                 <p className="text-sm font-medium text-neutral-600">Available Balance</p>
-                <p className="mt-2 text-3xl font-bold text-neutral-900">₦{wallet.balance.toLocaleString()}</p>
+                <p className="mt-2 text-3xl font-bold text-neutral-900">{formatCurrency(wallet.balance, currency)}</p>
               </div>
 
               <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
                 <div className="text-3xl mb-3">📈</div>
                 <p className="text-sm font-medium text-neutral-600">Total Earnings</p>
-                <p className="mt-2 text-2xl font-bold text-neutral-900">₦{wallet.totalEarnings.toLocaleString()}</p>
+                <p className="mt-2 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.totalEarnings, currency)}</p>
               </div>
 
               <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-soft">
                 <div className="text-3xl mb-3">📤</div>
                 <p className="text-sm font-medium text-neutral-600">Total Cashout</p>
-                <p className="mt-2 text-2xl font-bold text-neutral-900">₦{wallet.totalCashout.toLocaleString()}</p>
+                <p className="mt-2 text-2xl font-bold text-neutral-900">{formatCurrency(wallet.totalCashout, currency)}</p>
               </div>
             </div>
 
@@ -1525,7 +1538,7 @@ export default function ArtisanDashboardPage() {
                 {/* Cashout Form */}
                 <form onSubmit={handleCashout} className="mt-6 space-y-4 border-t border-neutral-200 pt-6">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700">Amount to Cashout (₦)</label>
+                    <label className="block text-sm font-medium text-neutral-700">Amount to Cashout ({currency})</label>
                     <input
                       type="number"
                       min={MIN_CASHOUT}
@@ -1538,7 +1551,7 @@ export default function ArtisanDashboardPage() {
                       required
                     />
                     <p className="mt-1 text-xs text-neutral-500">
-                      Minimum: ₦{MIN_CASHOUT.toLocaleString()} | Available: ₦{wallet.balance.toLocaleString()}
+                      Minimum: {formatCurrency(MIN_CASHOUT, currency)} | Available: {formatCurrency(wallet.balance, currency)}
                     </p>
                   </div>
 
@@ -1548,15 +1561,15 @@ export default function ArtisanDashboardPage() {
                       <div className="mt-2 space-y-1 text-sm text-amber-700">
                         <div className="flex justify-between">
                           <span>Amount:</span>
-                          <span className="font-semibold">₦{parseFloat(cashoutAmount).toLocaleString()}</span>
+                          <span className="font-semibold">{formatCurrency(parseFloat(cashoutAmount), currency)}</span>
                         </div>
                         <div className="flex justify-between">
                           <span>Fee ({CASHOUT_FEE_PERCENT}%):</span>
-                          <span className="font-semibold">-₦{((parseFloat(cashoutAmount) * CASHOUT_FEE_PERCENT) / 100).toFixed(2)}</span>
+                          <span className="font-semibold">-{formatCurrency((parseFloat(cashoutAmount) * CASHOUT_FEE_PERCENT) / 100, currency)}</span>
                         </div>
                         <div className="flex justify-between border-t border-amber-300 pt-1 font-bold">
                           <span>You Receive:</span>
-                          <span>₦{(parseFloat(cashoutAmount) - (parseFloat(cashoutAmount) * CASHOUT_FEE_PERCENT) / 100).toLocaleString()}</span>
+                          <span>{formatCurrency(parseFloat(cashoutAmount) - (parseFloat(cashoutAmount) * CASHOUT_FEE_PERCENT) / 100, currency)}</span>
                         </div>
                       </div>
                     </div>
@@ -1617,7 +1630,7 @@ export default function ArtisanDashboardPage() {
                         <div className={`text-right font-semibold ${
                           transaction.type === 'earning' ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {transaction.type === 'earning' ? '+' : '-'}₦{Math.abs(transaction.amount).toLocaleString()}
+                          {transaction.type === 'earning' ? '+' : '-'}{formatCurrency(Math.abs(transaction.amount), currency)}
                         </div>
                       </div>
                     ))
@@ -1878,7 +1891,7 @@ export default function ArtisanDashboardPage() {
                                           <div className="mt-2 flex items-center gap-2">
                                             <span className="text-xs text-neutral-500">Amount to Procure:</span>
                                             <span className="text-sm font-semibold text-green-700">
-                                              ₦{material.totalCost.toLocaleString()}
+                                              {formatCurrency(material.totalCost, currency)}
                                             </span>
                                           </div>
                                         )}

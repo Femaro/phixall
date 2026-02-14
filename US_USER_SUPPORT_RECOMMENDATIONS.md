@@ -192,7 +192,7 @@ This document identifies all areas of the Phixall platform that need updates to 
 
 #### Recommendations:
 - **Conditional structured data** based on user location
-- **US users**: Show Claeva International LLC as primary
+- **US users**: Show Phixall Facility Management LLC as primary
 - **Non-US users**: Show Phixall Technical Company Limited
 
 ---

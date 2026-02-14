@@ -73,7 +73,7 @@ export function getCompanyName(isUS: boolean | null): string {
     // Server-side: return generic name
     return 'Phixall';
   }
-  return isUS ? 'Claeva International LLC' : 'Phixall Technical Company Limited';
+  return isUS ? 'Phixall Facility Management LLC' : 'Phixall Technical Company Limited';
 }
 
 /**
@@ -84,8 +84,85 @@ export function getOwnerText(isUS: boolean | null): string {
     return 'Phixall';
   }
   if (isUS) {
-    return 'Phixall, a product of Claeva International LLC';
+    return 'Phixall, powered by Phixall Facility Management LLC';
   }
   return 'Phixall';
 }
 
+/**
+ * US States list for validation
+ */
+export const US_STATES = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+  'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
+  'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+  'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+  'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+  'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+  'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+  'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+  'West Virginia', 'Wisconsin', 'Wyoming', 'District of Columbia'
+];
+
+/**
+ * Check if a user profile indicates they are in the US
+ * Checks state, address, and coordinates
+ */
+export function isUSProfile(profile: {
+  state?: string;
+  address?: string;
+  coordinates?: { lat: number; lng: number };
+} | null | undefined): boolean {
+  if (!profile) return false;
+
+  // Check state
+  if (profile.state) {
+    const stateUpper = profile.state.trim();
+    if (US_STATES.some(usState => usState.toLowerCase() === stateUpper.toLowerCase())) {
+      return true;
+    }
+    // Check common abbreviations
+    const usStateAbbr = [
+      'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID',
+      'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN',
+      'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND',
+      'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT',
+      'VA', 'WA', 'WV', 'WI', 'WY', 'DC'
+    ];
+    if (usStateAbbr.includes(stateUpper.toUpperCase())) {
+      return true;
+    }
+  }
+
+  // Check address for US indicators
+  if (profile.address) {
+    const addressUpper = profile.address.toUpperCase();
+    // Check for US zip code pattern (5 digits or 5+4)
+    if (/\b\d{5}(-\d{4})?\b/.test(profile.address)) {
+      return true;
+    }
+    // Check for common US address patterns
+    if (addressUpper.includes('USA') || addressUpper.includes('UNITED STATES') || 
+        addressUpper.includes('US,') || addressUpper.endsWith(', US')) {
+      return true;
+    }
+  }
+
+  // Check coordinates - US is roughly between 24-50°N and 66-125°W
+  if (profile.coordinates?.lat && profile.coordinates?.lng) {
+    const { lat, lng } = profile.coordinates;
+    // US mainland bounds (approximate)
+    if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) {
+      return true;
+    }
+    // Alaska bounds (approximate)
+    if (lat >= 51 && lat <= 72 && lng >= -180 && lng <= -130) {
+      return true;
+    }
+    // Hawaii bounds (approximate)
+    if (lat >= 18 && lat <= 23 && lng >= -161 && lng <= -154) {
+      return true;
+    }
+  }  return false;
+}

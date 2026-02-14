@@ -21,7 +21,7 @@ export default function AboutPage() {
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
               {isUS ? (
-                <>Phixall, a product of Claeva International LLC, is a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers. We serve customers in the United States and worldwide.</>
+                <>Phixall, powered by Phixall Facility Management LLC, is a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers. We serve customers in the United States and worldwide.</>
               ) : (
                 <>We&apos;re building a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers.</>
               )}
@@ -47,7 +47,7 @@ export default function AboutPage() {
                 </p>
                 <p>
                   {isUS ? (
-                    <>Today, Phixall, a product of Claeva International LLC, serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers. International operations are conducted by Phixall Technical Company Limited under license from Claeva International LLC.</>
+                    <>Today, Phixall, powered by Phixall Facility Management LLC, serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers. International operations are conducted by Phixall Technical Company Limited under license from Phixall Facility Management LLC.</>
                   ) : (
                     <>Today, Phixall serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.</>
                   )}

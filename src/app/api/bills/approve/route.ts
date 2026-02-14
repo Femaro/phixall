@@ -49,7 +49,18 @@ export async function POST(request: NextRequest) {
     const wallet = walletDoc.data() || { balance: 0, heldBalance: 0 };
 
     const totalAmount = billData.amount;
-    const depositHeld = billData.depositHeld || 1000;
+    // Get deposit from bill or job document
+    let depositHeld = billData.depositHeld;
+    if (!depositHeld && billData.jobId) {
+      const jobDoc = await getDoc(doc(db, 'jobs', billData.jobId));
+      if (jobDoc.exists()) {
+        depositHeld = jobDoc.data().deposit || 1000;
+      } else {
+        depositHeld = 1000; // Default fallback
+      }
+    } else {
+      depositHeld = depositHeld || 1000; // Default fallback
+    }
     const remainingAmount = totalAmount - depositHeld;
 
     // Check if client has sufficient balance

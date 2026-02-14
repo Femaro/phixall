@@ -77,14 +77,6 @@ export default function USCorporateFooter() {
               <li><Link href="/us/about" className="text-neutral-600 transition-colors hover:text-[#3498db]">About Us</Link></li>
               <li><Link href="/us/contact" className="text-neutral-600 transition-colors hover:text-[#3498db]">Contact</Link></li>
               <li><Link href="/us/request-quote" className="text-neutral-600 transition-colors hover:text-[#3498db]">Request Quote</Link></li>
-              <li>
-                <a href="https://phixall.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-neutral-600 transition-colors hover:text-[#3498db]">
-                  Facility Management App
-                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              </li>
             </ul>
 
             <div className="mt-6">

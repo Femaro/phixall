@@ -129,19 +129,6 @@ export default function USCorporateHeader() {
               Contact
             </Link>
 
-            {/* Link to Main App */}
-            <a
-              href="https://phixall.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 border-2 border-neutral-300 bg-neutral-50 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-all hover:border-[#3498db] hover:bg-[#3498db] hover:text-white"
-            >
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Facility Management App
-            </a>
-
             {/* CTA Button */}
             <Link
               href="/us/request-quote"
@@ -187,15 +174,6 @@ export default function USCorporateHeader() {
               
               <Link href="/us/about" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">About</Link>
               <Link href="/us/contact" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">Contact</Link>
-              
-              <a
-                href="https://phixall.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block border-2 border-neutral-300 bg-neutral-50 px-4 py-3 text-center text-sm font-semibold text-neutral-700"
-              >
-                Facility Management App →
-              </a>
               
               <Link
                 href="/us/request-quote"

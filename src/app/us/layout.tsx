@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import USCorporateHeader from '@/components/us/USCorporateHeader';
+import USCorporateFooter from '@/components/us/USCorporateFooter';
 
 export const metadata: Metadata = {
   title: 'Enterprise Facility Management Solutions | Phixall US',
@@ -27,5 +29,11 @@ export default function USLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      <USCorporateHeader />
+      {children}
+      <USCorporateFooter />
+    </>
+  );
 }

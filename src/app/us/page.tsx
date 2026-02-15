@@ -60,16 +60,18 @@ export default function USCorporatePage() {
               </div>
             </div>
 
-            {/* Corporate Image Placeholder */}
-            <div className="relative h-[500px] border border-white/20 bg-white/5 backdrop-blur-sm">
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center text-white/60">
-                  <svg className="mx-auto h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <p className="mt-4 text-sm">Corporate Facility Image</p>
-                </div>
-              </div>
+            {/* Corporate Video */}
+            <div className="relative h-[500px] overflow-hidden border border-white/20">
+              <video 
+                className="h-full w-full object-cover"
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+              >
+                <source src="/banner video.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>

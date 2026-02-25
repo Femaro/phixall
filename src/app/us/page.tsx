@@ -16,7 +16,7 @@ export default function USCorporatePage() {
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                Trusted by 200+ Warehouse Clients
+                Trusted by 200+ Enterprise Clients
               </div>
               <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-6xl">
                 Enterprise Facility Management
@@ -30,7 +30,7 @@ export default function USCorporatePage() {
                   href="/us/request-quote" 
                   className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
                 >
-                  Request Warehouse Quote
+                  Request Enterprise Quote
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -77,7 +77,7 @@ export default function USCorporatePage() {
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Warehouse Facility Management Services</h2>
+            <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Enterprise Facility Management Services</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
               Specialized solutions for warehouse installations and operations with professional support
             </p>
@@ -270,7 +270,7 @@ export default function USCorporatePage() {
               href="/us/request-quote" 
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
             >
-              Request Warehouse Quote
+              Request Enterprise Quote
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -283,7 +283,7 @@ export default function USCorporatePage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/70">
-            Professional warehouse facility management services
+            Professional enterprise facility management services
           </p>
         </div>
       </section>

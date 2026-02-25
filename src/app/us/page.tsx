@@ -44,11 +44,7 @@ export default function USCorporatePage() {
               </div>
               
               {/* Trust Indicators */}
-              <div className="mt-12 grid grid-cols-3 gap-6 border-t border-white/20 pt-8">
-                <div>
-                  <div className="text-3xl font-bold text-white">24/7</div>
-                  <div className="mt-1 text-sm text-white/80">Emergency Response</div>
-                </div>
+              <div className="mt-12 grid grid-cols-2 gap-6 border-t border-white/20 pt-8">
                 <div>
                   <div className="text-3xl font-bold text-white">98.5%</div>
                   <div className="mt-1 text-sm text-white/80">Uptime Guaranteed</div>
@@ -77,32 +73,13 @@ export default function USCorporatePage() {
         </div>
       </section>
 
-      {/* Certifications Banner */}
-      <section className="border-y border-neutral-200 bg-neutral-50">
-        <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-8 text-center">
-            <div className="text-sm font-semibold uppercase tracking-wider text-neutral-600">Certified & Compliant:</div>
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              {['ISO 9001', 'OSHA Certified', 'EPA Compliant', 'LEED Accredited', 'NFPA Certified'].map((cert) => (
-                <div key={cert} className="flex items-center gap-2 border border-neutral-300 bg-white px-4 py-2">
-                  <svg className="h-5 w-5 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-sm font-semibold text-neutral-700">{cert}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Core Services Grid */}
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Warehouse Facility Management Services</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
-              Specialized solutions for warehouse installations and operations, backed by certified professionals and 24/7 support
+              Specialized solutions for warehouse installations and operations with professional support
             </p>
           </div>
 
@@ -112,7 +89,7 @@ export default function USCorporatePage() {
                 title: 'Electrical Services',
                 icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
                 description: 'Complete electrical installation and maintenance for warehouse facilities including power distribution, lighting systems, and backup power solutions.',
-                features: ['Power Distribution', 'Lighting Systems', 'Backup Systems', 'Emergency Power'],
+                features: ['Power Distribution', 'Lighting Systems', 'Backup Systems', 'Equipment Power'],
                 link: '/us/services/electrical'
               },
               {
@@ -215,11 +192,10 @@ export default function USCorporatePage() {
       {/* Stats Section */}
       <section className="bg-[#1e3a5f] py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {[
               { value: '10,000+', label: 'Warehouse Jobs Completed', sublabel: 'Annually' },
               { value: '98.5%', label: 'Uptime Rate', sublabel: 'Across all facilities' },
-              { value: '< 2 hrs', label: 'Avg Response Time', sublabel: 'Emergency services' },
               { value: '200+', label: 'Warehouse Clients', sublabel: 'Nationwide' }
             ].map((stat) => (
               <div key={stat.label} className="border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm">
@@ -247,7 +223,7 @@ export default function USCorporatePage() {
                 description: 'Service warehouse facilities across all 50 states with consistent quality and standardized procedures.'
               },
               {
-                title: 'Certified Professionals',
+                title: 'Professional Team',
                 icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>,
                 description: 'All technicians are background-checked, licensed, insured, and trained in warehouse facility standards.'
               },
@@ -257,9 +233,9 @@ export default function USCorporatePage() {
                 description: 'Specialized knowledge of warehouse operations, safety requirements, and distribution center needs.'
               },
               {
-                title: 'Compliance Expertise',
+                title: 'Safety Expertise',
                 icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Stay compliant with OSHA, EPA, NFPA, and warehouse-specific safety regulations.'
+                description: 'Maintain compliance with safety regulations and warehouse-specific safety requirements.'
               },
               {
                 title: 'Cost Optimization',
@@ -267,9 +243,9 @@ export default function USCorporatePage() {
                 description: 'Reduce operational costs through preventive maintenance, efficient installations, and bulk procurement.'
               },
               {
-                title: '24/7 Support',
+                title: 'Reliable Support',
                 icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Round-the-clock emergency response teams and dedicated account management for warehouse operations.'
+                description: 'Dedicated account management and support teams for warehouse operations.'
               }
             ].map((benefit) => (
               <div key={benefit.title} className="border-2 border-neutral-200 p-8">
@@ -307,7 +283,7 @@ export default function USCorporatePage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/70">
-            Available 24/7 for emergency services • Response within 2 hours guaranteed
+            Professional warehouse facility management services
           </p>
         </div>
       </section>

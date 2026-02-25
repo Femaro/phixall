@@ -3,23 +3,23 @@ import USCorporateHeader from '@/components/us/USCorporateHeader';
 import USCorporateFooter from '@/components/us/USCorporateFooter';
 
 export const metadata: Metadata = {
-  title: 'Enterprise Facility Management Solutions | Phixall US',
-  description: 'Comprehensive facility management services for commercial, industrial, and residential properties. Warehouse maintenance, offshore services, HVAC, electrical, plumbing, and supplies. Serving all 50 states.',
+  title: 'Warehouse Facility Management Solutions | Phixall US',
+  description: 'Specialized warehouse facility management services including electrical, plumbing, carpentry, painting, installation supplies, and facility advisory. Expert warehouse operations support across all 50 states.',
   keywords: [
-    'enterprise facility management',
-    'commercial facility services',
-    'warehouse maintenance services',
-    'industrial facility management',
-    'offshore facility services',
-    'facility management company USA',
-    'commercial property maintenance',
-    'corporate facility solutions',
-    'MRO supplies procurement',
-    'preventive maintenance programs'
+    'warehouse facility management',
+    'warehouse electrical services',
+    'warehouse plumbing services',
+    'warehouse carpentry services',
+    'warehouse painting services',
+    'warehouse installation supplies',
+    'facility management advisory',
+    'warehouse maintenance USA',
+    'distribution center services',
+    'warehouse operations management'
   ],
   openGraph: {
-    title: 'Enterprise Facility Management Solutions | Phixall US',
-    description: 'Comprehensive facility management services for commercial, industrial, and residential properties across the United States.',
+    title: 'Warehouse Facility Management Solutions | Phixall US',
+    description: 'Specialized warehouse facility management services including electrical, plumbing, carpentry, painting, and supplies across the United States.',
     type: 'website',
   },
 };

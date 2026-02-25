@@ -30,18 +30,13 @@ export default function RequestQuotePage() {
   const [submitted, setSubmitted] = useState(false);
 
   const serviceOptions = [
-    'Commercial Facility Management',
-    'Warehouse & Industrial Services',
-    'Residential Property Management',
-    'Offshore & Marine Services',
-    'HVAC & Mechanical Systems',
-    'Electrical & Power Systems',
-    'Plumbing & Water Systems',
-    'Fire Safety & Suppression',
-    'Supplies & Procurement',
+    'Electrical Services',
+    'Plumbing Services',
+    'Carpentry Services',
+    'Painting Services',
+    'Installation Item Supplies',
+    'Facility Management Advisory',
     'Preventive Maintenance Program',
-    'Emergency Services',
-    'Energy Management',
   ];
 
   const handleServiceToggle = (service: string) => {
@@ -84,12 +79,12 @@ export default function RequestQuotePage() {
               </ul>
             </div>
             <div className="mt-8 border-t border-neutral-200 pt-8">
-              <p className="text-sm font-semibold text-neutral-700">Need immediate assistance?</p>
-              <a href="tel:1-800-PHIXALL" className="mt-2 inline-flex items-center gap-2 text-lg font-bold text-[#e67e22] hover:underline">
+              <p className="text-sm font-semibold text-neutral-700">Need assistance?</p>
+              <a href="tel:1-800-PHIXALL" className="mt-2 inline-flex items-center gap-2 text-lg font-bold text-[#3498db] hover:underline">
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                 </svg>
-                Call 1-800-PHIXALL (24/7)
+                Call 1-800-PHIXALL
               </a>
             </div>
             <Link href="/us" className="mt-8 inline-block border-2 border-[#3498db] bg-[#3498db] px-8 py-3 text-sm font-bold uppercase text-white transition-all hover:bg-[#2980b9]">
@@ -107,9 +102,9 @@ export default function RequestQuotePage() {
       <section className="border-b border-neutral-200 bg-gradient-to-br from-[#1e3a5f] to-[#2c3e50]">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white lg:text-5xl">Request Enterprise Quote</h1>
+            <h1 className="text-4xl font-bold text-white lg:text-5xl">Request Warehouse Services Quote</h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
-              Get a customized facility management solution tailored to your specific needs. Fill out the form below and our team will contact you within 24 hours.
+              Get a customized warehouse facility management solution tailored to your specific needs. Fill out the form below and our team will contact you within 24 hours.
             </p>
           </div>
         </div>
@@ -142,14 +137,14 @@ export default function RequestQuotePage() {
                     className="mt-2 w-full border-2 border-neutral-300 px-4 py-3 focus:border-[#3498db] focus:outline-none"
                   >
                     <option value="">Select Industry</option>
-                    <option value="healthcare">Healthcare</option>
-                    <option value="education">Education</option>
+                    <option value="ecommerce">E-Commerce</option>
+                    <option value="logistics">Logistics & 3PL</option>
                     <option value="manufacturing">Manufacturing</option>
-                    <option value="retail">Retail</option>
-                    <option value="logistics">Logistics & Distribution</option>
-                    <option value="hospitality">Hospitality</option>
-                    <option value="government">Government</option>
-                    <option value="technology">Technology</option>
+                    <option value="cold-storage">Cold Storage</option>
+                    <option value="retail">Retail Distribution</option>
+                    <option value="food-beverage">Food & Beverage</option>
+                    <option value="pharmaceutical">Pharmaceutical</option>
+                    <option value="automotive">Automotive Parts</option>
                     <option value="other">Other</option>
                   </select>
                 </div>
@@ -216,15 +211,15 @@ export default function RequestQuotePage() {
                     className="mt-2 w-full border-2 border-neutral-300 px-4 py-3 focus:border-[#3498db] focus:outline-none"
                   >
                     <option value="">Select Facility Type</option>
-                    <option value="office">Office Building</option>
                     <option value="warehouse">Warehouse/Distribution Center</option>
-                    <option value="retail">Retail Space</option>
-                    <option value="manufacturing">Manufacturing Facility</option>
-                    <option value="healthcare">Healthcare Facility</option>
-                    <option value="education">Educational Institution</option>
-                    <option value="residential">Residential Property</option>
-                    <option value="mixed">Mixed Use</option>
-                    <option value="other">Other</option>
+                    <option value="ecommerce">E-Commerce Fulfillment Center</option>
+                    <option value="cold-storage">Cold Storage Facility</option>
+                    <option value="manufacturing">Manufacturing Warehouse</option>
+                    <option value="3pl">3PL/Logistics Facility</option>
+                    <option value="food-beverage">Food & Beverage Distribution</option>
+                    <option value="pharmaceutical">Pharmaceutical Warehouse</option>
+                    <option value="automotive">Automotive Parts Distribution</option>
+                    <option value="other">Other Warehouse Type</option>
                   </select>
                 </div>
                 <div>
@@ -356,10 +351,10 @@ export default function RequestQuotePage() {
           </form>
 
           {/* Contact Info */}
-          <div className="mt-12 border-2 border-[#e67e22] bg-orange-50 p-8 text-center">
+          <div className="mt-12 border-2 border-[#3498db] bg-blue-50 p-8 text-center">
             <h3 className="text-xl font-bold text-neutral-900">Prefer to speak with someone?</h3>
-            <p className="mt-2 text-neutral-600">Our enterprise sales team is available 24/7</p>
-            <a href="tel:1-800-PHIXALL" className="mt-4 inline-flex items-center gap-2 text-2xl font-bold text-[#e67e22] hover:underline">
+            <p className="mt-2 text-neutral-600">Our sales team is available to assist you</p>
+            <a href="tel:1-800-PHIXALL" className="mt-4 inline-flex items-center gap-2 text-2xl font-bold text-[#3498db] hover:underline">
               <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
               </svg>

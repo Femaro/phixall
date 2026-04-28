@@ -3,15 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1541888946425-d81bb82040ce?auto=format&fit=crop&q=80&w=1400';
+const HERO_IMAGE = '/us/images/us-proof-planning.jpg';
 
 export default function EngineeringPMPage() {
   return (
     <main className="min-h-screen bg-white">
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-cyan-950">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
+        <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px]" />
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:items-center lg:px-8 lg:py-24">
           <div className="max-w-xl">
             <div className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-white">
               Programs & portfolios

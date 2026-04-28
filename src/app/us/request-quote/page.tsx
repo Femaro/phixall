@@ -356,7 +356,7 @@ export default function RequestQuotePage() {
           {/* Contact */}
           <div className="mt-12 border-2 border-[#3498db] bg-blue-50 p-8 text-center">
             <p className="text-lg text-neutral-700">
-              Prefer to speak with someone? Or send an email to{' '}
+              Or send an email to{' '}
               <a href="mailto:ops@phixall.us" className="font-bold text-[#3498db] hover:underline">
                 ops@phixall.us
               </a>

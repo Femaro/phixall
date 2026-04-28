@@ -78,7 +78,7 @@ export const navWarehouseIndustries = {
       </svg>
     ),
     description:
-      'Facility services aligned to refrigerated warehousing: envelopes, glycol and ammonia-awareness partnerships, docks, condensation controls, QA holds, monitoring, energy integrity, rapid repair plays.',
+      'Facility services aligned to refrigerated warehousing: envelopes, glycol systems, docks, condensation controls, QA holds, monitoring, and rapid repair. Programs include coordination of trades near ammonia industrial refrigeration—from machinery-room perimeters through site safety briefings—with scheduling language that respects IIAR-aligned and PSM-driven facility programs.',
     services: [
       {
         title: 'Refrigeration envelope',
@@ -106,6 +106,20 @@ export const navWarehouseIndustries = {
           'Slip resistance and markings in ramps',
           'PIT charging ventilation awareness',
           'Audit-friendly documentation rhythms',
+        ],
+      },
+      {
+        title: 'Ammonia refrigeration environments',
+        icon: boxIcon(),
+        items: [
+          'Machinery-room–adjacent maintenance and repair coordination windows',
+          'Hot work and ignition-source controls coordinated with refrigeration operators',
+          'Ammonia detector, alarm, and ventilation testing windows aligned with site procedures',
+          'Emergency response drill support alongside facility teams',
+          'Contractor onboarding briefings aligned to site ammonia hazard programs',
+          'Documentation hooks that fit ammonia facility management narratives',
+          'LOTO and clearance narratives around packaged equipment skids near ammonia circuits',
+          'Spill response pathway awareness for contractor teams on the floor',
         ],
       },
     ],

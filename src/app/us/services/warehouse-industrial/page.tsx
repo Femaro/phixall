@@ -121,7 +121,7 @@ export default function WarehouseIndustrialPage() {
                   'Blast freezer maintenance',
                   'Humidity control systems',
                   'Emergency refrigeration repair',
-                  'Ammonia refrigeration systems',
+                  'Ammonia refrigeration envelopes—machinery-room perimeter repairs coordinated with PSM-aligned site procedures',
                   'Compliance documentation'
                 ]
               },

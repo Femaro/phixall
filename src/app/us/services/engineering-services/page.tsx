@@ -6,9 +6,6 @@ import Image from 'next/image';
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1581092160562-40aa08f9aefd?auto=format&fit=crop&q=80&w=1400';
 
-const POSTER_IMAGE =
-  'https://images.unsplash.com/photo-1581090570563-942d9e8c662d?auto=format&fit=crop&q=80&w=1200';
-
 export default function EngineeringServicesPage() {
   return (
     <main className="min-h-screen bg-white">
@@ -129,22 +126,6 @@ export default function EngineeringServicesPage() {
                 </ul>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-neutral-200 bg-neutral-50 py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-neutral-900">Briefing reel</h2>
-          <p className="mt-2 max-w-2xl text-neutral-600">
-            Drop your site walk-through or commissioning clip—drop-in path keeps URLs stable (
-            <code className="rounded bg-neutral-200 px-1 py-0.5 text-xs">public/us/media/hero-placeholder.mp4</code>
-            ).
-          </p>
-          <div className="relative mt-8 overflow-hidden rounded-2xl ring-1 ring-neutral-300">
-            <video muted playsInline controls preload="metadata" className="aspect-video w-full bg-neutral-900 object-cover" poster={POSTER_IMAGE}>
-              <source src="/us/media/hero-placeholder.mp4" type="video/mp4" />
-            </video>
           </div>
         </div>
       </section>

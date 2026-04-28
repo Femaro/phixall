@@ -83,12 +83,12 @@ export default function RequestQuotePage() {
             </div>
             <div className="mt-8 border-t border-neutral-200 pt-8">
               <p className="text-sm font-semibold text-neutral-700">Need assistance?</p>
-              <a href="tel:1-800-PHIXALL" className="mt-2 inline-flex items-center gap-2 text-lg font-bold text-[#3498db] hover:underline">
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                </svg>
-                Call 1-800-PHIXALL
-              </a>
+              <p className="mt-2 text-sm text-neutral-600">
+                Or send an email to{' '}
+                <a href="mailto:ops@phixall.us" className="font-bold text-[#3498db] hover:underline">
+                  ops@phixall.us
+                </a>
+              </p>
             </div>
             <Link href="/us" className="mt-8 inline-block border-2 border-[#3498db] bg-[#3498db] px-8 py-3 text-sm font-bold uppercase text-white transition-all hover:bg-[#2980b9]">
               Return to Homepage
@@ -353,16 +353,14 @@ export default function RequestQuotePage() {
             </div>
           </form>
 
-          {/* Contact Info */}
+          {/* Contact */}
           <div className="mt-12 border-2 border-[#3498db] bg-blue-50 p-8 text-center">
-            <h3 className="text-xl font-bold text-neutral-900">Prefer to speak with someone?</h3>
-            <p className="mt-2 text-neutral-600">Our sales team is available to assist you</p>
-            <a href="tel:1-800-PHIXALL" className="mt-4 inline-flex items-center gap-2 text-2xl font-bold text-[#3498db] hover:underline">
-              <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-              </svg>
-              1-800-PHIXALL
-            </a>
+            <p className="text-lg text-neutral-700">
+              Prefer to speak with someone? Or send an email to{' '}
+              <a href="mailto:ops@phixall.us" className="font-bold text-[#3498db] hover:underline">
+                ops@phixall.us
+              </a>
+            </p>
           </div>
         </div>
       </section>

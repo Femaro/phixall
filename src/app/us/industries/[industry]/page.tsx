@@ -1,5 +1,8 @@
 'use client';
+
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { navWarehouseIndustries } from '@/data/navWarehouseIndustries';
 
 const industries = {
   healthcare: {
@@ -89,12 +92,15 @@ const industries = {
       { title: 'Critical Systems', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>, items: ['Precision cooling', 'Power distribution', 'UPS systems', 'Generator backup', 'Environmental monitoring', 'Hot/cold aisle', 'Cable management', 'Fire suppression'] },
       { title: 'Infrastructure', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>, items: ['Redundant power', 'Network infrastructure', 'Server room maintenance', 'Clean power systems', 'Energy efficiency', 'Capacity planning', 'Uptime optimization', '24/7 monitoring'] }
     ]
-  }
+  },
+  ...navWarehouseIndustries,
 };
 
-
-export default function IndustryTemplate({ params }: { params: { industry: string } }) {
-  const industry = industries[params.industry as keyof typeof industries];
+export default function IndustryTemplate() {
+  const params = useParams();
+  const raw = params?.industry;
+  const slug = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw[0] ?? '' : '';
+  const industry = industries[slug as keyof typeof industries];
   
   if (!industry) {
     return (

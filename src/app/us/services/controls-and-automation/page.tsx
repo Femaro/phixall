@@ -6,9 +6,6 @@ import Image from 'next/image';
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1400';
 
-const POSTER_IMAGE =
-  'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&q=80&w=1200';
-
 export default function ControlsAutomationPage() {
   return (
     <main className="min-h-screen bg-white">
@@ -129,21 +126,6 @@ export default function ControlsAutomationPage() {
                 </ul>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-t border-neutral-200 bg-neutral-50 py-16 lg:py-24">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-neutral-900">Operator-ready media</h2>
-          <p className="mt-2 max-w-2xl text-neutral-600">
-            Optional walkthrough—place <code className="rounded bg-neutral-200 px-1 py-0.5 text-xs">hero-placeholder.mp4</code> in{' '}
-            <code className="rounded bg-neutral-200 px-1 py-0.5 text-xs">public/us/media/</code>.
-          </p>
-          <div className="relative mt-8 overflow-hidden rounded-2xl ring-1 ring-neutral-300">
-            <video muted playsInline controls preload="metadata" className="aspect-video w-full bg-neutral-900 object-cover" poster={POSTER_IMAGE}>
-              <source src="/us/media/hero-placeholder.mp4" type="video/mp4" />
-            </video>
           </div>
         </div>
       </section>

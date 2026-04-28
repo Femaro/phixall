@@ -6,9 +6,6 @@ import Image from 'next/image';
 const HERO_IMAGE =
   'https://images.unsplash.com/photo-1541888946425-d81bb82040ce?auto=format&fit=crop&q=80&w=1400';
 
-const POSTER_IMAGE =
-  'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=1200';
-
 export default function EngineeringPMPage() {
   return (
     <main className="min-h-screen bg-white">
@@ -148,22 +145,6 @@ export default function EngineeringPMPage() {
                 <p className="mt-2 text-sm text-neutral-600">{item.text}</p>
               </div>
             ))}
-          </div>
-          <div className="relative mt-14 overflow-hidden rounded-2xl ring-1 ring-neutral-300">
-            <video
-              muted
-              playsInline
-              controls
-              preload="metadata"
-              className="aspect-video w-full bg-neutral-900 object-cover"
-              poster={POSTER_IMAGE}
-            >
-              <source src="/us/media/hero-placeholder.mp4" type="video/mp4" />
-            </video>
-            <p className="bg-neutral-100 px-4 py-3 text-xs text-neutral-600">
-              Optional briefing clip — add <code className="rounded bg-neutral-200 px-1 py-0.5">hero-placeholder.mp4</code>{' '}
-              under <code className="rounded bg-neutral-200 px-1 py-0.5">public/us/media/</code> without changing routing.
-            </p>
           </div>
         </div>
       </section>

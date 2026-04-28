@@ -56,20 +56,10 @@ export default function USCorporatePage() {
               </div>
             </div>
 
-            {/* Hero media — still image fallback; optional bundled mp4 */}
-            <div className="relative h-[460px] overflow-hidden rounded-2xl border border-white/20 ring-1 ring-white/10 lg:h-[520px]">
-              <Image
-                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1400"
-                alt="Warehouse operations and logistics"
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-              <div className="absolute inset-x-4 bottom-4 rounded-xl border border-white/20 bg-black/45 px-4 py-3 backdrop-blur-md">
-                <p className="text-xs uppercase tracking-wide text-white/85">Facility spotlight</p>
-                <p className="text-sm font-semibold text-white">Throughput-safe programs with engineering oversight from kickoff through turnover.</p>
-              </div>
+            <div className="relative h-[500px] overflow-hidden rounded-2xl border border-white/20">
+              <video className="h-full w-full object-cover" autoPlay loop muted playsInline>
+                <source src="/banner video.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>
@@ -202,22 +192,27 @@ export default function USCorporatePage() {
         </div>
       </section>
 
-      {/* Proof strip */}
+      {/* Proof strip — on-brand generated photography */}
       <section className="border-y border-neutral-200 bg-neutral-900 py-10">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-4 md:grid-cols-3">
             {[
-              { src: 'https://images.unsplash.com/photo-1581090464777-f3220cae1dbf?auto=format&fit=crop&q=80&w=800', alt: 'Mechanical fabrication detail' },
-              { src: 'https://images.unsplash.com/photo-1542744173-053636fc5aa5?auto=format&fit=crop&q=80&w=800', alt: 'Facility planning session' },
-              { src: 'https://images.unsplash.com/photo-1544197150-b99a580bbbc2?auto=format&fit=crop&q=80&w=800', alt: 'Automation and controls hardware' },
+              { src: '/us/images/us-proof-mechanical.jpg', alt: 'Precision mechanical fabrication on the shop floor', caption: 'Mechanical & fabrication' },
+              { src: '/us/images/us-proof-planning.jpg', alt: 'Team reviewing facility plans and schedules', caption: 'Facility planning & programs' },
+              { src: '/us/images/us-proof-controls.jpg', alt: 'Industrial control panels and automation hardware', caption: 'Automation & controls' },
             ].map((img) => (
-              <div key={img.alt} className="relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
-              </div>
+              <figure key={img.src} className="overflow-hidden rounded-2xl ring-1 ring-white/10">
+                <div className="relative aspect-[4/3]">
+                  <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+                </div>
+                <figcaption className="bg-neutral-950 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-neutral-300">
+                  {img.caption}
+                </figcaption>
+              </figure>
             ))}
           </div>
-          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-400">
-            Representative industrial imagery — replace with branded photography anytime.
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-500">
+            Facility programs from fabrication through commissioning—documented, coordinated, nationwide.
           </p>
         </div>
       </section>

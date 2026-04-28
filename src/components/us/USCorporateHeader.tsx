@@ -51,7 +51,7 @@ export default function USCorporateHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-neutral-200/80 bg-white/90 shadow-sm shadow-neutral-900/5 backdrop-blur-md transition-shadow">
       <nav className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
@@ -80,32 +80,49 @@ export default function USCorporateHeader() {
               
               {servicesOpen && (
                 <div
-                  className="absolute left-0 top-full mt-2 w-80 border border-neutral-200 bg-white shadow-xl"
+                  className="absolute left-0 top-full z-50 mt-2 max-h-[min(80vh,28rem)] w-[min(100vw-2rem,44rem)] overflow-y-auto rounded-xl border border-neutral-200/80 bg-white/95 shadow-xl shadow-neutral-900/10 ring-1 ring-black/5 backdrop-blur-md"
                 >
-                  <div className="grid gap-1 p-4">
-                    <Link href="/us/services/electrical" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                  <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-2 sm:gap-2 sm:p-4">
+                    <Link href="/us/services/electrical" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Electrical Services</div>
-                      <div className="text-xs text-neutral-500">Power, Lighting, Backup Systems</div>
+                      <div className="text-xs text-neutral-500">Power, lighting, backup systems</div>
                     </Link>
-                    <Link href="/us/services/plumbing" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                    <Link href="/us/services/plumbing" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Plumbing Services</div>
-                      <div className="text-xs text-neutral-500">Industrial Plumbing, Pipe Systems</div>
+                      <div className="text-xs text-neutral-500">Industrial plumbing, piping</div>
                     </Link>
-                    <Link href="/us/services/carpentry" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                    <Link href="/us/services/carpentry" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Carpentry Services</div>
-                      <div className="text-xs text-neutral-500">Shelving, Dock Repairs, Woodwork</div>
+                      <div className="text-xs text-neutral-500">Shelving, docks, woodwork</div>
                     </Link>
-                    <Link href="/us/services/painting" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                    <Link href="/us/services/painting" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Painting Services</div>
-                      <div className="text-xs text-neutral-500">Floor Coatings, Protective Sealants</div>
+                      <div className="text-xs text-neutral-500">Coatings, markings, finishes</div>
                     </Link>
-                    <Link href="/us/services/supplies" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                    <Link href="/us/services/supplies" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Installation Item Supplies</div>
-                      <div className="text-xs text-neutral-500">MRO Supplies, Equipment Parts</div>
+                      <div className="text-xs text-neutral-500">MRO, equipment parts</div>
                     </Link>
-                    <Link href="/us/services/advisory" className="block border-l-4 border-transparent px-4 py-3 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db] hover:bg-neutral-50 hover:text-[#3498db]">
+                    <Link href="/us/services/advisory" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Facility Management Advisory</div>
-                      <div className="text-xs text-neutral-500">Optimization, Compliance, Planning</div>
+                      <div className="text-xs text-neutral-500">Optimization, compliance</div>
+                    </Link>
+                    <Link href="/us/services/engineering-project-management-support" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
+                      <div className="font-bold">Eng. Project Management Support</div>
+                      <div className="text-xs text-neutral-500">Schedules, governance, turnover</div>
+                    </Link>
+                    <Link href="/us/services/engineering-services" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
+                      <div className="font-bold">Engineering Services</div>
+                      <div className="text-xs text-neutral-500">Studies, commissioning, reviews</div>
+                    </Link>
+                    <Link href="/us/services/controls-and-automation" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
+                      <div className="font-bold">Controls &amp; Automation</div>
+                      <div className="text-xs text-neutral-500">PLC-adjacent, panels, OT/IT edges</div>
+                    </Link>
+                  </div>
+                  <div className="border-t border-neutral-200 px-4 py-2.5">
+                    <Link href="/us/services" className="text-xs font-semibold uppercase tracking-wide text-[#3498db] hover:underline">
+                      View all services
                     </Link>
                   </div>
                 </div>
@@ -129,7 +146,7 @@ export default function USCorporateHeader() {
               
               {industriesOpen && (
                 <div
-                  className="absolute left-0 top-full mt-2 w-64 border border-neutral-200 bg-white shadow-xl"
+                  className="absolute left-0 top-full z-50 mt-2 w-64 rounded-xl border border-neutral-200/80 bg-white/95 shadow-xl shadow-neutral-900/10 ring-1 ring-black/5 backdrop-blur-md"
                 >
                   <div className="grid gap-1 p-4">
                     <Link href="/us/industries/ecommerce" className="block px-4 py-2 text-sm font-medium text-neutral-700 transition-all hover:bg-neutral-50 hover:text-[#3498db]">E-Commerce Warehouses</Link>
@@ -190,6 +207,10 @@ export default function USCorporateHeader() {
                   <Link href="/us/services/painting" className="block text-sm text-neutral-700 hover:text-[#3498db]">Painting Services</Link>
                   <Link href="/us/services/supplies" className="block text-sm text-neutral-700 hover:text-[#3498db]">Installation Item Supplies</Link>
                   <Link href="/us/services/advisory" className="block text-sm text-neutral-700 hover:text-[#3498db]">Facility Management Advisory</Link>
+                  <Link href="/us/services/engineering-project-management-support" className="block text-sm text-neutral-700 hover:text-[#3498db]">Eng. Project Management Support</Link>
+                  <Link href="/us/services/engineering-services" className="block text-sm text-neutral-700 hover:text-[#3498db]">Engineering Services</Link>
+                  <Link href="/us/services/controls-and-automation" className="block text-sm text-neutral-700 hover:text-[#3498db]">Controls &amp; Automation</Link>
+                  <Link href="/us/services" className="block text-sm font-semibold text-[#3498db]">All services</Link>
                 </div>
               </div>
               

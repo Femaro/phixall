@@ -56,18 +56,20 @@ export default function USCorporatePage() {
               </div>
             </div>
 
-            {/* Corporate Video */}
-            <div className="relative h-[500px] overflow-hidden border border-white/20">
-              <video 
-                className="h-full w-full object-cover"
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-              >
-                <source src="/banner video.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+            {/* Hero media — still image fallback; optional bundled mp4 */}
+            <div className="relative h-[460px] overflow-hidden rounded-2xl border border-white/20 ring-1 ring-white/10 lg:h-[520px]">
+              <Image
+                src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1400"
+                alt="Warehouse operations and logistics"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+              <div className="absolute inset-x-4 bottom-4 rounded-xl border border-white/20 bg-black/45 px-4 py-3 backdrop-blur-md">
+                <p className="text-xs uppercase tracking-wide text-white/85">Facility spotlight</p>
+                <p className="text-sm font-semibold text-white">Throughput-safe programs with engineering oversight from kickoff through turnover.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -131,7 +133,7 @@ export default function USCorporatePage() {
               <Link 
                 key={service.title}
                 href={service.link}
-                className="group border-2 border-neutral-200 bg-white p-8 transition-all hover:border-[#3498db] hover:shadow-lg"
+                className="group rounded-2xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition-all hover:-translate-y-0.5 hover:border-[#3498db] hover:shadow-lg hover:ring-[#3498db]/25"
               >
                 <div>{service.icon}</div>
                 <h3 className="mt-4 text-xl font-bold text-neutral-900 group-hover:text-[#3498db]">{service.title}</h3>
@@ -158,6 +160,68 @@ export default function USCorporatePage() {
         </div>
       </section>
 
+      {/* Engineering & automation */}
+      <section className="border-t border-neutral-200 bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 py-20">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-cyan-700">Engineering runway</p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Program management &amp; technical depth</h2>
+            <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
+              Layer PM discipline with controls and engineering services so warehouse upgrades stay coordinated from kickoff packets through energized checkout.
+            </p>
+          </div>
+          <div className="mt-14 grid gap-8 md:grid-cols-3">
+            {[
+              {
+                title: 'Engineering PM Support',
+                href: '/us/services/engineering-project-management-support',
+                copy: 'Milestones, change control boards, turnovers, stakeholder cadence—all aligned with how your docks and lines actually behave.',
+              },
+              {
+                title: 'Engineering Services',
+                href: '/us/services/engineering-services',
+                copy: 'Studies, commissioning, field troubleshooting, FAT/SAT—without losing context on warehouse uptime risks.',
+              },
+              {
+                title: 'Controls & Automation',
+                href: '/us/services/controls-and-automation',
+                copy: 'Panels, PLC-era stacks, HMIs/MES bridges, sequencing, validation plans—wired to pragmatic operator reality.',
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group flex flex-col rounded-2xl bg-white p-8 shadow-md ring-1 ring-neutral-200 transition hover:-translate-y-1 hover:shadow-xl hover:ring-cyan-200"
+              >
+                <h3 className="text-xl font-bold text-neutral-900 group-hover:text-cyan-800">{item.title}</h3>
+                <p className="mt-4 flex-1 text-sm leading-relaxed text-neutral-600">{item.copy}</p>
+                <span className="mt-8 text-xs font-semibold uppercase tracking-wide text-[#3498db]">Explore specialty</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Proof strip */}
+      <section className="border-y border-neutral-200 bg-neutral-900 py-10">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid gap-4 md:grid-cols-3">
+            {[
+              { src: 'https://images.unsplash.com/photo-1581090464777-f3220cae1dbf?auto=format&fit=crop&q=80&w=800', alt: 'Mechanical fabrication detail' },
+              { src: 'https://images.unsplash.com/photo-1542744173-053636fc5aa5?auto=format&fit=crop&q=80&w=800', alt: 'Facility planning session' },
+              { src: 'https://images.unsplash.com/photo-1544197150-b99a580bbbc2?auto=format&fit=crop&q=80&w=800', alt: 'Automation and controls hardware' },
+            ].map((img) => (
+              <div key={img.alt} className="relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-400">
+            Representative industrial imagery — replace with branded photography anytime.
+          </p>
+        </div>
+      </section>
+
       {/* Industries Served */}
       <section className="border-t border-neutral-200 bg-neutral-50 py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -179,7 +243,7 @@ export default function USCorporatePage() {
               { name: 'Pharmaceutical', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>, desc: 'Medical Supply Warehouses' },
               { name: 'Automotive Parts', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>, desc: 'Auto Parts Distribution Centers' }
             ].map((industry) => (
-              <div key={industry.name} className="border border-neutral-300 bg-white p-6 text-center transition-all hover:border-[#3498db] hover:shadow-md">
+              <div key={industry.name} className="rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm ring-1 ring-neutral-100 transition-all hover:border-[#3498db]/40 hover:shadow-md">
                 <div className="mx-auto w-fit">{industry.icon}</div>
                 <h3 className="mt-3 text-lg font-bold text-neutral-900">{industry.name}</h3>
                 <p className="mt-1 text-sm text-neutral-600">{industry.desc}</p>
@@ -198,7 +262,7 @@ export default function USCorporatePage() {
               { value: '98.5%', label: 'Uptime Rate', sublabel: 'Across all facilities' },
               { value: '200+', label: 'Warehouse Clients', sublabel: 'Nationwide' }
             ].map((stat) => (
-              <div key={stat.label} className="border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm">
+              <div key={stat.label} className="rounded-2xl border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
                 <div className="text-4xl font-bold text-white">{stat.value}</div>
                 <div className="mt-2 text-lg font-semibold text-white/90">{stat.label}</div>
                 <div className="mt-1 text-sm text-white/70">{stat.sublabel}</div>
@@ -248,7 +312,7 @@ export default function USCorporatePage() {
                 description: 'Dedicated account management and support teams for warehouse operations.'
               }
             ].map((benefit) => (
-              <div key={benefit.title} className="border-2 border-neutral-200 p-8">
+              <div key={benefit.title} className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm ring-1 ring-neutral-100">
                 <div>{benefit.icon}</div>
                 <h3 className="mt-4 text-xl font-bold text-neutral-900">{benefit.title}</h3>
                 <p className="mt-3 text-neutral-600">{benefit.description}</p>

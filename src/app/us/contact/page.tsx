@@ -2,15 +2,22 @@
 
 import Link from 'next/link';
 
+const EMAIL = 'ops@phixall.us';
+const PHONE_DISPLAY = '(317) 832-6185';
+const PHONE_HREF = 'tel:+13178326185';
+const ADDRESS = '1782 Williams Glen Blvd, Zionsville, IN 46077';
+const MAP_URL =
+  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('1782 Williams Glen Blvd, Zionsville, IN 46077');
+
 export default function USContactPage() {
   return (
     <main className="min-h-screen bg-white">
       <section className="border-b border-neutral-200 bg-gradient-to-br from-[#1e3a5f] to-[#2c3e50]">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white lg:text-5xl">Contact Enterprise Sales</h1>
+            <h1 className="text-4xl font-bold text-white lg:text-5xl">Contact Phixall US</h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
-              Get in touch with our enterprise facility management team. We're here to help 24/7.
+              Reach our operations desk for facility programs, engineering scopes, and site support. We respond during business hours and coordinate emergency dispatches through the same line.
             </p>
           </div>
         </div>
@@ -19,113 +26,95 @@ export default function USContactPage() {
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
-            {/* Contact Methods */}
             <div>
-              <h2 className="text-3xl font-bold text-neutral-900">Get In Touch</h2>
+              <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Reach us directly</h2>
               <p className="mt-4 text-lg text-neutral-600">
-                Our enterprise sales and support teams are available around the clock to discuss your facility management needs.
+                One mailbox and one coordinated phone number keep requests moving—tell us whether you need trades, procurement, advisory, automation, engineering PM, or a bundled scope.
               </p>
 
               <div className="mt-8 space-y-6">
-                {/* Emergency Line */}
-                <div className="border-4 border-[#e67e22] bg-orange-50 p-6">
-                  <div className="flex items-center gap-3">
-                    <svg className="h-8 w-8 text-[#e67e22]" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                <div className="rounded-2xl border border-[#3498db]/30 bg-[#3498db]/5 p-6 shadow-sm ring-1 ring-neutral-100">
+                  <div className="flex items-start gap-3">
+                    <svg className="h-8 w-8 flex-shrink-0 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                     <div>
-                      <div className="text-xs font-bold uppercase tracking-wider text-neutral-600">24/7 Emergency Hotline</div>
-                      <a href="tel:1-800-PHIXALL" className="text-2xl font-bold text-[#e67e22] hover:underline">1-800-PHIXALL</a>
+                      <div className="text-xs font-bold uppercase tracking-wider text-neutral-600">Phone</div>
+                      <a href={PHONE_HREF} className="text-2xl font-bold text-[#3498db] hover:underline">
+                        {PHONE_DISPLAY}
+                      </a>
+                      <p className="mt-2 text-sm text-neutral-600">
+                        Monday–Friday, 8:00 AM – 6:00 PM Eastern. For after-hours emergencies on active programs, call the same number and follow the recorded prompts.
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Enterprise Sales */}
-                <div className="border-2 border-neutral-200 bg-white p-6">
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
                   <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    Enterprise Sales
+                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    Email
                   </h3>
-                  <div className="mt-4 space-y-2 text-sm text-neutral-600">
-                    <p><strong>Phone:</strong> <a href="tel:1-800-749-2551" className="text-[#3498db] hover:underline">1-800-749-2551</a></p>
-                    <p><strong>Email:</strong> <a href="mailto:enterprise@phixall.com" className="text-[#3498db] hover:underline">enterprise@phixall.com</a></p>
-                    <p><strong>Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</p>
+                  <div className="mt-4 text-sm text-neutral-600">
+                    <p>
+                      <a href={`mailto:${EMAIL}`} className="font-semibold text-[#3498db] hover:underline">
+                        {EMAIL}
+                      </a>
+                    </p>
+                    <p className="mt-2 text-xs text-neutral-500">Send drawings, timelines, sketches, outage windows—anything that helps ops understand urgency.</p>
                   </div>
                 </div>
 
-                {/* General Inquiries */}
-                <div className="border-2 border-neutral-200 bg-white p-6">
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
                   <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    General Inquiries
+                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Corporate HQ
                   </h3>
                   <div className="mt-4 space-y-2 text-sm text-neutral-600">
-                    <p><strong>Email:</strong> <a href="mailto:info@phixall.com" className="text-[#3498db] hover:underline">info@phixall.com</a></p>
-                    <p><strong>Support:</strong> <a href="mailto:support@phixall.com" className="text-[#3498db] hover:underline">support@phixall.com</a></p>
-                  </div>
-                </div>
-
-                {/* Corporate Headquarters */}
-                <div className="border-2 border-neutral-200 bg-white p-6">
-                  <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                    Corporate Headquarters
-                  </h3>
-                  <div className="mt-4 space-y-2 text-sm text-neutral-600">
-                    <p><strong>Phixall Facility Management LLC</strong></p>
-                    <p>United States</p>
-                    <p><strong>Business Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</p>
+                    <p className="font-semibold text-neutral-900">Phixall Facility Management LLC</p>
+                    <p>{ADDRESS}</p>
+                    <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#3498db] hover:underline">
+                      Open in Google Maps
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Request Quote CTA */}
             <div>
-              <div className="sticky top-24 border-2 border-[#3498db] bg-blue-50/50 p-8">
-                <h3 className="text-2xl font-bold text-neutral-900">Request a Custom Quote</h3>
+              <div className="sticky top-24 rounded-2xl border border-[#3498db]/40 bg-gradient-to-br from-blue-50/80 to-white p-8 shadow-md ring-1 ring-[#3498db]/20">
+                <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need a bundled quote?</h3>
                 <p className="mt-4 text-neutral-600">
-                  Fill out our enterprise quote form and receive a customized facility management solution within 24 hours.
+                  Outline your facilities, blackout windows, and services— we will pair trades, procurement, advisory, automation, engineering, and PM staffing as one rollout plan.
                 </p>
-                <Link 
+                <Link
                   href="/us/request-quote"
-                  className="mt-6 block w-full border-2 border-[#3498db] bg-[#3498db] px-6 py-4 text-center text-base font-bold uppercase text-white transition-all hover:bg-[#2980b9]"
+                  className="mt-6 block w-full rounded-xl border-2 border-[#3498db] bg-[#3498db] px-6 py-4 text-center text-base font-bold uppercase tracking-wide text-white transition-all hover:bg-[#2980b9]"
                 >
-                  Request Enterprise Quote
+                  Start request
                 </Link>
 
-                <div className="mt-8 border-t border-neutral-300 pt-8">
-                  <h4 className="font-bold text-neutral-900">What to Expect</h4>
+                <div className="mt-8 border-t border-neutral-200 pt-8">
+                  <h4 className="font-bold text-neutral-900">Typical turnaround</h4>
                   <ul className="mt-4 space-y-3 text-sm text-neutral-600">
                     <li className="flex items-start gap-2">
                       <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      Response within 24 hours
+                      Same-day acknowledgement for emailed requests submitted before 4:00 PM ET
                     </li>
                     <li className="flex items-start gap-2">
                       <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      Dedicated account manager
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Custom solution design
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      Transparent pricing
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      On-site assessment available
+                      Proposal within two business days for standard scopes once context is clarified
                     </li>
                   </ul>
                 </div>
@@ -135,14 +124,12 @@ export default function USContactPage() {
         </div>
       </section>
 
-      {/* Regional Offices */}
-      <section className="border-t border-neutral-200 bg-neutral-50 py-20">
+      <section className="border-t border-neutral-200 bg-neutral-50 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-neutral-900">Regional Service Centers</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-neutral-600">
-            With service centers across all 50 states, we provide fast local response with nationwide consistency.
+          <h2 className="text-center text-2xl font-bold text-neutral-900">Regional familiarity</h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-neutral-600">
+            We routinely dispatch teams nationwide; the Zionsville office anchors program management and engineering SMEs for Midwest logistics hubs—and coordinates partners everywhere else Phixall US serves.
           </p>
-
           <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
               { region: 'Northeast', states: 'NY, NJ, PA, CT, MA, ME, NH, VT, RI' },
@@ -152,9 +139,9 @@ export default function USContactPage() {
               { region: 'West', states: 'CA, OR, WA, NV, UT, CO' },
               { region: 'Northwest', states: 'ID, MT, WY, ND, SD' },
               { region: 'Mid-Atlantic', states: 'MD, DE, WV, DC' },
-              { region: 'Pacific', states: 'HI, AK' }
+              { region: 'Pacific', states: 'HI, AK' },
             ].map((region) => (
-              <div key={region.region} className="border-2 border-neutral-200 bg-white p-6">
+              <div key={region.region} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
                 <h3 className="font-bold text-neutral-900">{region.region}</h3>
                 <p className="mt-2 text-xs text-neutral-600">{region.states}</p>
               </div>

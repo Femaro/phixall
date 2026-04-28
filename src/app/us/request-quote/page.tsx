@@ -37,6 +37,9 @@ export default function RequestQuotePage() {
     'Installation Item Supplies',
     'Facility Management Advisory',
     'Preventive Maintenance Program',
+    'Engineering Project Management Support',
+    'Engineering Services',
+    'Controls & Automation',
   ];
 
   const handleServiceToggle = (service: string) => {

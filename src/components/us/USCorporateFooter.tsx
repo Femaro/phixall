@@ -6,7 +6,7 @@ import Logo from '@/app/logo.png';
 
 export default function USCorporateFooter() {
   return (
-    <footer className="border-t border-neutral-200 bg-neutral-50">
+    <footer className="border-t-4 border-t-[#3498db]/40 border-neutral-200 bg-gradient-to-b from-neutral-50 to-neutral-100/80">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-5">
@@ -16,7 +16,7 @@ export default function USCorporateFooter() {
               <Image src={Logo} alt="Phixall" width={72} height={72} />
             </Link>
             <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-              Phixall, powered by Phixall Facility Management LLC, provides specialized warehouse facility management services including electrical, plumbing, carpentry, painting, supplies, and advisory services across the United States.
+              Phixall, powered by Phixall Facility Management LLC, delivers nationwide warehouse trades, procurement, advisory, controls, engineering services, and PM support from our Indiana headquarters and partner teams across the United States.
             </p>
             
           </div>
@@ -31,6 +31,10 @@ export default function USCorporateFooter() {
               <li><Link href="/us/services/painting" className="text-neutral-600 transition-colors hover:text-[#3498db]">Painting Services</Link></li>
               <li><Link href="/us/services/supplies" className="text-neutral-600 transition-colors hover:text-[#3498db]">Installation Item Supplies</Link></li>
               <li><Link href="/us/services/advisory" className="text-neutral-600 transition-colors hover:text-[#3498db]">Facility Management Advisory</Link></li>
+              <li><Link href="/us/services/engineering-project-management-support" className="text-neutral-600 transition-colors hover:text-[#3498db]">Eng. Project Management Support</Link></li>
+              <li><Link href="/us/services/engineering-services" className="text-neutral-600 transition-colors hover:text-[#3498db]">Engineering Services</Link></li>
+              <li><Link href="/us/services/controls-and-automation" className="text-neutral-600 transition-colors hover:text-[#3498db]">Controls &amp; Automation</Link></li>
+              <li><Link href="/us/services" className="text-neutral-600 transition-colors hover:text-[#3498db]">Browse all services</Link></li>
             </ul>
           </div>
 

@@ -1,7 +1,10 @@
 import { Metadata } from 'next';
+import { getMarketingSiteOrigin, getPhixallUsHomeUrl } from '@/lib/phixallUsSite';
+
+const marketingSite = getMarketingSiteOrigin();
 
 export const defaultMetadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://phixall.vercel.app'),
+  metadataBase: new URL(marketingSite),
   title: {
     default: 'Phixall - Professional Facility Management & Maintenance Services',
     template: '%s | Phixall'
@@ -89,6 +92,10 @@ export const defaultMetadata: Metadata = {
   },
   alternates: {
     canonical: '/',
+    languages: {
+      'en-US': getPhixallUsHomeUrl(),
+      'x-default': `${marketingSite}/`,
+    },
   },
   category: 'business',
 };

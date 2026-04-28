@@ -227,3 +227,31 @@ If you're still having issues after following these steps:
 
 **Next step:** Go to Method 1 above and add those environment variables! 🎯
 
+---
+
+## US visitors: phixall.com → phixall.us (edge redirect)
+
+Production **Vercel** deployments can redirect **US** visitors from `phixall.com` to `https://phixall.us` (path and query preserved, **307**). Logic lives in [`src/middleware.ts`](src/middleware.ts).
+
+| Variable | Purpose |
+|----------|---------|
+| `US_REDIRECT_ALLOWLIST_IPS` | Comma-separated client IPs (first `X-Forwarded-For` hop) that **never** receive the redirect. |
+| `US_REDIRECT_BYPASS_SECRET` | If set, visiting `https://phixall.com/...?bypass_geo=<secret>` sets an HttpOnly cookie so the redirect is skipped (90 days). Rotate the secret if it leaks. |
+| `ENABLE_US_DOTCOM_REDIRECT` | When `VERCEL_ENV` is **`preview`**, redirects are **disabled** unless this is **`true`**. **Production** does not need this variable: US visitors on `phixall.com` receive the redirect. |
+| `PHIXALL_US_SITE_URL` | Optional. Canonical origin for enterprise metadata and sitemap URLs (default `https://phixall.us`). No trailing slash. |
+
+**Behavior notes**
+
+- **Local `next dev`**: redirect is **disabled** (`NODE_ENV=development`). `request.geo` is usually absent locally anyway.
+- **Preview**: redirect is **off** unless `ENABLE_US_DOTCOM_REDIRECT=true`.
+- **Troubleshooting**: use an allowlisted IP, the bypass query + cookie, or preview with `ENABLE_US_DOTCOM_REDIRECT=true`.
+
+---
+
+## Enterprise US SEO (phixall.us) and Search Console
+
+- **Sitemap**: [`src/app/sitemap.ts`](src/app/sitemap.ts) lists main marketing URLs and full `https://phixall.us/us/...` enterprise routes. Submit **`https://phixall.us/sitemap.xml`** in the **phixall.us** Google Search Console property (and the marketing URL in the **phixall.com** property if needed).
+- **Verification**: Add both **Domain** or **URL-prefix** properties for `phixall.com` and `phixall.us` in [Google Search Console](https://search.google.com/search-console), then submit sitemaps per property.
+- **Hreflang / alternates**: Root metadata and [`src/app/us/layout.tsx`](src/app/us/layout.tsx) expose `en-US` vs `x-default` language alternates; **JSON-LD** (`Organization` + `WebSite`) is rendered in the US layout via [`src/components/us/PhixallUsJsonLd.tsx`](src/components/us/PhixallUsJsonLd.tsx).
+- **Env**: Set `NEXT_PUBLIC_SITE_URL` to the primary marketing origin (e.g. `https://phixall.com`) and `PHIXALL_US_SITE_URL` to `https://phixall.us` in production so metadata and sitemap URLs match live hosts.
+

@@ -10,11 +10,11 @@ export default function USAboutPage() {
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold text-white lg:text-6xl">
-              Indiana-focused
+              United States
               <span className="block text-[#3498db]">Facility Management Partner</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg text-white/90">
-              Phixall, powered by Phixall Facility Management LLC, delivers land-based facility management for commercial and industrial properties within authorized Indiana service areas—coordinating on-site technicians for warehouses, distribution centers, and plant-adjacent facilities.
+              Phixall, powered by Phixall Facility Management LLC, delivers land-based facility management for commercial and industrial properties within Indiana service areas—coordinating on-site technicians for warehouses, distribution centers, and plant-adjacent facilities.
             </p>
           </div>
         </div>

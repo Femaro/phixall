@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Engineering Services | Phixall US',
     description:
-      'Design support and field-aligned engineering services for warehouses, logistics, and industrial facilities nationwide.',
+      'Design support and field-aligned engineering services for warehouses, logistics, and inland industrial facilities in authorized Indiana service areas.',
     type: 'website',
   },
 };

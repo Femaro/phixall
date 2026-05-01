@@ -126,27 +126,10 @@ export default function USContactPage() {
 
       <section className="border-t border-neutral-200 bg-neutral-50 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-neutral-900">Regional familiarity</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-neutral-600">
-            We routinely dispatch teams nationwide; the Zionsville office anchors program management and engineering SMEs for Midwest logistics hubs—and coordinates partners everywhere else Phixall US serves.
+          <h2 className="text-center text-2xl font-bold text-neutral-900">Indiana operations center</h2>
+          <p className="mx-auto mt-3 max-w-3xl text-center text-neutral-600">
+            Phixall Facility Management LLC runs program management and engineering oversight from Zionsville, Indiana. Field technicians are assigned to on-shore, inland commercial and industrial sites within contracted, authorized Indiana service areas—supporting land-based clients such as food manufacturing and distribution operators without offshore or maritime field scopes.
           </p>
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { region: 'Northeast', states: 'NY, NJ, PA, CT, MA, ME, NH, VT, RI' },
-              { region: 'Southeast', states: 'FL, GA, NC, SC, VA, TN, AL, MS, LA' },
-              { region: 'Midwest', states: 'IL, OH, MI, IN, WI, MN, MO, IA, KS' },
-              { region: 'Southwest', states: 'TX, AZ, NM, OK, AR' },
-              { region: 'West', states: 'CA, OR, WA, NV, UT, CO' },
-              { region: 'Northwest', states: 'ID, MT, WY, ND, SD' },
-              { region: 'Mid-Atlantic', states: 'MD, DE, WV, DC' },
-              { region: 'Pacific', states: 'HI, AK' },
-            ].map((region) => (
-              <div key={region.region} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
-                <h3 className="font-bold text-neutral-900">{region.region}</h3>
-                <p className="mt-2 text-xs text-neutral-600">{region.states}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
     </main>

@@ -17,7 +17,7 @@ export default function ResidentialPage() {
               <span className="block text-purple-300">Management Services</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-white/90">
-              Professional facility management for multi-family complexes, condominiums, HOA communities, luxury residential buildings, senior living facilities, and student housing across the United States.
+              Professional facility management for multi-family complexes, condominiums, HOA communities, luxury residential buildings, senior living facilities, and student housing—where offered—within authorized inland service areas in Indiana.
             </p>
           </div>
         </div>

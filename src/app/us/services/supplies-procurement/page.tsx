@@ -18,7 +18,7 @@ export default function SuppliesProcurementPage() {
               <span className="block text-purple-300">Procurement Services</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-white/90">
-              Comprehensive MRO supplies, equipment parts, bulk procurement, vendor management, and just-in-time delivery services for commercial and industrial facilities nationwide.
+              Comprehensive MRO supplies, equipment parts, bulk procurement, vendor management, and just-in-time delivery coordinated for commercial and industrial facilities in authorized Indiana service areas.
             </p>
           </div>
         </div>
@@ -420,7 +420,7 @@ export default function SuppliesProcurementPage() {
                 <div>
                   <div className="text-4xl font-bold text-purple-600">500+</div>
                   <div className="mt-2 font-semibold text-neutral-900">Vetted Suppliers</div>
-                  <p className="mt-1 text-sm text-neutral-600">Nationwide network of quality vendors</p>
+                  <p className="mt-1 text-sm text-neutral-600">Vetted suppliers aligned to inland facility programs</p>
                 </div>
                 <div>
                   <div className="text-4xl font-bold text-purple-600">50,000+</div>
@@ -468,7 +468,7 @@ export default function SuppliesProcurementPage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/70">
-            Same-day quotes available • Volume discounts up to 30% • Nationwide delivery
+            Same-day quotes available • Volume discounts up to 30% • Coordinated delivery within contracted Indiana scopes
           </p>
         </div>
       </section>

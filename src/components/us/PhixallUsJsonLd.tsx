@@ -18,6 +18,14 @@ export default function PhixallUsJsonLd() {
 			alternateName: ['Phixall US'],
 			url: homeUrl,
 			sameAs: [...sameAsProfiles],
+			areaServed: {
+				'@type': 'AdministrativeArea',
+				name: 'Indiana',
+				containedInPlace: {
+					'@type': 'Country',
+					name: 'United States',
+				},
+			},
 		},
 		{
 			'@type': 'WebSite',

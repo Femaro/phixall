@@ -18,7 +18,7 @@ export default function CommercialPage() {
               <span className="block text-[#3498db]">Management Services</span>
             </h1>
             <p className="mt-6 text-lg leading-relaxed text-white/90">
-              Comprehensive facility management for office buildings, retail spaces, corporate campuses, educational institutions, healthcare facilities, and government buildings across the United States.
+              Comprehensive facility management for office buildings, retail spaces, corporate campuses, educational institutions, healthcare facilities, and government buildings at inland commercial sites within authorized Indiana service areas.
             </p>
           </div>
         </div>
@@ -67,8 +67,8 @@ export default function CommercialPage() {
                   <p className="mt-1 text-sm text-neutral-600">24/7/365 availability</p>
                 </div>
                 <div>
-                  <h4 className="font-bold text-neutral-900">Geographic Coverage</h4>
-                  <p className="mt-1 text-sm text-neutral-600">All 50 states</p>
+                  <h4 className="font-bold text-neutral-900">Geographic coverage</h4>
+                  <p className="mt-1 text-sm text-neutral-600">Indiana—contracted on-shore facilities only</p>
                 </div>
               </div>
             </div>

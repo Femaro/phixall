@@ -16,7 +16,7 @@ export default function USCorporateFooter() {
               <Image src={Logo} alt="Phixall" width={72} height={72} />
             </Link>
             <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-              Phixall, powered by Phixall Facility Management LLC, delivers nationwide warehouse trades, procurement, advisory, controls, engineering services, and PM support from our Indiana headquarters and partner teams across the United States.
+              Phixall, powered by Phixall Facility Management LLC, delivers on-shore warehouse trades, procurement, advisory, controls, engineering services, and PM support from Indiana—focused on inland commercial and industrial facilities with coordinated on-site technicians in authorized service areas.
             </p>
             
           </div>

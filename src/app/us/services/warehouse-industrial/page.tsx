@@ -56,7 +56,7 @@ export default function WarehouseIndustrialPage() {
               <div className="mt-6 space-y-6">
                 <div>
                   <h4 className="font-bold text-neutral-900">Coverage</h4>
-                  <p className="mt-1 text-sm text-neutral-600">All 50 states with regional service centers</p>
+                  <p className="mt-1 text-sm text-neutral-600">Authorized inland sites in Indiana under written agreements</p>
                 </div>
                 <div>
                   <h4 className="font-bold text-neutral-900">Response Time</h4>

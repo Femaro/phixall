@@ -10,11 +10,11 @@ export default function USAboutPage() {
         <div className="relative mx-auto max-w-7xl px-6 py-20 lg:px-8">
           <div className="text-center">
             <h1 className="text-5xl font-bold text-white lg:text-6xl">
-              America's Leading
+              Indiana-focused
               <span className="block text-[#3498db]">Facility Management Partner</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg text-white/90">
-              Phixall, powered by Phixall Facility Management LLC, delivers comprehensive facility management solutions to commercial, industrial, and residential properties across all 50 states.
+              Phixall, powered by Phixall Facility Management LLC, delivers land-based facility management for commercial and industrial properties within authorized Indiana service areas—coordinating on-site technicians for warehouses, distribution centers, and plant-adjacent facilities.
             </p>
           </div>
         </div>
@@ -62,10 +62,10 @@ export default function USAboutPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-8 md:grid-cols-4">
             {[
-              { value: '500+', label: 'Enterprise Clients', sublabel: 'Nationwide' },
+              { value: '500+', label: 'Enterprise Clients', sublabel: 'Industrial & commercial' },
               { value: '50,000+', label: 'Jobs Completed', sublabel: 'Annually' },
               { value: '98.5%', label: 'Uptime Rate', sublabel: 'Guaranteed' },
-              { value: '50', label: 'States Covered', sublabel: 'Full US Coverage' }
+              { value: 'IN', label: 'Primary geography', sublabel: 'Authorized Indiana operations' }
             ].map((stat) => (
               <div key={stat.label} className="border-l-4 border-[#3498db] bg-white/10 p-6 text-center backdrop-blur-sm">
                 <div className="text-4xl font-bold text-white">{stat.value}</div>
@@ -108,7 +108,7 @@ export default function USAboutPage() {
       {/* CTA */}
       <section className="bg-gradient-to-br from-[#2c3e50] to-[#1e3a5f] py-20">
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h2 className="text-4xl font-bold text-white">Partner With America's Facility Management Leader</h2>
+          <h2 className="text-4xl font-bold text-white">Partner with a land-based Indiana facility operator</h2>
           <p className="mt-6 text-lg text-white/90">
             Join 500+ enterprise clients who trust Phixall for their facility management needs.
           </p>

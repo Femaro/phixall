@@ -40,7 +40,7 @@ export const PHIXALL_US_PATHS: readonly string[] = [
 	'services/carpentry',
 	'services/controls-and-automation',
 	'services/plumbing-water',
-	'services/offshore-marine',
+	'services/inland-industrial',
 	'services/supplies-procurement',
 ];
 

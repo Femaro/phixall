@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Engineering Project Management Support | Phixall US',
   description:
-    'Schedules, PMO-style governance, documentation, vendor coordination, and change control for facility and industrial capital projects across the United States.',
+    'Schedules, PMO-style governance, documentation, vendor coordination, and change control for land-based facility and industrial capital projects in authorized Indiana service areas.',
   openGraph: {
     title: 'Engineering Project Management Support | Phixall US',
     description:

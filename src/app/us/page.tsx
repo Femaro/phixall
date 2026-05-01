@@ -20,7 +20,7 @@ export default function USCorporatePage() {
               </div>
               <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-6xl">
                 Enterprise Facility Management
-                <span className="block text-[#3498db]">Solutions for America</span>
+                <span className="block text-[#3498db]">On-shore solutions in Indiana</span>
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
                 Specialized facility management services for warehouse and distribution operations. We deliver comprehensive electrical, plumbing, carpentry, painting, and supply services to keep your warehouse running efficiently.
@@ -50,8 +50,8 @@ export default function USCorporatePage() {
                   <div className="mt-1 text-sm text-white/80">Uptime Guaranteed</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-white">50+</div>
-                  <div className="mt-1 text-sm text-white/80">States Covered</div>
+                  <div className="text-3xl font-bold text-white">IN</div>
+                  <div className="mt-1 text-sm text-white/80">Primary service state</div>
                 </div>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function USCorporatePage() {
             ))}
           </div>
           <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-500">
-            Facility programs from fabrication through commissioning—documented, coordinated, nationwide.
+            Facility programs from fabrication through commissioning—documented, coordinated, on-site across authorized Indiana locations.
           </p>
         </div>
       </section>
@@ -255,7 +255,7 @@ export default function USCorporatePage() {
             {[
               { value: '10,000+', label: 'Warehouse Jobs Completed', sublabel: 'Annually' },
               { value: '98.5%', label: 'Uptime Rate', sublabel: 'Across all facilities' },
-              { value: '200+', label: 'Warehouse Clients', sublabel: 'Nationwide' }
+              { value: '200+', label: 'Warehouse Clients', sublabel: 'Industrial & logistics' }
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
                 <div className="text-4xl font-bold text-white">{stat.value}</div>
@@ -277,9 +277,9 @@ export default function USCorporatePage() {
           <div className="mt-16 grid gap-8 lg:grid-cols-3">
             {[
               {
-                title: 'Nationwide Coverage',
+                title: 'Authorized Indiana footprint',
                 icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Service warehouse facilities across all 50 states with consistent quality and standardized procedures.'
+                description: 'On-shore, inland commercial and industrial facility services coordinated from Indiana—with consistent quality and documented procedures at contracted sites.'
               },
               {
                 title: 'Professional Team',

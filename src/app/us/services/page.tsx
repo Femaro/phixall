@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Facility Services Catalog | Phixall US',
   description:
-    'Warehouse trades, procurement, advisory, engineering PM, engineering services, controls, and nationwide dispatch—in one roadmap-friendly catalog.',
+    'Warehouse trades, procurement, advisory, engineering PM, engineering services, and controls—coordinated for inland commercial and industrial facilities in authorized Indiana service areas.',
 };
 
 const sections = [
@@ -33,7 +33,7 @@ const sections = [
       { href: '/us/services/warehouse-industrial', label: 'Warehouse & Industrial', blurb: 'Distribution, manufacturing adjacent, throughput' },
       { href: '/us/services/commercial', label: 'Commercial Facilities', blurb: 'Office-heavy and mixed portfolios' },
       { href: '/us/services/residential', label: 'Residential Properties', blurb: 'Multifamily and residential-adjacent support' },
-      { href: '/us/services/offshore-marine', label: 'Offshore & Marine', blurb: 'Special logistics and hardened environments' },
+      { href: '/us/services/inland-industrial', label: 'Inland Industrial & Commercial', blurb: 'On-shore facilities, warehouses, and plant-adjacent sites' },
       { href: '/us/services/supplies', label: 'Installation Item Supplies', blurb: 'MRO stocking and rollout materials' },
       { href: '/us/services/supplies-procurement', label: 'Supplies & Procurement', blurb: 'Programmatic sourcing and invoicing hygiene' },
     ],

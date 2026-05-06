@@ -248,21 +248,78 @@ export default function USCorporatePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Company foundation + how we deliver */}
       <section className="bg-[#1e3a5f] py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Our foundation</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-white lg:text-4xl">
+              Phixall Facility Management Company
+            </h2>
+            <p className="mt-4 text-lg leading-relaxed text-white/85">
+              Building on a legacy of managing over 10,000 facility projects, Phixall Facility Management Company was formally established in 2026 to provide dedicated, high-compliance solutions for enterprise partners.
+            </p>
+          </div>
+          <p className="mt-14 text-center text-sm font-semibold uppercase tracking-wider text-[#3498db]">
+            How we deliver
+          </p>
+          <div className="mt-6 grid gap-8 md:grid-cols-3">
             {[
-              { value: '10,000+', label: 'Warehouse Jobs Completed', sublabel: 'Annually' },
-              { value: '98.5%', label: 'Uptime Rate', sublabel: 'Across all facilities' },
-              { value: '200+', label: 'Warehouse Clients', sublabel: 'Industrial & logistics' }
-            ].map((stat) => (
-              <div key={stat.label} className="rounded-2xl border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
-                <div className="text-4xl font-bold text-white">{stat.value}</div>
-                <div className="mt-2 text-lg font-semibold text-white/90">{stat.label}</div>
-                <div className="mt-1 text-sm text-white/70">{stat.sublabel}</div>
+              {
+                title: 'End-to-end coordination',
+                body: 'Kickoff packets, change control, and turnovers aligned with how your lines and docks actually run—not generic checklists.',
+                icon: (
+                  <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'Qualified field execution',
+                body: 'Licensed, insured technicians trained for industrial and logistics environments—with safety and compliance treated as part of the job.',
+                icon: (
+                  <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                ),
+              },
+              {
+                title: 'Indiana enterprise coverage',
+                body: 'On-shore coordination for authorized commercial and industrial sites across Indiana—responsive support scoped to your contract and locations.',
+                icon: (
+                  <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                ),
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">{item.icon}</div>
+                <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/75">{item.body}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/us/request-quote"
+              className="inline-flex items-center gap-2 border-2 border-white bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
+            >
+              Request enterprise quote
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+            <Link
+              href="/us/services"
+              className="text-sm font-semibold text-white/90 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              Browse service lines
+            </Link>
           </div>
         </div>
       </section>

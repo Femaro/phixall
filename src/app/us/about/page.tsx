@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
 
 export default function USAboutPage() {
   return (
@@ -57,40 +58,16 @@ export default function USAboutPage() {
         </div>
       </section>
 
-      {/* Certifications */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-center text-3xl font-bold text-neutral-900">Certifications & Compliance</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-lg text-neutral-600">
-            We maintain the highest industry certifications to ensure quality and compliance.
-          </p>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3 lg:grid-cols-5">
-            {[
-              { name: 'ISO 9001', desc: 'Quality Management' },
-              { name: 'OSHA Certified', desc: 'Safety Standards' },
-              { name: 'EPA Compliant', desc: 'Environmental' },
-              { name: 'LEED Accredited', desc: 'Green Building' },
-              { name: 'NFPA Certified', desc: 'Fire Safety' }
-            ].map((cert) => (
-              <div key={cert.name} className="border-2 border-neutral-200 bg-white p-6 text-center">
-                <svg className="mx-auto h-12 w-12 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <h3 className="mt-4 font-bold text-neutral-900">{cert.name}</h3>
-                <p className="mt-1 text-xs text-neutral-600">{cert.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <TrustComplianceBadges />
 
       {/* CTA */}
       <section className="bg-gradient-to-br from-[#2c3e50] to-[#1e3a5f] py-20">
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h2 className="text-4xl font-bold text-white">Partner with a land-based Indiana facility operator</h2>
+          <h2 className="text-4xl font-bold text-white">
+            Work with an Indiana-based facility operator
+          </h2>
           <p className="mt-6 text-lg text-white/90">
-            Talk with our team about facility programs scoped to your sites, contracts, and compliance requirements.
+            Share your sites and priorities—we align on-site programs, contracts, and compliance so your facilities stay covered without guesswork.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/us/request-quote" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90">

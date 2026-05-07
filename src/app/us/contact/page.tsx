@@ -5,9 +5,6 @@ import Link from 'next/link';
 const EMAIL = 'ops@phixall.us';
 const PHONE_DISPLAY = '(317) 832-6185';
 const PHONE_HREF = 'tel:+13178326185';
-const ADDRESS = '1782 Williams Glen Blvd, Zionsville, IN 46077';
-const MAP_URL =
-  'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('1782 Williams Glen Blvd, Zionsville, IN 46077');
 
 export default function USContactPage() {
   return (
@@ -72,17 +69,14 @@ export default function USContactPage() {
                     <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    Corporate HQ
+                    Legal entity
                   </h3>
                   <div className="mt-4 space-y-2 text-sm text-neutral-600">
                     <p className="font-semibold text-neutral-900">Phixall Facility Management LLC</p>
-                    <p>{ADDRESS}</p>
-                    <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-[#3498db] hover:underline">
-                      Open in Google Maps
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
+                    <p>
+                      Indiana-based program management and coordination for inland commercial and industrial facilities within
+                      contracted service areas—use phone or email for routing and scheduling.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -128,7 +122,10 @@ export default function USContactPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <h2 className="text-center text-2xl font-bold text-neutral-900">Indiana operations center</h2>
           <p className="mx-auto mt-3 max-w-3xl text-center text-neutral-600">
-            Phixall Facility Management LLC runs program management and engineering oversight from Zionsville, Indiana. Field technicians are assigned to on-shore, inland commercial and industrial sites within contracted, authorized Indiana service areas—supporting land-based clients such as food manufacturing and distribution operators without offshore or maritime field scopes.
+            Phixall Facility Management LLC runs program management and engineering oversight for Indiana-based operations. Field
+            technicians are assigned to on-shore, inland commercial and industrial sites within contracted, authorized Indiana
+            service areas—supporting land-based clients such as food manufacturing and distribution operators without offshore
+            or maritime field scopes.
           </p>
         </div>
       </section>

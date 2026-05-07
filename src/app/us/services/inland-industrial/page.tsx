@@ -53,7 +53,7 @@ export default function InlandIndustrialPage() {
                 <div>
                   <h4 className="font-bold text-neutral-900">Geography</h4>
                   <p className="mt-1 text-sm text-neutral-600">
-                    Program management from Zionsville, Indiana, with field execution limited to contracted, authorized inland sites in Indiana unless otherwise agreed in writing.
+                    Program management from Indiana, with field execution limited to contracted, authorized inland sites in Indiana unless otherwise agreed in writing.
                   </p>
                 </div>
                 <div>

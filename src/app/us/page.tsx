@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
 
 export default function USCorporatePage() {
   return (
@@ -216,6 +217,8 @@ export default function USCorporatePage() {
           </p>
         </div>
       </section>
+
+      <TrustComplianceBadges />
 
       {/* Industries Served */}
       <section className="border-t border-neutral-200 bg-neutral-50 py-20">

@@ -14,7 +14,7 @@ export default function USAboutPage() {
               <span className="block text-[#3498db]">Facility Management Partner</span>
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg text-white/90">
-              Phixall, powered by Phixall Facility Management LLC, delivers land-based facility management for commercial and industrial properties within Indiana service areas—coordinating on-site technicians for warehouses, distribution centers, and plant-adjacent facilities.
+              Phixall, powered by Phixall Facility Management LLC, delivers land-based facility management for commercial and industrial properties within Indiana service areas,  coordinating on-site technicians for warehouses, distribution centers, and plant-adjacent facilities.
             </p>
           </div>
         </div>
@@ -57,26 +57,6 @@ export default function USAboutPage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="bg-[#1e3a5f] py-20">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-8 md:grid-cols-4">
-            {[
-              { value: '500+', label: 'Enterprise Clients', sublabel: 'Industrial & commercial' },
-              { value: '50,000+', label: 'Jobs Completed', sublabel: 'Annually' },
-              { value: '98.5%', label: 'Uptime Rate', sublabel: 'Guaranteed' },
-              { value: 'IN', label: 'Primary geography', sublabel: 'Authorized Indiana operations' }
-            ].map((stat) => (
-              <div key={stat.label} className="border-l-4 border-[#3498db] bg-white/10 p-6 text-center backdrop-blur-sm">
-                <div className="text-4xl font-bold text-white">{stat.value}</div>
-                <div className="mt-2 text-sm font-semibold text-white/90">{stat.label}</div>
-                <div className="mt-1 text-xs text-white/70">{stat.sublabel}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Certifications */}
       <section className="bg-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -110,7 +90,7 @@ export default function USAboutPage() {
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold text-white">Partner with a land-based Indiana facility operator</h2>
           <p className="mt-6 text-lg text-white/90">
-            Join 500+ enterprise clients who trust Phixall for their facility management needs.
+            Talk with our team about facility programs scoped to your sites, contracts, and compliance requirements.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link href="/us/request-quote" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90">

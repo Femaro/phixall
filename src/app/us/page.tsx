@@ -48,11 +48,11 @@ export default function USCorporatePage() {
               {/* Trust Indicators */}
               <div className="mt-12 grid grid-cols-2 gap-6 border-t border-white/20 pt-8">
                 <div>
-                  <div className="text-3xl font-bold text-white">98.5%</div>
+                  <div className="text-3xl font-bold text-[#5dade2]">98.5%</div>
                   <div className="mt-1 text-sm text-white/80">Uptime Guaranteed</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-white">IN</div>
+                  <div className="text-3xl font-bold text-[#5dade2]">IN</div>
                   <div className="mt-1 text-sm text-white/80">Primary service state</div>
                 </div>
               </div>
@@ -68,10 +68,12 @@ export default function USCorporatePage() {
       </section>
 
       {/* Core Services Grid */}
-      <section className="bg-white py-20">
+      <section className="relative border-t border-neutral-200/80 bg-gradient-to-b from-slate-100/90 via-white to-[#3498db]/[0.06] py-20">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3498db]/40 to-transparent" aria-hidden />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Enterprise Facility Management Services</h2>
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Full facility coverage</p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Enterprise Facility Management Services</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
               Specialized solutions for warehouse installations and operations with professional support
             </p>
@@ -125,9 +127,11 @@ export default function USCorporatePage() {
               <Link 
                 key={service.title}
                 href={service.link}
-                className="group rounded-2xl bg-white p-8 shadow-sm ring-1 ring-neutral-200 transition-all hover:-translate-y-0.5 hover:border-[#3498db] hover:shadow-lg hover:ring-[#3498db]/25"
+                className="group rounded-2xl bg-gradient-to-br from-white to-slate-50/80 p-8 shadow-sm ring-1 ring-neutral-200/80 transition-all hover:-translate-y-0.5 hover:border-[#3498db] hover:shadow-lg hover:shadow-[#3498db]/10 hover:ring-[#3498db]/30"
               >
-                <div>{service.icon}</div>
+                <div className="inline-flex rounded-2xl bg-gradient-to-br from-[#3498db]/15 to-[#1e3a5f]/10 p-4 ring-1 ring-[#3498db]/20">
+                  {service.icon}
+                </div>
                 <h3 className="mt-4 text-xl font-bold text-neutral-900 group-hover:text-[#3498db]">{service.title}</h3>
                 <p className="mt-3 text-neutral-600">{service.description}</p>
                 <ul className="mt-4 space-y-2">
@@ -153,7 +157,7 @@ export default function USCorporatePage() {
       </section>
 
       {/* Engineering & automation */}
-      <section className="border-t border-neutral-200 bg-gradient-to-br from-slate-50 via-white to-emerald-50/40 py-20">
+      <section className="border-t border-neutral-200 bg-gradient-to-br from-cyan-50/50 via-slate-50 to-emerald-50/50 py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wider text-cyan-700">Engineering runway</p>
@@ -183,7 +187,7 @@ export default function USCorporatePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="group flex flex-col rounded-2xl bg-white p-8 shadow-md ring-1 ring-neutral-200 transition hover:-translate-y-1 hover:shadow-xl hover:ring-cyan-200"
+                className="group flex flex-col rounded-2xl border border-cyan-100/80 bg-gradient-to-br from-white to-cyan-50/40 p-8 shadow-md ring-1 ring-neutral-200/60 transition hover:-translate-y-1 hover:shadow-xl hover:ring-[#3498db]/35"
               >
                 <h3 className="text-xl font-bold text-neutral-900 group-hover:text-cyan-800">{item.title}</h3>
                 <p className="mt-4 flex-1 text-sm leading-relaxed text-neutral-600">{item.copy}</p>
@@ -195,7 +199,7 @@ export default function USCorporatePage() {
       </section>
 
       {/* Proof strip — on-brand generated photography */}
-      <section className="border-y border-neutral-200 bg-neutral-900 py-10">
+      <section className="border-y border-neutral-800 bg-gradient-to-b from-neutral-950 via-neutral-900 to-[#1e3a5f] py-10">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-4 md:grid-cols-3">
             {[
@@ -203,17 +207,17 @@ export default function USCorporatePage() {
               { src: '/us/images/us-proof-planning.jpg', alt: 'Team reviewing facility plans and schedules', caption: 'Facility planning & programs' },
               { src: '/us/images/us-proof-controls.jpg', alt: 'Industrial control panels and automation hardware', caption: 'Automation & controls' },
             ].map((img) => (
-              <figure key={img.src} className="overflow-hidden rounded-2xl ring-1 ring-white/10">
+              <figure key={img.src} className="overflow-hidden rounded-2xl ring-1 ring-[#3498db]/25 shadow-lg shadow-[#3498db]/5">
                 <div className="relative aspect-[4/3]">
                   <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
                 </div>
-                <figcaption className="bg-neutral-950 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-neutral-300">
+                <figcaption className="border-t-2 border-[#3498db]/80 bg-gradient-to-r from-neutral-950 to-[#1e3a5f]/95 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-[#5dade2]">
                   {img.caption}
                 </figcaption>
               </figure>
             ))}
           </div>
-          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-500">
+          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-400">
             Facility programs from fabrication through commissioning—documented, coordinated, on-site across authorized Indiana locations.
           </p>
         </div>
@@ -222,10 +226,11 @@ export default function USCorporatePage() {
       <TrustComplianceBadges />
 
       {/* Industries Served */}
-      <section className="border-t border-neutral-200 bg-neutral-50 py-20">
+      <section className="border-t border-neutral-200 bg-gradient-to-b from-blue-50/50 via-neutral-50 to-white py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Warehouse Industries We Serve</h2>
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#1e3a5f]">Sectors we support</p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Warehouse Industries We Serve</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
               Specialized warehouse facility management solutions tailored to your industry's unique requirements
             </p>
@@ -242,8 +247,13 @@ export default function USCorporatePage() {
               { name: 'Pharmaceutical', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>, desc: 'Medical Supply Warehouses' },
               { name: 'Automotive Parts', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>, desc: 'Auto Parts Distribution Centers' }
             ].map((industry) => (
-              <div key={industry.name} className="rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm ring-1 ring-neutral-100 transition-all hover:border-[#3498db]/40 hover:shadow-md">
-                <div className="mx-auto w-fit">{industry.icon}</div>
+              <div
+                key={industry.name}
+                className="rounded-2xl border border-[#3498db]/15 bg-gradient-to-b from-white to-slate-50/80 p-6 text-center shadow-md shadow-[#1e3a5f]/5 ring-1 ring-neutral-100 transition-all hover:border-[#3498db]/35 hover:shadow-lg hover:shadow-[#3498db]/10"
+              >
+                <div className="mx-auto w-fit rounded-2xl bg-gradient-to-br from-[#3498db]/12 to-[#1e3a5f]/8 p-4 ring-1 ring-[#3498db]/15">
+                  {industry.icon}
+                </div>
                 <h3 className="mt-3 text-lg font-bold text-neutral-900">{industry.name}</h3>
                 <p className="mt-1 text-sm text-neutral-600">{industry.desc}</p>
               </div>
@@ -253,8 +263,9 @@ export default function USCorporatePage() {
       </section>
 
       {/* Company foundation + how we deliver */}
-      <section className="bg-[#1e3a5f] py-20">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#1e3a5f] via-[#243b55] to-[#1e3a5f] py-20">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#3498db]/15 via-transparent to-transparent" aria-hidden />
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Our foundation</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-white lg:text-4xl">
@@ -302,7 +313,7 @@ export default function USCorporatePage() {
                 key={item.title}
                 className="rounded-2xl border-l-4 border-[#3498db] bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">{item.icon}</div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#3498db]/20 ring-1 ring-[#3498db]/35">{item.icon}</div>
                 <h3 className="mt-4 text-lg font-semibold text-white">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/75">{item.body}</p>
               </div>
@@ -329,10 +340,11 @@ export default function USCorporatePage() {
       </section>
 
       {/* Why Choose Phixall */}
-      <section className="bg-white py-20">
+      <section className="border-t border-neutral-200 bg-gradient-to-b from-white via-slate-50/50 to-[#3498db]/[0.08] py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-4xl font-bold tracking-tight text-neutral-900">Why Warehouse Clients Choose Phixall</h2>
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Why Phixall</p>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Why Warehouse Clients Choose Phixall</h2>
           </div>
 
           <div className="mt-16 grid gap-8 lg:grid-cols-3">
@@ -368,8 +380,13 @@ export default function USCorporatePage() {
                 description: 'Dedicated account management and support teams for warehouse operations.'
               }
             ].map((benefit) => (
-              <div key={benefit.title} className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm ring-1 ring-neutral-100">
-                <div>{benefit.icon}</div>
+              <div
+                key={benefit.title}
+                className="rounded-2xl border border-neutral-200/80 bg-gradient-to-br from-white to-slate-50/80 p-8 shadow-sm ring-1 ring-[#3498db]/10 transition hover:shadow-md hover:ring-[#3498db]/25"
+              >
+                <div className="inline-flex rounded-xl bg-gradient-to-br from-[#3498db]/12 to-[#1e3a5f]/8 p-3 ring-1 ring-[#3498db]/20">
+                  {benefit.icon}
+                </div>
                 <h3 className="mt-4 text-xl font-bold text-neutral-900">{benefit.title}</h3>
                 <p className="mt-3 text-neutral-600">{benefit.description}</p>
               </div>
@@ -379,8 +396,9 @@ export default function USCorporatePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-t border-neutral-200 bg-gradient-to-br from-[#2c3e50] to-[#1e3a5f] py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
+      <section className="relative overflow-hidden border-t border-neutral-200 bg-gradient-to-br from-[#3498db]/30 via-[#2c3e50] to-[#1e3a5f] py-20">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" aria-hidden />
+        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold tracking-tight text-white">Ready to Optimize Your Warehouse Facility?</h2>
           <p className="mt-6 text-lg text-white/90">
             Request a custom quote and discover how Phixall can enhance your warehouse operations, reduce costs, and improve efficiency.

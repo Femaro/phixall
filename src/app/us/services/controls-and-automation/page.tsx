@@ -30,10 +30,10 @@ export default function ControlsAutomationPage() {
                 Request controls scope
               </Link>
               <Link
-                href="/us/services/engineering-services"
+                href="/us/services/engineering-project-management-support"
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-white/10"
               >
-                Engineering services
+                Engineering PM support
               </Link>
             </div>
           </div>

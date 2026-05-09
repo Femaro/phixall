@@ -16,7 +16,7 @@ export default function USCorporateFooter() {
               <Image src={Logo} alt="Phixall" width={72} height={72} />
             </Link>
             <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-              Phixall, powered by Phixall Facility Management LLC, delivers on-shore warehouse trades, procurement, advisory, controls, engineering services, and PM support from Indiana—focused on inland commercial and industrial facilities with coordinated on-site technicians in authorized service areas.
+              Phixall, powered by Phixall Facility Management LLC, delivers on-shore warehouse trades, procurement, advisory, controls, and engineering PM support from Indiana—focused on inland commercial and industrial facilities with coordinated on-site technicians in authorized service areas.
             </p>
             
           </div>
@@ -32,7 +32,6 @@ export default function USCorporateFooter() {
               <li><Link href="/us/services/supplies" className="text-neutral-600 transition-colors hover:text-[#3498db]">Installation Item Supplies</Link></li>
               <li><Link href="/us/services/advisory" className="text-neutral-600 transition-colors hover:text-[#3498db]">Facility Management Advisory</Link></li>
               <li><Link href="/us/services/engineering-project-management-support" className="text-neutral-600 transition-colors hover:text-[#3498db]">Eng. Project Management Support</Link></li>
-              <li><Link href="/us/services/engineering-services" className="text-neutral-600 transition-colors hover:text-[#3498db]">Engineering Services</Link></li>
               <li><Link href="/us/services/controls-and-automation" className="text-neutral-600 transition-colors hover:text-[#3498db]">Controls &amp; Automation</Link></li>
               <li><Link href="/us/services" className="text-neutral-600 transition-colors hover:text-[#3498db]">Browse all services</Link></li>
             </ul>

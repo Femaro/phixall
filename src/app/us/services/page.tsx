@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const metadata: Metadata = {
   title: 'Facility Services Catalog | Phixall US',
   description:
-    'Warehouse trades, procurement, advisory, engineering PM, engineering services, and controls—coordinated for inland commercial and industrial facilities in authorized Indiana service areas.',
+    'Warehouse trades, procurement, advisory, engineering PM, and controls—coordinated for inland commercial and industrial facilities in authorized Indiana service areas.',
 };
 
 const sections = [
@@ -18,10 +18,8 @@ const sections = [
       { href: '/us/services/plumbing', label: 'Plumbing Services', blurb: 'Industrial piping and distribution systems' },
       { href: '/us/services/carpentry', label: 'Carpentry Services', blurb: 'Shelving, docks, fixtures, carpentry installs' },
       { href: '/us/services/painting', label: 'Painting Services', blurb: 'Floor coatings, lines, protective finishes' },
-      { href: '/us/services/hvac-mechanical', label: 'HVAC & Mechanical', blurb: 'Climate systems and mechanical upkeep' },
       { href: '/us/services/electrical-power', label: 'Electrical & Power', blurb: 'Distribution, backup power, selective projects' },
       { href: '/us/services/plumbing-water', label: 'Plumbing & Water', blurb: 'Water systems aligned to facility throughput' },
-      { href: '/us/services/fire-safety', label: 'Fire Safety & Suppression', blurb: 'Inspections aligned to AHJ expectations' },
     ],
   },
   {
@@ -31,8 +29,6 @@ const sections = [
       'Full-service footprints for common industrial and logistics footprints—with procurement and operations alignment.',
     items: [
       { href: '/us/services/warehouse-industrial', label: 'Warehouse & Industrial', blurb: 'Distribution, manufacturing adjacent, throughput' },
-      { href: '/us/services/commercial', label: 'Commercial Facilities', blurb: 'Office-heavy and mixed portfolios' },
-      { href: '/us/services/residential', label: 'Residential Properties', blurb: 'Multifamily and residential-adjacent support' },
       { href: '/us/services/inland-industrial', label: 'Inland Industrial & Commercial', blurb: 'On-shore facilities, warehouses, and plant-adjacent sites' },
       { href: '/us/services/supplies', label: 'Installation Item Supplies', blurb: 'MRO stocking and rollout materials' },
       { href: '/us/services/supplies-procurement', label: 'Supplies & Procurement', blurb: 'Programmatic sourcing and invoicing hygiene' },
@@ -45,7 +41,6 @@ const sections = [
       'PM rigor and technical horsepower for modernization, commissioning, integrations, panels, instrumentation, sequences, reliability.',
     items: [
       { href: '/us/services/engineering-project-management-support', label: 'Engineering PM Support', blurb: 'Schedules, change control, turnovers' },
-      { href: '/us/services/engineering-services', label: 'Engineering Services', blurb: 'Studies, field engineering, commissioning' },
       { href: '/us/services/controls-and-automation', label: 'Controls & Automation', blurb: 'PLC-era controls stacks, integrations, FAT/SAT' },
     ],
   },
@@ -65,7 +60,7 @@ export default function USServicesIndexPage() {
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-200/90">Service catalog</p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-white lg:text-5xl">Every Phixall US capability</h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/85">
-            Browse specialties by practice area—then request a bundled quote combining trades, procurement, advisory, engineering, and automation.
+            Browse specialties by practice area—then request a bundled quote combining trades, procurement, advisory, engineering PM, and automation.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link

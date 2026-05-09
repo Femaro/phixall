@@ -163,20 +163,15 @@ export default function USCorporatePage() {
             <p className="text-sm font-semibold uppercase tracking-wider text-cyan-700">Engineering runway</p>
             <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Program management &amp; technical depth</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
-              Layer PM discipline with controls and engineering services so warehouse upgrades stay coordinated from kickoff packets through energized checkout.
+              Layer PM discipline with controls so warehouse upgrades stay coordinated from kickoff packets through energized checkout.
             </p>
           </div>
-          <div className="mt-14 grid gap-8 md:grid-cols-3">
+          <div className="mt-14 grid gap-8 md:grid-cols-2 lg:max-w-4xl lg:mx-auto">
             {[
               {
                 title: 'Engineering PM Support',
                 href: '/us/services/engineering-project-management-support',
                 copy: 'Milestones, change control boards, turnovers, stakeholder cadence—all aligned with how your docks and lines actually behave.',
-              },
-              {
-                title: 'Engineering Services',
-                href: '/us/services/engineering-services',
-                copy: 'Studies, commissioning, field troubleshooting, FAT/SAT—without losing context on warehouse uptime risks.',
               },
               {
                 title: 'Controls & Automation',

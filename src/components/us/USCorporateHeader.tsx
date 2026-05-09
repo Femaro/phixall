@@ -111,10 +111,6 @@ export default function USCorporateHeader() {
                       <div className="font-bold">Eng. Project Management Support</div>
                       <div className="text-xs text-neutral-500">Schedules, governance, turnover</div>
                     </Link>
-                    <Link href="/us/services/engineering-services" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
-                      <div className="font-bold">Engineering Services</div>
-                      <div className="text-xs text-neutral-500">Studies, commissioning, reviews</div>
-                    </Link>
                     <Link href="/us/services/controls-and-automation" className="rounded-lg border border-transparent px-3 py-2.5 text-sm font-medium text-neutral-700 transition-all hover:border-[#3498db]/30 hover:bg-neutral-50 hover:text-[#3498db]">
                       <div className="font-bold">Controls &amp; Automation</div>
                       <div className="text-xs text-neutral-500">PLC-adjacent, panels, OT/IT edges</div>
@@ -208,7 +204,6 @@ export default function USCorporateHeader() {
                   <Link href="/us/services/supplies" className="block text-sm text-neutral-700 hover:text-[#3498db]">Installation Item Supplies</Link>
                   <Link href="/us/services/advisory" className="block text-sm text-neutral-700 hover:text-[#3498db]">Facility Management Advisory</Link>
                   <Link href="/us/services/engineering-project-management-support" className="block text-sm text-neutral-700 hover:text-[#3498db]">Eng. Project Management Support</Link>
-                  <Link href="/us/services/engineering-services" className="block text-sm text-neutral-700 hover:text-[#3498db]">Engineering Services</Link>
                   <Link href="/us/services/controls-and-automation" className="block text-sm text-neutral-700 hover:text-[#3498db]">Controls &amp; Automation</Link>
                   <Link href="/us/services" className="block text-sm font-semibold text-[#3498db]">All services</Link>
                 </div>

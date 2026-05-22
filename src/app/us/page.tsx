@@ -14,19 +14,13 @@ export default function USCorporatePage() {
         <div className="relative mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <div className="inline-flex items-center gap-2 border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-white backdrop-blur-sm">
-                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                Enterprise Facility Management Services
-              </div>
               <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-6xl">
-                Facility management built for throughput
+                Enterprise Facility Management Services
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
-                We integrate facility management with the operational realities of high-volume distribution. By synchronizing
-                essential trades—electrical, plumbing, carpentry, and painting—with your supply chain requirements, we ensure
-                maintenance and installations never become a bottleneck to your throughput.
+                We synchronize core trades (electrical, plumbing, carpentry, and painting) 
+                with your supply chain requirements to ensure maintenance never interrupts 
+                your distribution velocity.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -75,8 +69,7 @@ export default function USCorporatePage() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3498db]/40 to-transparent" aria-hidden />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Full facility coverage</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Enterprise Facility Management Services</h2>
+            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Our Enterprise Facility Management Services</h2>
             <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
               Specialized solutions for warehouse installations and operations with professional support
             </p>

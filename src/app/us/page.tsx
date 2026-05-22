@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
+import PartnerLogosStrip from '@/components/us/PartnerLogosStrip';
 
 export default function USCorporatePage() {
   return (
@@ -66,6 +67,8 @@ export default function USCorporatePage() {
           </div>
         </div>
       </section>
+
+      <PartnerLogosStrip />
 
       {/* Core Services Grid */}
       <section className="relative border-t border-neutral-200/80 bg-gradient-to-b from-slate-100/90 via-white to-[#3498db]/[0.06] py-20">

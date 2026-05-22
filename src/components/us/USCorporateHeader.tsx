@@ -161,10 +161,6 @@ export default function USCorporateHeader() {
             <Link href="/us/about" className="text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-colors hover:text-[#3498db]">
               About
             </Link>
-            
-            <Link href="/us/contact" className="text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-colors hover:text-[#3498db]">
-              Contact us
-            </Link>
 
             {/* CTA Button */}
             <Link
@@ -210,8 +206,7 @@ export default function USCorporateHeader() {
               </div>
               
               <Link href="/us/about" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">About</Link>
-              <Link href="/us/contact" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">Contact us</Link>
-              
+
               <Link
                 href="/us/contact"
                 className="block border-2 border-[#3498db] bg-[#3498db] px-4 py-3 text-center text-sm font-bold uppercase text-white"

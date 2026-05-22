@@ -3,8 +3,8 @@
 import Link from 'next/link';
 
 const EMAIL = 'ops@phixall.us';
-const PHONE_DISPLAY = '(317) 832-6185';
-const PHONE_HREF = 'tel:+13178326185';
+const PHONE_DISPLAY = '(317) 991-2460';
+const PHONE_HREF = 'tel:+13179912460';
 
 export default function USContactPage() {
   return (

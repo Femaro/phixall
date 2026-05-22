@@ -72,14 +72,14 @@ export default function InlandIndustrialPage() {
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-3xl font-bold text-white">Discuss an inland facility program</h2>
           <p className="mt-4 text-white/85">
-            Request a scoped quote for land-based warehouse, plant-adjacent, or commercial industrial work in Indiana.
+            Contact our team about land-based warehouse, plant-adjacent, or commercial industrial work in Indiana.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-[#1e3a5f] transition hover:bg-white/90"
             >
-              Request quote
+              Contact us
             </Link>
             <Link
               href="/us/contact"

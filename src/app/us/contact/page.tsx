@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 const EMAIL = 'ops@phixall.us';
 const PHONE_DISPLAY = '(317) 991-2460';
 const PHONE_HREF = 'tel:+13179912460';
@@ -84,16 +82,16 @@ export default function USContactPage() {
 
             <div>
               <div className="sticky top-24 rounded-2xl border border-[#3498db]/40 bg-gradient-to-br from-blue-50/80 to-white p-8 shadow-md ring-1 ring-[#3498db]/20">
-                <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need a bundled quote?</h3>
+                <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need a bundled program?</h3>
                 <p className="mt-4 text-neutral-600">
                   Outline your facilities, blackout windows, and services— we will pair trades, procurement, advisory, automation, engineering, and PM staffing as one rollout plan.
                 </p>
-                <Link
-                  href="/us/request-quote"
+                <a
+                  href={`mailto:${EMAIL}?subject=${encodeURIComponent('Phixall US bundled program inquiry')}`}
                   className="mt-6 block w-full rounded-xl border-2 border-[#3498db] bg-[#3498db] px-6 py-4 text-center text-base font-bold uppercase tracking-wide text-white transition-all hover:bg-[#2980b9]"
                 >
-                  Start request
-                </Link>
+                  Reach us now
+                </a>
 
                 <div className="mt-8 border-t border-neutral-200 pt-8">
                   <h4 className="font-bold text-neutral-900">Typical turnaround</h4>

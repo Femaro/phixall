@@ -60,14 +60,14 @@ export default function USServicesIndexPage() {
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-200/90">Service catalog</p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-white lg:text-5xl">Every Phixall US capability</h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/85">
-            Browse specialties by practice area—then request a bundled quote combining trades, procurement, advisory, engineering PM, and automation.
+            Browse specialties by practice area—then contact us for a bundled program combining trades, procurement, advisory, engineering PM, and automation.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center rounded-xl border-2 border-white bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-slate-900 transition hover:bg-white/90"
             >
-              Request a quote
+              Contact us
             </Link>
             <Link href="/us/contact" className="rounded-xl border-2 border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">
               Contact ops

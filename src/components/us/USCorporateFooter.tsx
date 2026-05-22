@@ -57,8 +57,7 @@ export default function USCorporateFooter() {
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">Company</h3>
             <ul className="mt-4 space-y-3 text-sm">
               <li><Link href="/us/about" className="text-neutral-600 transition-colors hover:text-[#3498db]">About Us</Link></li>
-              <li><Link href="/us/contact" className="text-neutral-600 transition-colors hover:text-[#3498db]">Contact</Link></li>
-              <li><Link href="/us/request-quote" className="text-neutral-600 transition-colors hover:text-[#3498db]">Request Quote</Link></li>
+              <li><Link href="/us/contact" className="text-neutral-600 transition-colors hover:text-[#3498db]">Contact us</Link></li>
             </ul>
           </div>
         </div>

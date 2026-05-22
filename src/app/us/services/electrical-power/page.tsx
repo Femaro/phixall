@@ -89,8 +89,8 @@ export default function ElectricalPowerPage() {
             From routine maintenance to emergency power solutions, we keep your facility energized 24/7.
           </p>
           <div className="mt-10">
-            <Link href="/us/request-quote" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-amber-700 transition-all hover:bg-white/90">
-              Request Electrical Quote
+            <Link href="/us/contact" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-amber-700 transition-all hover:bg-white/90">
+              Contact us
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         destination: '/us/services/inland-industrial',
         permanent: true,
       },
+      {
+        source: '/us/request-quote',
+        destination: '/us/contact',
+        permanent: true,
+      },
     ];
   },
   images: {

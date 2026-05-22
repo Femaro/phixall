@@ -22,7 +22,6 @@ export const PHIXALL_US_PATHS: readonly string[] = [
 	'',
 	'about',
 	'contact',
-	'request-quote',
 	'services',
 	'services/plumbing',
 	'services/supplies',

@@ -24,10 +24,10 @@ export default function EngineeringPMPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/us/request-quote"
+                href="/us/contact"
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-white bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-slate-900 transition-all hover:bg-white/90"
               >
-                Request a quote
+                Contact us
               </Link>
               <Link
                 href="/us/contact"
@@ -156,10 +156,10 @@ export default function EngineeringPMPage() {
           </p>
           <div className="mt-10">
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 rounded-xl border-2 border-white bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-slate-900 transition-all hover:bg-white/90"
             >
-              Request project support
+              Reach us now
             </Link>
           </div>
         </div>

@@ -163,15 +163,15 @@ export default function USCorporateHeader() {
             </Link>
             
             <Link href="/us/contact" className="text-sm font-semibold uppercase tracking-wide text-neutral-700 transition-colors hover:text-[#3498db]">
-              Contact
+              Contact us
             </Link>
 
             {/* CTA Button */}
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="border-2 border-[#3498db] bg-[#3498db] px-6 py-2 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-[#2980b9]"
             >
-              Request Quote
+              Reach us now
             </Link>
           </div>
 
@@ -210,13 +210,13 @@ export default function USCorporateHeader() {
               </div>
               
               <Link href="/us/about" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">About</Link>
-              <Link href="/us/contact" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">Contact</Link>
+              <Link href="/us/contact" className="block text-sm font-semibold text-neutral-700 hover:text-[#3498db]">Contact us</Link>
               
               <Link
-                href="/us/request-quote"
+                href="/us/contact"
                 className="block border-2 border-[#3498db] bg-[#3498db] px-4 py-3 text-center text-sm font-bold uppercase text-white"
               >
-                Request Quote
+                Reach us now
               </Link>
             </div>
           </div>

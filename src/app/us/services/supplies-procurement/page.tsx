@@ -350,10 +350,10 @@ export default function SuppliesProcurementPage() {
                   ))}
                 </ul>
                 <Link 
-                  href="/us/request-quote"
+                  href="/us/contact"
                   className={`mt-8 block w-full border-2 ${program.popular ? 'border-purple-600 bg-purple-600 text-white hover:bg-purple-700' : 'border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800'} px-6 py-3 text-center font-bold uppercase tracking-wide transition-all`}
                 >
-                  Get Quote
+                  Contact us
                 </Link>
               </div>
             ))}
@@ -448,14 +448,14 @@ export default function SuppliesProcurementPage() {
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold text-white">Streamline Your Facility Supply Chain</h2>
           <p className="mt-6 text-lg text-white/90">
-            Let us handle your procurement so you can focus on operations. Request a quote and discover how much you can save with managed procurement.
+            Let us handle your procurement so you can focus on operations. Contact us and discover how much you can save with managed procurement.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link 
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-purple-600 transition-all hover:bg-white/90"
             >
-              Get Procurement Quote
+              Reach us now
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -468,7 +468,7 @@ export default function SuppliesProcurementPage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/70">
-            Same-day quotes available • Volume discounts up to 30% • Coordinated delivery within contracted Indiana scopes
+            Same-day responses • Volume discounts up to 30% • Coordinated delivery within contracted Indiana scopes
           </p>
         </div>
       </section>

@@ -203,7 +203,7 @@ export default function WarehouseIndustrialPage() {
             {[
               {
                 name: 'Bronze Plan',
-                price: 'Custom Quote',
+                price: 'Tailored scope',
                 features: [
                   'Quarterly equipment inspections',
                   'Annual HVAC maintenance',
@@ -215,7 +215,7 @@ export default function WarehouseIndustrialPage() {
               },
               {
                 name: 'Silver Plan',
-                price: 'Custom Quote',
+                price: 'Tailored scope',
                 features: [
                   'Monthly equipment inspections',
                   'Quarterly HVAC maintenance',
@@ -230,7 +230,7 @@ export default function WarehouseIndustrialPage() {
               },
               {
                 name: 'Platinum Plan',
-                price: 'Custom Quote',
+                price: 'Tailored scope',
                 features: [
                   'Weekly facility walkthroughs',
                   'Monthly equipment inspections',
@@ -263,10 +263,10 @@ export default function WarehouseIndustrialPage() {
                   ))}
                 </ul>
                 <Link 
-                  href="/us/request-quote"
+                  href="/us/contact"
                   className={`mt-8 block w-full border-2 ${plan.popular ? 'border-[#3498db] bg-[#3498db] text-white hover:bg-[#2980b9]' : 'border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800'} px-6 py-3 text-center font-bold uppercase tracking-wide transition-all`}
                 >
-                  Get Quote
+                  Contact us
                 </Link>
               </div>
             ))}
@@ -333,14 +333,14 @@ export default function WarehouseIndustrialPage() {
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold text-white">Ready to Optimize Your Industrial Operations?</h2>
           <p className="mt-6 text-lg text-white/90">
-            Get a custom quote for your warehouse or industrial facility. Our team will assess your needs and provide a comprehensive maintenance plan.
+            Contact our team about your warehouse or industrial facility—we assess your needs and provide a comprehensive maintenance plan.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link 
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
             >
-              Request Custom Quote
+              Contact us
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

@@ -166,11 +166,11 @@ export default function IndustryTemplate() {
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold text-white">Specialized {industry.title} Solutions</h2>
           <p className="mt-6 text-lg text-white/90">
-            Request a quote tailored to your {industry.title.toLowerCase()} facility's unique needs.
+            Contact our team—the same desk routes trades, procurement, advisory, and automation for scopes tailored to your {industry.title.toLowerCase()} facility.
           </p>
           <div className="mt-10">
-            <Link href="/us/request-quote" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-neutral-900 transition-all hover:bg-white/90">
-              Request Industry Quote
+            <Link href="/us/contact" className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-neutral-900 transition-all hover:bg-white/90">
+              Contact us
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

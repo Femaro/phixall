@@ -24,10 +24,10 @@ export default function ControlsAutomationPage() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
-                href="/us/request-quote"
+                href="/us/contact"
                 className="inline-flex items-center gap-2 rounded-xl border-2 border-white bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-slate-900 transition-all hover:bg-white/90"
               >
-                Request controls scope
+                Contact us
               </Link>
               <Link
                 href="/us/services/engineering-project-management-support"
@@ -137,10 +137,10 @@ export default function ControlsAutomationPage() {
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 rounded-xl border-2 border-white bg-white px-8 py-4 text-sm font-bold uppercase tracking-wide text-emerald-950 transition-all hover:bg-white/90"
             >
-              Request automation quote
+              Reach us now
             </Link>
             <Link href="/us/contact" className="rounded-xl border-2 border-white/40 px-8 py-4 text-sm font-bold uppercase tracking-wide text-white transition-all hover:bg-white/10">
               Contact ops

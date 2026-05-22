@@ -30,10 +30,10 @@ export default function USCorporatePage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
-                  href="/us/request-quote" 
+                  href="/us/contact" 
                   className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
                 >
-                  Request Enterprise Quote
+                  Reach us now
                   <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -319,10 +319,10 @@ export default function USCorporatePage() {
           </div>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/us/request-quote"
+              href="/us/contact"
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-6 py-3 text-sm font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
             >
-              Request enterprise quote
+              Contact us
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -399,14 +399,14 @@ export default function USCorporatePage() {
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center lg:px-8">
           <h2 className="text-4xl font-bold tracking-tight text-white">Ready to Optimize Your Warehouse Facility?</h2>
           <p className="mt-6 text-lg text-white/90">
-            Request a custom quote and discover how Phixall can enhance your warehouse operations, reduce costs, and improve efficiency.
+            Contact our team and discover how Phixall can enhance your warehouse operations, reduce costs, and improve efficiency.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link 
-              href="/us/request-quote" 
+              href="/us/contact" 
               className="inline-flex items-center gap-2 border-2 border-white bg-white px-8 py-4 text-base font-bold uppercase tracking-wide text-[#1e3a5f] transition-all hover:bg-white/90"
             >
-              Request Enterprise Quote
+              Reach us now
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

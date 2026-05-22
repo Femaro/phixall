@@ -4,29 +4,29 @@ import Image from 'next/image';
 
 const logos = [
   {
-    src: '/us/partners/conagra.svg',
+    src: '/us/partners/conagra.png',
     alt: 'Conagra Brands',
-    width: 200,
-    height: 52,
+    width: 262,
+    height: 193,
     className: 'object-contain',
   },
   {
-    src: '/us/partners/isnetworld.svg',
-    alt: 'ISNetworld',
-    width: 200,
-    height: 52,
+    src: '/us/partners/isnetworld.png',
+    alt: 'ISNetworld — ISN',
+    width: 228,
+    height: 206,
     className: 'object-contain',
   },
   {
-    src: '/us/partners/osha.svg',
+    src: '/us/partners/osha.png',
     alt: 'OSHA — Occupational Safety and Health Administration, U.S. Department of Labor',
-    width: 200,
-    height: 62,
+    width: 720,
+    height: 208,
     className: 'object-contain',
   },
 ] as const;
 
-/** Partner logo strip — uses files under `/public/us/partners/`. Swap SVGs per brand guidelines (see README in that folder). */
+/** Partner logos from `/public/us/partners/` (see README for trademark usage). */
 export default function PartnerLogosStrip() {
   return (
     <section className="border-b border-neutral-200 bg-gradient-to-r from-neutral-50 via-white to-slate-50 py-12">
@@ -38,15 +38,14 @@ export default function PartnerLogosStrip() {
           {logos.map((logo) => (
             <div
               key={logo.src}
-              className="flex h-[4.25rem] w-[220px] max-w-[min(100%,220px)] items-center justify-center rounded-xl border border-slate-200/80 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-slate-900/[0.04] grayscale transition-[filter] duration-300 hover:grayscale-0"
+              className="flex h-[4.75rem] w-[240px] max-w-[min(100%,280px)] items-center justify-center rounded-xl border border-slate-200/80 bg-white px-5 py-3 shadow-sm ring-1 ring-slate-900/[0.04] grayscale transition-[filter] duration-300 hover:grayscale-0 sm:w-[260px]"
             >
               <Image
                 src={logo.src}
                 alt={logo.alt}
                 width={logo.width}
                 height={logo.height}
-                className={`h-auto max-h-[62px] w-auto max-w-full ${logo.className ?? ''}`}
-                unoptimized
+                className={`h-auto max-h-[52px] w-auto max-w-full ${logo.className ?? ''}`}
               />
             </div>
           ))}

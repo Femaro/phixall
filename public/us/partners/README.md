@@ -1,9 +1,13 @@
 # Partner logos (US site)
 
-SVGs here are referenced by `PartnerLogosStrip`. Replace each file with **trademark-approved** artwork from:
+Approved logo files hosted here:
 
-- **Conagra** — Conagra Brands media / brand guidelines  
-- **ISNetworld** — ISNetworld member logo usage rules  
-- **OSHA / USDOL** — [OSHA trademarks](https://www.osha.gov/) and DOL guidance for federal marks  
+| File | Brand |
+|------|--------|
+| `conagra.png` | Conagra Brands |
+| `isnetworld.png` | ISNetworld (ISN) |
+| `osha.png` | OSHA / U.S. Department of Labor |
 
-Keep filenames (`conagra.svg`, `isnetworld.svg`, `osha.svg`) or update paths in `src/components/us/PartnerLogosStrip.tsx`.
+Used by `PartnerLogosStrip` on the phixall.us homepage. Follow each owner’s trademark and usage guidelines.
+
+Legacy placeholder SVGs (`conagra.svg`, `isnetworld.svg`, `osha.svg`) were replaced by PNGs—you can delete any leftover `.svg` files in this folder if present.

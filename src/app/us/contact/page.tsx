@@ -1,8 +1,8 @@
 'use client';
 
 const EMAIL = 'ops@phixall.us';
-const PHONE_DISPLAY = '(317) 991-2460';
-const PHONE_HREF = 'tel:+13179912460';
+const PHONE_DISPLAY = '(317) 832-6185';
+const PHONE_HREF = 'tel:+13178326185';
 
 export default function USContactPage() {
   return (
@@ -23,9 +23,6 @@ export default function USContactPage() {
           <div className="grid gap-12 lg:grid-cols-2">
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-neutral-900">Reach us directly</h2>
-              <p className="mt-4 text-lg text-neutral-600">
-                One mailbox and one coordinated phone number keep requests moving—tell us whether you need trades, procurement, advisory, automation, engineering PM, or a bundled scope.
-              </p>
 
               <div className="mt-8 space-y-6">
                 <div className="rounded-2xl border border-[#3498db]/30 bg-[#3498db]/5 p-6 shadow-sm ring-1 ring-neutral-100">
@@ -59,22 +56,6 @@ export default function USContactPage() {
                       </a>
                     </p>
                     <p className="mt-2 text-xs text-neutral-500">Send drawings, timelines, sketches, outage windows—anything that helps ops understand urgency.</p>
-                  </div>
-                </div>
-
-                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
-                  <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    Legal entity
-                  </h3>
-                  <div className="mt-4 space-y-2 text-sm text-neutral-600">
-                    <p className="font-semibold text-neutral-900">Phixall Facility Management LLC</p>
-                    <p>
-                      Indiana-based program management and coordination for inland commercial and industrial facilities within
-                      contracted service areas—use phone or email for routing and scheduling.
-                    </p>
                   </div>
                 </div>
               </div>

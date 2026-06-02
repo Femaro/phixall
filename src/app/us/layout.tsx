@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(phixallUsOrigin),
   title: 'Warehouse Facility Management Solutions | Phixall US',
   description:
-    'Specialized on-shore warehouse and industrial facility management in Indiana—electrical, plumbing, trades, procurement, advisory, engineering PM, engineering services, and controls with coordinated on-site technicians.',
+    'On-shore warehouse and industrial facility management in Indiana—trades, coatings, procurement, project support, automation coordination, and owner\'s-representative services with coordinated on-site technicians.',
   keywords: [
     'warehouse facility management',
     'warehouse electrical services',
@@ -19,8 +19,9 @@ export const metadata: Metadata = {
     'warehouse painting services',
     'warehouse installation supplies',
     'facility management advisory',
-    'engineering services',
-    'controls automation',
+    'automation coordination',
+    'owners representative',
+    'owners rep facility',
     'engineering project management',
     'warehouse maintenance USA',
     'distribution center services',
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Warehouse Facility Management Solutions | Phixall US',
     description:
-      'Trades, procurement, advisory, engineering PM, engineering services, and controls for land-based warehouse and industrial programs in authorized Indiana service areas.',
+      'Trades, coatings, procurement, project support, automation coordination, and owner\'s-representative services for land-based warehouse and industrial programs in authorized Indiana service areas.',
     type: 'website',
     url: '/us',
   },

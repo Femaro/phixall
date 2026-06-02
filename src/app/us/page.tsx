@@ -4,6 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
 import PartnerLogosStrip from '@/components/us/PartnerLogosStrip';
+import { US_CORE_SERVICES, US_HOMEPAGE_SPOTLIGHTS } from '@/data/usCoreServices';
+import { US_INDUSTRIES } from '@/data/usIndustries';
+import { US_SITE_IMAGES } from '@/data/usSiteImages';
 
 export default function USCorporatePage() {
   return (
@@ -18,9 +21,7 @@ export default function USCorporatePage() {
                 Enterprise Facility Management Services
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
-                We synchronize core trades (electrical, plumbing, carpentry, and painting) 
-                with your supply chain requirements to ensure maintenance never interrupts 
-                your distribution velocity.
+                We synchronize core trades with your supply chain—and provide owner&apos;s-representative and automation program coordination for modernization rollouts—so maintenance and upgrades never interrupt your distribution velocity.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -64,191 +65,146 @@ export default function USCorporatePage() {
 
       <PartnerLogosStrip />
 
-      {/* Core Services Grid */}
-      <section className="relative border-t border-neutral-200/80 bg-gradient-to-b from-slate-100/90 via-white to-[#3498db]/[0.06] py-20">
+      {/* Service categories — compact overview */}
+      <section className="relative border-t border-neutral-200/80 bg-gradient-to-b from-slate-100/90 via-white to-[#3498db]/[0.06] py-16">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3498db]/40 to-transparent" aria-hidden />
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Our Enterprise Facility Management Services</h2>
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
-              Specialized solutions for warehouse installations and operations with professional support
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">What we do</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">Service Categories</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
+              Four integrated programs—pick a category to learn more.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                title: 'Electrical Services',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>,
-                description: 'Complete electrical installation and maintenance for warehouse facilities including power distribution, lighting systems, and backup power solutions.',
-                features: ['Power Distribution', 'Lighting Systems', 'Backup Systems', 'Equipment Power'],
-                link: '/us/services/electrical'
-              },
-              {
-                title: 'Plumbing Services',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>,
-                description: 'Industrial plumbing solutions for warehouse facilities including pipe systems, water distribution, drainage, and wastewater management.',
-                features: ['Industrial Plumbing', 'Pipe Systems', 'Water Distribution', 'Drainage Systems'],
-                link: '/us/services/plumbing'
-              },
-              {
-                title: 'Carpentry Services',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>,
-                description: 'Professional carpentry services for warehouse structures including shelving installation, loading dock repairs, and custom woodwork.',
-                features: ['Shelving Installation', 'Dock Repairs', 'Custom Woodwork', 'Structural Repairs'],
-                link: '/us/services/carpentry'
-              },
-              {
-                title: 'Painting Services',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>,
-                description: 'Industrial painting and coating services for warehouse facilities including floor coatings, wall finishes, and protective sealants.',
-                features: ['Floor Coatings', 'Wall Painting', 'Protective Sealants', 'Line Marking'],
-                link: '/us/services/painting'
-              },
-              {
-                title: 'Installation Item Supplies',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>,
-                description: 'Supply and procurement of installation materials, equipment parts, MRO supplies, and facility maintenance items for warehouse operations.',
-                features: ['Installation Materials', 'Equipment Parts', 'MRO Supplies', 'Bulk Procurement'],
-                link: '/us/services/supplies'
-              },
-              {
-                title: 'Facility Management Advisory',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
-                description: 'Expert advisory services for warehouse facility optimization, compliance management, preventive maintenance planning, and cost reduction strategies.',
-                features: ['Facility Optimization', 'Compliance Advisory', 'Maintenance Planning', 'Cost Analysis'],
-                link: '/us/services/advisory'
-              }
-            ].map((service) => (
-              <Link 
-                key={service.title}
-                href={service.link}
-                className="group rounded-2xl bg-gradient-to-br from-white to-slate-50/80 p-8 shadow-sm ring-1 ring-neutral-200/80 transition-all hover:-translate-y-0.5 hover:border-[#3498db] hover:shadow-lg hover:shadow-[#3498db]/10 hover:ring-[#3498db]/30"
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {US_CORE_SERVICES.map((service) => (
+              <Link
+                key={service.id}
+                href={service.href}
+                className="group rounded-xl border border-neutral-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#3498db]/40 hover:shadow-md"
               >
-                <div className="inline-flex rounded-2xl bg-gradient-to-br from-[#3498db]/15 to-[#1e3a5f]/10 p-4 ring-1 ring-[#3498db]/20">
-                  {service.icon}
-                </div>
-                <h3 className="mt-4 text-xl font-bold text-neutral-900 group-hover:text-[#3498db]">{service.title}</h3>
-                <p className="mt-3 text-neutral-600">{service.description}</p>
-                <ul className="mt-4 space-y-2">
-                  {service.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-neutral-600">
-                      <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-6 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[#3498db]">
-                  Learn More
-                  <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h3 className="text-base font-bold text-neutral-900 group-hover:text-[#3498db]">{service.navLabel}</h3>
+                <p className="mt-1 text-xs text-neutral-500">{service.navSubtext}</p>
+                <p className="mt-3 text-sm leading-snug text-neutral-600">{service.summary}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-[#3498db]">
+                  Learn more
+                  <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </div>
+                </span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Engineering & automation */}
-      <section className="border-t border-neutral-200 bg-gradient-to-br from-cyan-50/50 via-slate-50 to-emerald-50/50 py-20">
+      {/* Featured services — image + text spotlight rows */}
+      <section className="border-t border-neutral-200 bg-white py-4">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-cyan-700">Engineering runway</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Program management &amp; technical depth</h2>
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
-              Layer PM discipline with controls so warehouse upgrades stay coordinated from kickoff packets through energized checkout.
-            </p>
+          <div className="py-12 text-center">
+            <p className="text-sm font-semibold uppercase tracking-wider text-[#1e3a5f]">Featured services</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">Field coordination &amp; modernization programs</h2>
           </div>
-          <div className="mt-14 grid gap-8 md:grid-cols-2 lg:max-w-4xl lg:mx-auto">
-            {[
-              {
-                title: 'Engineering PM Support',
-                href: '/us/services/engineering-project-management-support',
-                copy: 'Milestones, change control boards, turnovers, stakeholder cadence—all aligned with how your docks and lines actually behave.',
-              },
-              {
-                title: 'Controls & Automation',
-                href: '/us/services/controls-and-automation',
-                copy: 'Panels, PLC-era stacks, HMIs/MES bridges, sequencing, validation plans—wired to pragmatic operator reality.',
-              },
-            ].map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="group flex flex-col rounded-2xl border border-cyan-100/80 bg-gradient-to-br from-white to-cyan-50/40 p-8 shadow-md ring-1 ring-neutral-200/60 transition hover:-translate-y-1 hover:shadow-xl hover:ring-[#3498db]/35"
-              >
-                <h3 className="text-xl font-bold text-neutral-900 group-hover:text-cyan-800">{item.title}</h3>
-                <p className="mt-4 flex-1 text-sm leading-relaxed text-neutral-600">{item.copy}</p>
-                <span className="mt-8 text-xs font-semibold uppercase tracking-wide text-[#3498db]">Explore specialty</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* Proof strip — on-brand generated photography */}
-      <section className="border-y border-neutral-800 bg-gradient-to-b from-neutral-950 via-neutral-900 to-[#1e3a5f] py-10">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-4 md:grid-cols-3">
-            {[
-              { src: '/us/images/us-proof-mechanical.jpg', alt: 'Precision mechanical fabrication on the shop floor', caption: 'Mechanical & fabrication' },
-              { src: '/us/images/us-proof-planning.jpg', alt: 'Team reviewing facility plans and schedules', caption: 'Facility planning & programs' },
-              { src: '/us/images/us-proof-controls.jpg', alt: 'Industrial control panels and automation hardware', caption: 'Automation & controls' },
-            ].map((img) => (
-              <figure key={img.src} className="overflow-hidden rounded-2xl ring-1 ring-[#3498db]/25 shadow-lg shadow-[#3498db]/5">
-                <div className="relative aspect-[4/3]">
-                  <Image src={img.src} alt={img.alt} fill className="object-cover" sizes="(max-width: 768px) 100vw, 33vw" />
+          <div className="space-y-16 pb-16 lg:space-y-24">
+            {US_HOMEPAGE_SPOTLIGHTS.map((spotlight, index) => {
+              const imageFirst = index % 2 === 0;
+              return (
+                <div
+                  key={spotlight.id}
+                  className={`grid items-center gap-8 lg:grid-cols-2 lg:gap-12 ${imageFirst ? '' : ''}`}
+                >
+                  <div className={`relative aspect-[4/3] overflow-hidden rounded-2xl ring-1 ring-neutral-200 ${imageFirst ? 'lg:order-1' : 'lg:order-2'}`}>
+                    <Image
+                      src={spotlight.imageSrc}
+                      alt={spotlight.imageAlt}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                  </div>
+                  <div className={imageFirst ? 'lg:order-2' : 'lg:order-1'}>
+                    <h3 className="text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">{spotlight.title}</h3>
+                    <p className="mt-4 text-base leading-relaxed text-neutral-600">{spotlight.description}</p>
+                    <Link
+                      href={spotlight.href}
+                      className="mt-6 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-[#3498db] transition-colors hover:text-[#2980b9]"
+                    >
+                      {spotlight.cta}
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
-                <figcaption className="border-t-2 border-[#3498db]/80 bg-gradient-to-r from-neutral-950 to-[#1e3a5f]/95 px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-[#5dade2]">
-                  {img.caption}
-                </figcaption>
-              </figure>
-            ))}
+              );
+            })}
           </div>
-          <p className="mx-auto mt-6 max-w-3xl text-center text-xs text-neutral-400">
-            Facility programs from fabrication through commissioning—documented, coordinated, on-site across authorized Indiana locations.
-          </p>
         </div>
       </section>
 
       <TrustComplianceBadges />
 
       {/* Industries Served */}
-      <section className="border-t border-neutral-200 bg-gradient-to-b from-blue-50/50 via-neutral-50 to-white py-20">
+      <section className="border-t border-neutral-200 bg-neutral-50/60 py-14">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#1e3a5f]">Sectors we support</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Warehouse Industries We Serve</h2>
-            <p className="mx-auto mt-4 max-w-3xl text-lg text-neutral-600">
-              Specialized warehouse facility management solutions tailored to your industry's unique requirements
-            </p>
-          </div>
-
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { name: 'E-Commerce Warehouses', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>, desc: 'Fulfillment & Distribution Centers' },
-              { name: 'Logistics', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>, desc: '3PL & Distribution Facilities' },
-              { name: 'Manufacturing', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>, desc: 'Production Warehouse Facilities' },
-              { name: 'Cold Storage', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>, desc: 'Refrigerated facilities—including ammonia refrigeration envelopes coordinated with your site safety programs' },
-              { name: 'Retail Distribution', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>, desc: 'Retail Supply Chain Warehouses' },
-              { name: 'Food & Beverage', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>, desc: 'Food Distribution Warehouses' },
-              { name: 'Pharmaceutical', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>, desc: 'Medical Supply Warehouses' },
-              { name: 'Automotive Parts', icon: <svg className="h-10 w-10 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>, desc: 'Auto Parts Distribution Centers' }
-            ].map((industry) => (
-              <div
-                key={industry.name}
-                className="rounded-2xl border border-[#3498db]/15 bg-gradient-to-b from-white to-slate-50/80 p-6 text-center shadow-md shadow-[#1e3a5f]/5 ring-1 ring-neutral-100 transition-all hover:border-[#3498db]/35 hover:shadow-lg hover:shadow-[#3498db]/10"
-              >
-                <div className="mx-auto w-fit rounded-2xl bg-gradient-to-br from-[#3498db]/12 to-[#1e3a5f]/8 p-4 ring-1 ring-[#3498db]/15">
-                  {industry.icon}
-                </div>
-                <h3 className="mt-3 text-lg font-bold text-neutral-900">{industry.name}</h3>
-                <p className="mt-1 text-sm text-neutral-600">{industry.desc}</p>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Image card */}
+            <div className="relative min-h-[280px] overflow-hidden rounded-2xl ring-1 ring-neutral-200 lg:min-h-[360px]">
+              <Image
+                src={US_SITE_IMAGES.warehouseDistribution.src}
+                alt={US_SITE_IMAGES.warehouseDistribution.alt}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/80 via-[#1e3a5f]/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6 lg:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#5dade2]">Sectors we support</p>
+                <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90">
+                  Programs built for warehouse throughput, food-safe environments, and plant-adjacent sites across Indiana.
+                </p>
               </div>
-            ))}
+            </div>
+
+            {/* Industries list card */}
+            <div className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100 lg:p-8">
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">Industries we serve</h2>
+              <p className="mt-2 text-sm text-neutral-600">
+                Facility management tailored to your sector&apos;s operating requirements.
+              </p>
+              <ul className="mt-6 divide-y divide-neutral-100">
+                {US_INDUSTRIES.map((industry) => (
+                  <li key={industry.id}>
+                    <Link
+                      href={`/us/industries#${industry.id}`}
+                      className="group flex items-center justify-between py-3 text-sm font-medium text-neutral-800 transition-colors hover:text-[#3498db]"
+                    >
+                      {industry.label}
+                      <svg
+                        className="h-4 w-4 text-neutral-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#3498db]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/us/industries"
+                className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#3498db] hover:underline"
+              >
+                View all industries
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -272,8 +228,8 @@ export default function USCorporatePage() {
           <div className="mt-6 grid gap-8 md:grid-cols-3">
             {[
               {
-                title: 'End-to-end coordination',
-                body: 'Kickoff packets, change control, and turnovers aligned with how your lines and docks actually run—not generic checklists.',
+                title: 'Field coordination',
+                body: 'Daily safety briefings, trade scheduling, and subcontractor check-in—keeping active carpentry, MEP, and painting work safe and on track inside your operating windows.',
                 icon: (
                   <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -331,57 +287,64 @@ export default function USCorporatePage() {
       </section>
 
       {/* Why Choose Phixall */}
-      <section className="border-t border-neutral-200 bg-gradient-to-b from-white via-slate-50/50 to-[#3498db]/[0.08] py-20">
+      <section className="border-t border-neutral-200 bg-white py-14">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">Why Phixall</p>
-            <h2 className="mt-2 text-4xl font-bold tracking-tight text-neutral-900">Why Warehouse Clients Choose Phixall</h2>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Why Phixall</p>
+              <h2 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">
+                Built for enterprise warehouse programs
+              </h2>
+            </div>
+            <p className="max-w-lg text-sm text-neutral-600 lg:text-right">
+              One coordinated partner for trades, coatings, procurement, field coordination, and modernization programs—without adding headcount to your plant team.
+            </p>
           </div>
 
-          <div className="mt-16 grid gap-8 lg:grid-cols-3">
-            {[
-              {
-                title: 'Authorized Indiana footprint',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'On-shore, inland commercial and industrial facility services coordinated from Indiana—with consistent quality and documented procedures at contracted sites.'
-              },
-              {
-                title: 'Professional Team',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>,
-                description: 'All technicians are background-checked, licensed, insured, and trained in warehouse facility standards.'
-              },
-              {
-                title: 'Warehouse Expertise',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>,
-                description: 'Specialized knowledge of warehouse operations, safety requirements, and distribution center needs.'
-              },
-              {
-                title: 'Safety Expertise',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Maintain compliance with safety regulations and warehouse-specific safety requirements.'
-              },
-              {
-                title: 'Cost Optimization',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Reduce operational costs through preventive maintenance, efficient installations, and bulk procurement.'
-              },
-              {
-                title: 'Reliable Support',
-                icon: <svg className="h-12 w-12 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-                description: 'Dedicated account management and support teams for warehouse operations.'
-              }
-            ].map((benefit) => (
-              <div
-                key={benefit.title}
-                className="rounded-2xl border border-neutral-200/80 bg-gradient-to-br from-white to-slate-50/80 p-8 shadow-sm ring-1 ring-[#3498db]/10 transition hover:shadow-md hover:ring-[#3498db]/25"
-              >
-                <div className="inline-flex rounded-xl bg-gradient-to-br from-[#3498db]/12 to-[#1e3a5f]/8 p-3 ring-1 ring-[#3498db]/20">
-                  {benefit.icon}
-                </div>
-                <h3 className="mt-4 text-xl font-bold text-neutral-900">{benefit.title}</h3>
-                <p className="mt-3 text-neutral-600">{benefit.description}</p>
-              </div>
-            ))}
+          <div className="mt-10 grid gap-8 lg:grid-cols-2">
+            <ul className="space-y-0 divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-slate-50/50">
+              {[
+                {
+                  title: 'Indiana footprint',
+                  description: 'On-shore coordination from authorized Indiana sites with documented procedures at every contracted location.',
+                },
+                {
+                  title: 'Vetted field teams',
+                  description: 'Background-checked, licensed, and insured technicians trained for warehouse and industrial environments.',
+                },
+                {
+                  title: 'Safety-first execution',
+                  description: 'OSHA 1910/1926 discipline, daily briefings, and ISNetworld-aligned subcontractor oversight on every job.',
+                },
+              ].map((item) => (
+                <li key={item.title} className="px-5 py-4 first:rounded-t-2xl last:rounded-b-2xl">
+                  <p className="font-semibold text-neutral-900">{item.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                </li>
+              ))}
+            </ul>
+
+            <ul className="space-y-0 divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-slate-50/50">
+              {[
+                {
+                  title: 'Warehouse & distribution know-how',
+                  description: 'Programs shaped around docks, throughput, outage windows, and the realities of fulfillment operations.',
+                },
+                {
+                  title: 'Cost-smart delivery',
+                  description: 'Preventive maintenance, bundled procurement, and coordinated trades that reduce downtime and vendor sprawl.',
+                },
+                {
+                  title: 'Responsive account support',
+                  description: 'Dedicated coordination from first scope review through turnover—one desk, clear accountability.',
+                },
+              ].map((item) => (
+                <li key={item.title} className="px-5 py-4 first:rounded-t-2xl last:rounded-b-2xl">
+                  <p className="font-semibold text-neutral-900">{item.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-neutral-600">{item.description}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>

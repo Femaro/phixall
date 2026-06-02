@@ -1,56 +1,13 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
+import { US_CORE_SERVICES } from '@/data/usCoreServices';
 
 export const metadata: Metadata = {
-  title: 'Facility Services Catalog | Phixall US',
+  title: 'Facility Services | Phixall US',
   description:
-    'Warehouse trades, procurement, advisory, engineering PM, and controls—coordinated for inland commercial and industrial facilities in authorized Indiana service areas.',
+    'General trades MRO, industrial coatings, enterprise procurement, and project support—including automation coordination and owner\'s-representative services—for inland commercial and industrial facilities.',
 };
-
-const sections = [
-  {
-    id: 'trades',
-    title: 'Field & building trades',
-    description:
-      'Installation, preventive maintenance, and emergency response disciplines for warehousing and logistics environments.',
-    items: [
-      { href: '/us/services/electrical', label: 'Electrical Services', blurb: 'Power, lighting, material-handling electrification' },
-      { href: '/us/services/plumbing', label: 'Plumbing Services', blurb: 'Industrial piping and distribution systems' },
-      { href: '/us/services/carpentry', label: 'Carpentry Services', blurb: 'Shelving, docks, fixtures, carpentry installs' },
-      { href: '/us/services/painting', label: 'Painting Services', blurb: 'Floor coatings, lines, protective finishes' },
-      { href: '/us/services/electrical-power', label: 'Electrical & Power', blurb: 'Distribution, backup power, selective projects' },
-      { href: '/us/services/plumbing-water', label: 'Plumbing & Water', blurb: 'Water systems aligned to facility throughput' },
-    ],
-  },
-  {
-    id: 'programs',
-    title: 'Programs & facility verticals',
-    description:
-      'Full-service footprints for common industrial and logistics footprints—with procurement and operations alignment.',
-    items: [
-      { href: '/us/services/warehouse-industrial', label: 'Warehouse & Industrial', blurb: 'Distribution, manufacturing adjacent, throughput' },
-      { href: '/us/services/inland-industrial', label: 'Inland Industrial & Commercial', blurb: 'On-shore facilities, warehouses, and plant-adjacent sites' },
-      { href: '/us/services/supplies', label: 'Installation Item Supplies', blurb: 'MRO stocking and rollout materials' },
-      { href: '/us/services/supplies-procurement', label: 'Supplies & Procurement', blurb: 'Programmatic sourcing and invoicing hygiene' },
-    ],
-  },
-  {
-    id: 'engineering',
-    title: 'Engineering & automation',
-    description:
-      'PM rigor and technical horsepower for modernization, commissioning, integrations, panels, instrumentation, sequences, reliability.',
-    items: [
-      { href: '/us/services/engineering-project-management-support', label: 'Engineering PM Support', blurb: 'Schedules, change control, turnovers' },
-      { href: '/us/services/controls-and-automation', label: 'Controls & Automation', blurb: 'PLC-era controls stacks, integrations, FAT/SAT' },
-    ],
-  },
-  {
-    id: 'advisory',
-    title: 'Advisory',
-    description: 'Executive-level optimization across compliance, capex planning, preventive programs, supplier landscape.',
-    items: [{ href: '/us/services/advisory', label: 'Facility Management Advisory', blurb: 'Optimization, capex pacing, playbook design' }],
-  },
-] as const;
 
 export default function USServicesIndexPage() {
   return (
@@ -58,9 +15,11 @@ export default function USServicesIndexPage() {
       <section className="border-b border-neutral-200 bg-gradient-to-br from-[#1e3a5f] via-[#243b53] to-slate-900">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-200/90">Service catalog</p>
-          <h1 className="mt-2 text-4xl font-bold tracking-tight text-white lg:text-5xl">Every Phixall US capability</h1>
+          <h1 className="mt-2 text-4xl font-bold tracking-tight text-white lg:text-5xl">
+            Integrated facility capabilities
+          </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/85">
-            Browse specialties by practice area—then contact us for a bundled program combining trades, procurement, advisory, engineering PM, and automation.
+            Four consolidated service buckets—trades, coatings, procurement, and project support with automation coordination and owner&apos;s-representative programs—for enterprise inland facilities.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
@@ -69,34 +28,47 @@ export default function USServicesIndexPage() {
             >
               Contact us
             </Link>
-            <Link href="/us/contact" className="rounded-xl border-2 border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10">
+            <Link
+              href="/us/contact"
+              className="rounded-xl border-2 border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10"
+            >
               Contact ops
             </Link>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto max-w-7xl space-y-20 px-6 py-16 lg:px-8 lg:py-24">
-        {sections.map((section) => (
-          <section key={section.id}>
-            <h2 className="text-3xl font-bold tracking-tight text-neutral-900">{section.title}</h2>
-            <p className="mt-2 max-w-3xl text-neutral-600">{section.description}</p>
-            <ul className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {section.items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="group flex h-full flex-col rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-[#3498db]/40"
-                  >
-                    <span className="text-lg font-bold text-neutral-900 group-hover:text-[#3498db]">{item.label}</span>
-                    <span className="mt-2 flex-1 text-sm text-neutral-600">{item.blurb}</span>
-                    <span className="mt-4 text-xs font-semibold uppercase tracking-wide text-[#3498db]">View detail</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
+      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
+        <ul className="grid gap-8 lg:grid-cols-2">
+          {US_CORE_SERVICES.map((service) => (
+            <li key={service.id}>
+              <Link
+                href={service.href}
+                className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200 transition hover:-translate-y-0.5 hover:shadow-md hover:ring-[#3498db]/40"
+              >
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <Image
+                    src={service.imageSrc}
+                    alt={service.imageAlt}
+                    fill
+                    className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-8">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">{service.navLabel}</p>
+                  <h2 className="mt-2 text-xl font-bold leading-snug text-neutral-900 group-hover:text-[#3498db] lg:text-2xl">
+                    {service.headline}
+                  </h2>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-neutral-600">{service.summary}</p>
+                  <span className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#3498db]">
+                    View detail →
+                  </span>
+                </div>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </main>
   );

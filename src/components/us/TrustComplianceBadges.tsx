@@ -75,128 +75,97 @@ function IconFlameShield({ className }: { className?: string }) {
   );
 }
 
-type BadgeProps = {
+type TrustItem = {
   title: string;
   subtext: string;
   icon: ReactNode;
-  emphasized?: boolean;
 };
 
-function BadgeCard({ title, subtext, icon, emphasized }: BadgeProps) {
+function CompactBadge({ title, subtext, icon }: TrustItem) {
   return (
-    <div
-      className={
-        emphasized
-          ? 'group relative flex flex-col rounded-2xl border border-slate-200/80 bg-white p-8 shadow-sm ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10 hover:ring-[#1e3a5f]/20'
-          : 'group relative flex flex-col rounded-xl border border-slate-200/80 bg-white p-6 shadow-sm ring-1 ring-slate-900/5 transition duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-900/8 hover:ring-[#1e3a5f]/15'
-      }
-    >
-      <div
-        className={
-          emphasized
-            ? 'flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-[#1e3a5f] transition group-hover:border-[#1e3a5f]/25 group-hover:bg-[#1e3a5f]/[0.06] group-hover:text-[#1e3a5f]'
-            : 'flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-[#1e3a5f] transition group-hover:border-[#1e3a5f]/25 group-hover:bg-[#1e3a5f]/[0.06]'
-        }
-      >
+    <div className="flex items-center gap-3 rounded-lg border border-slate-200/80 bg-white px-4 py-3">
+      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-slate-50 text-[#1e3a5f]">
         {icon}
       </div>
-      <h3
-        className={
-          emphasized
-            ? 'mt-5 text-lg font-semibold leading-snug text-slate-900'
-            : 'mt-4 text-base font-semibold leading-snug text-slate-900'
-        }
-      >
-        {title}
-      </h3>
-      <p className={emphasized ? 'mt-2 text-sm leading-relaxed text-slate-600' : 'mt-1.5 text-xs leading-relaxed text-slate-600'}>
-        {subtext}
-      </p>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold leading-snug text-slate-900">{title}</p>
+        <p className="text-xs text-slate-500">{subtext}</p>
+      </div>
     </div>
   );
 }
 
-const verifiedCredentials: BadgeProps[] = [
+const verifiedCredentials: TrustItem[] = [
   {
     title: 'ISNetworld Member',
-    subtext: 'Safety & Compliance Vetted',
-    icon: <IconShieldCheck className="h-8 w-8" />,
-    emphasized: true,
+    subtext: 'Safety & compliance vetted',
+    icon: <IconShieldCheck className="h-5 w-5" />,
   },
   {
     title: 'D&B Verified',
-    subtext: 'Dun & Bradstreet Registered',
-    icon: <IconBuildingVerified className="h-8 w-8" />,
-    emphasized: true,
+    subtext: 'Dun & Bradstreet registered',
+    icon: <IconBuildingVerified className="h-5 w-5" />,
   },
   {
     title: 'Diverse Supplier',
-    subtext: 'Minority-Owned Business Enterprise (MBE)',
-    icon: <IconDiversity className="h-8 w-8" />,
-    emphasized: true,
+    subtext: 'Minority-owned business enterprise (MBE)',
+    icon: <IconDiversity className="h-5 w-5" />,
   },
 ];
 
-const operationalStandards: BadgeProps[] = [
+const operationalStandards: TrustItem[] = [
   {
     title: 'OSHA Compliant',
-    subtext: '1910 & 1926 Safety Standards',
-    icon: <IconSafetyAlert className="h-6 w-6" />,
+    subtext: '1910 & 1926 safety standards',
+    icon: <IconSafetyAlert className="h-4 w-4" />,
   },
   {
     title: 'Quality Assured',
-    subtext: 'Standardized QA/QC Framework',
-    icon: <IconQuality className="h-6 w-6" />,
+    subtext: 'Standardized QA/QC framework',
+    icon: <IconQuality className="h-4 w-4" />,
   },
   {
     title: 'EPA Aligned',
-    subtext: 'Environmental & Waste Stewardship',
-    icon: <IconLeaf className="h-6 w-6" />,
+    subtext: 'Environmental stewardship',
+    icon: <IconLeaf className="h-4 w-4" />,
   },
   {
     title: 'Fire & Life Safety',
-    subtext: 'NFPA Code Adherence',
-    icon: <IconFlameShield className="h-6 w-6" />,
+    subtext: 'NFPA code adherence',
+    icon: <IconFlameShield className="h-4 w-4" />,
   },
 ];
 
 export default function TrustComplianceBadges() {
   return (
-    <section className="border-t border-neutral-200 bg-gradient-to-b from-slate-50 to-white py-20">
+    <section className="border-t border-neutral-200 bg-slate-50/80 py-12">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Phixall Facility Management Company LLC</p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 lg:text-4xl">Trust &amp; compliance</h2>
-          <p className="mt-4 text-base text-slate-600">
-            Third-party verification and field standards you can reference in program reviews and RFPs.
-          </p>
-        </div>
-
-        <div className="mt-14">
-          <p className="mb-6 text-center text-xs font-bold uppercase tracking-widest text-[#1e3a5f]">
-            Verified credentials
-          </p>
-          <div className="grid gap-6 md:grid-cols-3">
-            {verifiedCredentials.map((badge) => (
-              <BadgeCard key={badge.title} {...badge} />
-            ))}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Trust &amp; compliance</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 lg:text-3xl">
+              Verified for enterprise programs
+            </h2>
           </div>
-        </div>
-
-        <div className="mt-14">
-          <p className="mb-5 text-center text-xs font-bold uppercase tracking-widest text-slate-600">
-            Operational standards
+          <p className="max-w-md text-sm text-slate-600 sm:text-right">
+            Third-party verification and field standards for program reviews and RFPs.
           </p>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {operationalStandards.map((badge) => (
-              <BadgeCard key={badge.title} {...badge} />
-            ))}
-          </div>
         </div>
 
-        <p className="mx-auto mt-14 max-w-3xl text-center text-sm leading-relaxed text-slate-600">
-          Phixall is committed to the highest standards of operational excellence. Our programs are modeled after international
-          quality and safety benchmarks to ensure peak performance for our enterprise partners.
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {verifiedCredentials.map((badge) => (
+            <CompactBadge key={badge.title} {...badge} />
+          ))}
+        </div>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {operationalStandards.map((badge) => (
+            <CompactBadge key={badge.title} {...badge} />
+          ))}
+        </div>
+
+        <p className="mt-6 text-center text-xs text-slate-500">
+          Phixall Facility Management LLC · Licensed and insured · Indiana operations
         </p>
       </div>
     </section>

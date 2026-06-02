@@ -23,27 +23,9 @@ export const PHIXALL_US_PATHS: readonly string[] = [
 	'about',
 	'contact',
 	'services',
-	'services/plumbing',
-	'services/supplies',
-	'services/electrical-power',
-	'services/advisory',
-	'services/engineering-project-management-support',
-	'services/warehouse-industrial',
-	'services/electrical',
-	'services/painting',
-	'services/carpentry',
-	'services/controls-and-automation',
-	'services/plumbing-water',
-	'services/inland-industrial',
-	'services/supplies-procurement',
-];
-
-/** Keys aligned with `navWarehouseIndustries` in `src/data/navWarehouseIndustries.tsx`. */
-export const PHIXALL_US_INDUSTRY_SLUGS: readonly string[] = [
-	'ecommerce',
-	'cold-storage',
-	'retail-distribution',
-	'food-beverage',
-	'pharmaceutical',
-	'automotive-parts',
+	'services/general-trades-mro',
+	'services/industrial-coatings',
+	'services/mro-procurement',
+	'services/facility-project-management',
+	'industries',
 ];

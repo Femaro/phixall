@@ -1,9 +1,5 @@
 import { MetadataRoute } from 'next';
-import {
-	PHIXALL_US_INDUSTRY_SLUGS,
-	PHIXALL_US_PATHS,
-	getPhixallUsOrigin,
-} from '@/lib/phixallUsSite';
+import { PHIXALL_US_PATHS, getPhixallUsOrigin } from '@/lib/phixallUsSite';
 
 export default function sitemap(): MetadataRoute.Sitemap {
 	const baseUrl =
@@ -51,13 +47,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			};
 		});
 
-	const industryEntries: MetadataRoute.Sitemap =
-		PHIXALL_US_INDUSTRY_SLUGS.map((slug) => ({
-			url: `${phixallUsOrigin}/us/industries/${slug}`,
-			lastModified: new Date(),
-			changeFrequency: 'weekly' as const,
-			priority: 0.84,
-		}));
-
-	return [...mainEntries, ...usEnterpriseEntries, ...industryEntries];
+	return [...mainEntries, ...usEnterpriseEntries];
 }

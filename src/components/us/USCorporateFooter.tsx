@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Logo from '@/app/logo.png';
+import { US_CORE_SERVICES } from '@/data/usCoreServices';
+import { US_INDUSTRIES } from '@/data/usIndustries';
 
 export default function USCorporateFooter() {
   return (
@@ -15,25 +17,24 @@ export default function USCorporateFooter() {
             <Link href="/us" className="flex items-center">
               <Image src={Logo} alt="Phixall" width={72} height={72} />
             </Link>
-            <p className="mt-6 text-sm leading-relaxed text-neutral-600">
-              Phixall, powered by Phixall Facility Management LLC, delivers on-shore warehouse trades, procurement, advisory, controls, and engineering PM support from Indiana—focused on inland commercial and industrial facilities with coordinated on-site technicians in authorized service areas.
-            </p>
-            
           </div>
 
           {/* Services */}
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">Services</h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li><Link href="/us/services/electrical" className="text-neutral-600 transition-colors hover:text-[#3498db]">Electrical Services</Link></li>
-              <li><Link href="/us/services/plumbing" className="text-neutral-600 transition-colors hover:text-[#3498db]">Plumbing Services</Link></li>
-              <li><Link href="/us/services/carpentry" className="text-neutral-600 transition-colors hover:text-[#3498db]">Carpentry Services</Link></li>
-              <li><Link href="/us/services/painting" className="text-neutral-600 transition-colors hover:text-[#3498db]">Painting Services</Link></li>
-              <li><Link href="/us/services/supplies" className="text-neutral-600 transition-colors hover:text-[#3498db]">Installation Item Supplies</Link></li>
-              <li><Link href="/us/services/advisory" className="text-neutral-600 transition-colors hover:text-[#3498db]">Facility Management Advisory</Link></li>
-              <li><Link href="/us/services/engineering-project-management-support" className="text-neutral-600 transition-colors hover:text-[#3498db]">Eng. Project Management Support</Link></li>
-              <li><Link href="/us/services/controls-and-automation" className="text-neutral-600 transition-colors hover:text-[#3498db]">Controls &amp; Automation</Link></li>
-              <li><Link href="/us/services" className="text-neutral-600 transition-colors hover:text-[#3498db]">Browse all services</Link></li>
+              {US_CORE_SERVICES.map((service) => (
+                <li key={service.id}>
+                  <Link href={service.href} className="text-neutral-600 transition-colors hover:text-[#3498db]">
+                    {service.navLabel}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/us/services" className="text-neutral-600 transition-colors hover:text-[#3498db]">
+                  Browse all services
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -41,14 +42,21 @@ export default function USCorporateFooter() {
           <div>
             <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">Industries</h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li><Link href="/us/industries/ecommerce" className="text-neutral-600 transition-colors hover:text-[#3498db]">E-Commerce Warehouses</Link></li>
-              <li><Link href="/us/industries/logistics" className="text-neutral-600 transition-colors hover:text-[#3498db]">Logistics & 3PL</Link></li>
-              <li><Link href="/us/industries/manufacturing" className="text-neutral-600 transition-colors hover:text-[#3498db]">Manufacturing</Link></li>
-              <li><Link href="/us/industries/cold-storage" className="text-neutral-600 transition-colors hover:text-[#3498db]">Cold Storage</Link></li>
-              <li><Link href="/us/industries/retail-distribution" className="text-neutral-600 transition-colors hover:text-[#3498db]">Retail Distribution</Link></li>
-              <li><Link href="/us/industries/food-beverage" className="text-neutral-600 transition-colors hover:text-[#3498db]">Food & Beverage</Link></li>
-              <li><Link href="/us/industries/pharmaceutical" className="text-neutral-600 transition-colors hover:text-[#3498db]">Pharmaceutical</Link></li>
-              <li><Link href="/us/industries/automotive-parts" className="text-neutral-600 transition-colors hover:text-[#3498db]">Automotive Parts</Link></li>
+              <li>
+                <Link href="/us/industries" className="text-neutral-600 transition-colors hover:text-[#3498db]">
+                  All industries
+                </Link>
+              </li>
+              {US_INDUSTRIES.map((industry) => (
+                <li key={industry.id}>
+                  <Link
+                    href={`/us/industries#${industry.id}`}
+                    className="text-neutral-600 transition-colors hover:text-[#3498db]"
+                  >
+                    {industry.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 

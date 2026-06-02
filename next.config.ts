@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const LEGACY_SERVICE_REDIRECTS = [
-  // General Trades & MRO
+  // Licensed-trade & legacy service pages
   'electrical',
   'plumbing',
   'carpentry',
@@ -9,15 +9,17 @@ const LEGACY_SERVICE_REDIRECTS = [
   'plumbing-water',
   'warehouse-industrial',
   'inland-industrial',
-  // Industrial Coatings
   'painting',
-  // MRO Procurement
   'supplies',
   'supplies-procurement',
-  // Facility Project Management & Advisory
   'advisory',
   'engineering-project-management-support',
   'controls-and-automation',
+  // Previous consolidated buckets
+  'general-trades-mro',
+  'industrial-coatings',
+  'mro-procurement',
+  'facility-project-management',
 ] as const;
 
 const nextConfig: NextConfig = {
@@ -25,7 +27,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/us/services/offshore-marine',
-        destination: '/us/services/general-trades-mro',
+        destination: '/us/services/facility-maintenance-support',
         permanent: true,
       },
       {
@@ -58,16 +60,26 @@ const nextConfig: NextConfig = {
 function redirectTarget(slug: (typeof LEGACY_SERVICE_REDIRECTS)[number]): string {
   switch (slug) {
     case 'painting':
-      return 'industrial-coatings';
+    case 'industrial-coatings':
+      return 'facility-painting';
     case 'supplies':
     case 'supplies-procurement':
-      return 'mro-procurement';
+    case 'mro-procurement':
+      return 'materials-procurement';
     case 'advisory':
     case 'engineering-project-management-support':
     case 'controls-and-automation':
-      return 'facility-project-management';
+    case 'facility-project-management':
+      return 'vendor-coordination';
+    case 'electrical':
+    case 'plumbing':
+    case 'carpentry':
+    case 'electrical-power':
+    case 'plumbing-water':
+    case 'general-trades-mro':
+      return 'light-repairs-upkeep';
     default:
-      return 'general-trades-mro';
+      return 'facility-maintenance-support';
   }
 }
 

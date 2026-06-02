@@ -17,13 +17,6 @@ const logos = [
     height: 206,
     className: 'object-contain',
   },
-  {
-    src: '/us/partners/osha.png',
-    alt: 'OSHA — Occupational Safety and Health Administration, U.S. Department of Labor',
-    width: 720,
-    height: 208,
-    className: 'object-contain',
-  },
 ] as const;
 
 /** Partner logos from `/public/us/partners/` (see README for trademark usage). */
@@ -32,7 +25,7 @@ export default function PartnerLogosStrip() {
     <section className="border-b border-neutral-200 bg-gradient-to-r from-neutral-50 via-white to-slate-50 py-12">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-          Trusted by operators &amp; aligned with rigorous safety programs
+          Trusted by Indiana facility operators
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-14 gap-y-10 md:gap-x-16 lg:justify-between lg:gap-x-12">
           {logos.map((logo) => (

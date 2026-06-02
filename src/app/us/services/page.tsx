@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
 
 export const metadata: Metadata = {
-  title: 'Facility Services | Phixall US',
+  title: 'Facility Support Services | Phixall US',
   description:
-    'General trades MRO, industrial coatings, enterprise procurement, and project support—including automation coordination and owner\'s-representative services—for inland commercial and industrial facilities.',
+    'Indiana-based facility support—maintenance assistance, light repairs, basic painting, vendor coordination, and materials handling. Services available only within Indiana.',
 };
 
 export default function USServicesIndexPage() {
@@ -16,10 +16,10 @@ export default function USServicesIndexPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-200/90">Service catalog</p>
           <h1 className="mt-2 text-4xl font-bold tracking-tight text-white lg:text-5xl">
-            Integrated facility capabilities
+            Indiana facility support services
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-white/85">
-            Four consolidated service buckets—trades, coatings, procurement, and project support with automation coordination and owner&apos;s-representative programs—for enterprise inland facilities.
+            Five support programs for Indiana warehouses and commercial facilities—available only within Indiana.
           </p>
           <div className="mt-8 flex flex-wrap gap-4">
             <Link
@@ -32,7 +32,7 @@ export default function USServicesIndexPage() {
               href="/us/contact"
               className="rounded-xl border-2 border-white/40 px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10"
             >
-              Contact ops
+              Reach us now
             </Link>
           </div>
         </div>

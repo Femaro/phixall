@@ -12,7 +12,7 @@ export default function USContactPage() {
           <div className="text-center">
             <h1 className="text-4xl font-bold text-white lg:text-5xl">Contact Phixall US</h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg text-white/90">
-              Reach our operations desk for facility programs, engineering scopes, and site support. We respond during business hours and coordinate emergency dispatches through the same line.
+              Reach our Indiana operations desk for facility support inquiries. We respond during business hours. Services are available only within Indiana.
             </p>
           </div>
         </div>
@@ -36,7 +36,7 @@ export default function USContactPage() {
                         {PHONE_DISPLAY}
                       </a>
                       <p className="mt-2 text-sm text-neutral-600">
-                        Monday–Friday, 8:00 AM – 6:00 PM Eastern. For after-hours emergencies on active programs, call the same number and follow the recorded prompts.
+                        Monday–Friday, 8:00 AM – 6:00 PM Eastern.
                       </p>
                     </div>
                   </div>
@@ -55,7 +55,7 @@ export default function USContactPage() {
                         {EMAIL}
                       </a>
                     </p>
-                    <p className="mt-2 text-xs text-neutral-500">Send drawings, timelines, sketches, outage windows—anything that helps ops understand urgency.</p>
+                    <p className="mt-2 text-xs text-neutral-500">Tell us about your Indiana facility sites and the support you need.</p>
                   </div>
                 </div>
               </div>
@@ -63,12 +63,12 @@ export default function USContactPage() {
 
             <div>
               <div className="sticky top-24 rounded-2xl border border-[#3498db]/40 bg-gradient-to-br from-blue-50/80 to-white p-8 shadow-md ring-1 ring-[#3498db]/20">
-                <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need a bundled program?</h3>
+                <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need facility support?</h3>
                 <p className="mt-4 text-neutral-600">
-                  Outline your facilities, blackout windows, and services— we will pair trades, procurement, advisory, automation, engineering, and PM staffing as one rollout plan.
+                  Outline your Indiana facilities and priorities—we will align maintenance support, light repairs, painting, vendor coordination, and materials handling under one desk.
                 </p>
                 <a
-                  href={`mailto:${EMAIL}?subject=${encodeURIComponent('Phixall US bundled program inquiry')}`}
+                  href={`mailto:${EMAIL}?subject=${encodeURIComponent('Phixall US facility support inquiry')}`}
                   className="mt-6 block w-full rounded-xl border-2 border-[#3498db] bg-[#3498db] px-6 py-4 text-center text-base font-bold uppercase tracking-wide text-white transition-all hover:bg-[#2980b9]"
                 >
                   Reach us now
@@ -87,7 +87,7 @@ export default function USContactPage() {
                       <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#27ae60]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
-                      Proposal within two business days for standard scopes once context is clarified
+                      Response within two business days once context is clarified
                     </li>
                   </ul>
                 </div>
@@ -99,12 +99,9 @@ export default function USContactPage() {
 
       <section className="border-t border-neutral-200 bg-neutral-50 py-16">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h2 className="text-center text-2xl font-bold text-neutral-900">Indiana operations center</h2>
+          <h2 className="text-center text-2xl font-bold text-neutral-900">Indiana operations</h2>
           <p className="mx-auto mt-3 max-w-3xl text-center text-neutral-600">
-            Phixall Facility Management LLC runs program management and engineering oversight for Indiana-based operations. Field
-            technicians are assigned to on-shore, inland commercial and industrial sites within contracted, authorized Indiana
-            service areas—supporting land-based clients such as food manufacturing and distribution operators without offshore
-            or maritime field scopes.
+            Phixall Facility Management LLC is an Indiana-based facility support company. Our team serves warehouses, logistics centers, and commercial facilities—available only within Indiana.
           </p>
         </div>
       </section>

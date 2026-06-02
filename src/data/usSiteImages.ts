@@ -1,58 +1,63 @@
-/** Unique photography for the US marketing site — one image per placement, no repeats. */
+/** Unique photography for the US marketing site — facility support only. */
 export type USSiteImage = {
   src: string;
   alt: string;
 };
 
 export const US_SITE_IMAGES = {
-  /** Homepage spotlight: commercial carpentry */
-  carpentry: {
-    src: '/us/images/us-commercial-carpentry.avif',
-    alt: 'Commercial carpentry and structural work in an industrial facility',
+  /** Homepage spotlight: light repairs & upkeep */
+  lightRepairs: {
+    src: '/us/images/us-warehouse-distribution.jpg',
+    alt: 'Warehouse facility aisle with organized inventory and routine upkeep areas',
   },
-  /** Homepage spotlight: commercial painting */
-  industrialPainting: {
+  /** Homepage spotlight: facility painting */
+  facilityPainting: {
     src: '/us/images/us-industrial-painting.jpg',
-    alt: 'Commercial painter applying facility finishes with proper PPE and surface preparation',
+    alt: 'Facility painting and surface maintenance with proper protective equipment',
   },
-  /** Homepage spotlight: project assistance & field coordination */
-  fieldCoordination: {
+  /** Homepage spotlight: vendor coordination */
+  vendorCoordination: {
     src: '/us/images/us-proof-planning.jpg',
-    alt: 'Field coordinators reviewing blueprints and schedules in a warehouse environment',
+    alt: 'Facility support team reviewing schedules and documentation in a warehouse setting',
   },
-  /** Homepage spotlight: automation coordination */
-  automationControls: {
-    src: '/us/images/us-proof-controls.jpg',
-    alt: 'Industrial automation control panel with PLCs and networked field wiring',
+  /** Homepage spotlight: facility maintenance support */
+  facilityMaintenance: {
+    src: '/us/images/us-logistics-fulfillment.jpg',
+    alt: 'Warehouse logistics floor with materials handling and routine facility support',
   },
   /** Homepage industries block */
   warehouseDistribution: {
     src: '/us/images/us-warehouse-distribution.jpg',
-    alt: 'Modern warehouse distribution center with pallet racking and inventory aisles',
+    alt: 'Indiana warehouse and distribution facility interior',
   },
-  /** Industries page hero image */
+  /** Industries page hero */
   logisticsFulfillment: {
     src: '/us/images/us-logistics-fulfillment.jpg',
-    alt: 'Fulfillment and logistics operations inside a distribution facility',
+    alt: 'Fulfillment and logistics operations inside an Indiana distribution facility',
   },
-  /** Trades & MRO service detail */
-  tradesMro: {
-    src: '/us/images/us-proof-mechanical.jpg',
-    alt: 'Precision mechanical maintenance and industrial MRO work on facility equipment',
+  /** Facility maintenance support service detail */
+  maintenanceSupport: {
+    src: '/us/images/us-logistics-fulfillment.jpg',
+    alt: 'General facility maintenance support in a warehouse environment',
   },
-  /** Coatings & finishes service detail */
-  floorCoatings: {
-    src: '/us/images/us-floor-coatings.jpg',
-    alt: 'Industrial metal finishing and coating work performed in a commercial facility',
-  },
-  /** Procurement & supply service detail */
-  procurementStaging: {
+  /** Light repairs service detail */
+  lightRepairsDetail: {
     src: '/us/images/us-procurement-staging.jpg',
-    alt: 'MRO materials staged and organized for facility maintenance programs',
+    alt: 'On-site facility support staff coordinating routine upkeep tasks',
   },
-  /** Project support service detail */
-  fieldConstruction: {
-    src: '/us/images/us-field-construction.jpg',
-    alt: 'Construction and modernization work coordinated on an active facility site',
+  /** Facility painting service detail */
+  paintingDetail: {
+    src: '/us/images/us-industrial-painting.jpg',
+    alt: 'Basic facility painting and surface maintenance work',
+  },
+  /** Vendor coordination service detail */
+  vendorCoordinationDetail: {
+    src: '/us/images/us-proof-planning.jpg',
+    alt: 'Vendor communication and documentation support for facility programs',
+  },
+  /** Materials procurement service detail */
+  materialsProcurement: {
+    src: '/us/images/us-procurement-staging.jpg',
+    alt: 'Materials handling and basic procurement support in a warehouse',
   },
 } as const satisfies Record<string, USSiteImage>;

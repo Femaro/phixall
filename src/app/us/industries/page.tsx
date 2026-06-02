@@ -9,7 +9,7 @@ import { US_SITE_IMAGES } from '@/data/usSiteImages';
 export const metadata: Metadata = {
   title: 'Industries We Serve | Phixall US',
   description:
-    'Facility programs for warehouse, distribution, food manufacturing, and industrial sites across Indiana—delivered through four integrated service categories.',
+    'Facility support for warehouse, distribution, and commercial sites across Indiana—delivered through five service categories. Services available only within Indiana.',
 };
 
 export default function USIndustriesPage() {
@@ -20,7 +20,7 @@ export default function USIndustriesPage() {
           <p className="text-sm font-semibold uppercase tracking-wider text-cyan-200/90">Sectors we support</p>
           <h1 className="mt-2 max-w-3xl text-4xl font-bold text-white lg:text-5xl">Industries we serve</h1>
           <p className="mt-4 max-w-2xl text-lg text-white/90">
-            One program model across warehouse and industrial environments—scoped through our four core service categories.
+            Facility support for Indiana warehouse and commercial environments—scoped through our five core service categories.
           </p>
         </div>
       </section>
@@ -40,7 +40,7 @@ export default function USIndustriesPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/80 via-[#1e3a5f]/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-6 lg:p-8">
                 <p className="max-w-sm text-sm leading-relaxed text-white/90">
-                  Programs built for throughput, food-safe environments, and plant-adjacent sites across authorized Indiana locations.
+                  Facility support for warehouses, logistics centers, and commercial sites across Indiana.
                 </p>
               </div>
             </div>
@@ -48,7 +48,7 @@ export default function USIndustriesPage() {
             <div className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100 lg:p-8">
               <h2 className="text-2xl font-bold tracking-tight text-neutral-900">Supported sectors</h2>
               <p className="mt-2 text-sm text-neutral-600">
-                Facility management tailored to each operating environment.
+                Facility support tailored to each operating environment within Indiana.
               </p>
               <ul className="mt-6 divide-y divide-neutral-100">
                 {US_INDUSTRIES.map((industry) => (
@@ -69,10 +69,10 @@ export default function USIndustriesPage() {
             <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">How we deliver</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900">Service categories by sector</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-neutral-600">
-              Every industry program routes through the same four capabilities—trades, coatings, procurement, and project support including automation coordination and owner&apos;s-representative services.
+              Every industry program routes through the same five capabilities—maintenance support, light repairs, basic painting, vendor coordination, and materials handling.
             </p>
           </div>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {US_CORE_SERVICES.map((service) => (
               <Link
                 key={service.id}
@@ -95,9 +95,9 @@ export default function USIndustriesPage() {
 
       <section className="border-t border-neutral-200 py-14">
         <div className="mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h2 className="text-2xl font-bold text-neutral-900">Discuss your facility program</h2>
+          <h2 className="text-2xl font-bold text-neutral-900">Discuss your facility support needs</h2>
           <p className="mt-3 text-neutral-600">
-            Tell us your sector, sites, and priorities—we align trades, coatings, procurement, and coordination under one desk.
+            Tell us your sector, Indiana sites, and priorities—we align maintenance support, light repairs, painting, vendor coordination, and materials handling under one desk.
           </p>
           <Link
             href="/us/contact"

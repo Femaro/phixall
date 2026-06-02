@@ -18,10 +18,10 @@ export default function USCorporatePage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <h1 className="mt-6 text-5xl font-bold leading-tight tracking-tight text-white lg:text-6xl">
-                Enterprise Facility Management Services
+                Indiana Facility Support Services
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
-                We synchronize core trades with your supply chain—and provide owner&apos;s-representative and automation program coordination for modernization rollouts—so maintenance and upgrades never interrupt your distribution velocity.
+                Phixall provides facility support services for Indiana commercial sites including maintenance assistance, repairs, painting, vendor coordination, and materials handling.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -44,12 +44,12 @@ export default function USCorporatePage() {
               {/* Trust Indicators */}
               <div className="mt-12 grid grid-cols-2 gap-6 border-t border-white/20 pt-8">
                 <div>
-                  <div className="text-3xl font-bold text-[#5dade2]">98.5%</div>
-                  <div className="mt-1 text-sm text-white/80">Uptime Guaranteed</div>
+                  <div className="text-3xl font-bold text-[#5dade2]">2026</div>
+                  <div className="mt-1 text-sm text-white/80">Established</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-[#5dade2]">IN</div>
-                  <div className="mt-1 text-sm text-white/80">Primary service state</div>
+                  <div className="mt-1 text-sm text-white/80">Service Coverage</div>
                 </div>
               </div>
             </div>
@@ -72,12 +72,9 @@ export default function USCorporatePage() {
           <div className="text-center">
             <p className="text-sm font-semibold uppercase tracking-wider text-[#3498db]">What we do</p>
             <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">Service Categories</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-neutral-600">
-              Four integrated programs—pick a category to learn more.
-            </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {US_CORE_SERVICES.map((service) => (
               <Link
                 key={service.id}
@@ -104,7 +101,7 @@ export default function USCorporatePage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="py-12 text-center">
             <p className="text-sm font-semibold uppercase tracking-wider text-[#1e3a5f]">Featured services</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">Field coordination &amp; modernization programs</h2>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-neutral-900 lg:text-4xl">Facility support coordination</h2>
           </div>
 
           <div className="space-y-16 pb-16 lg:space-y-24">
@@ -163,7 +160,7 @@ export default function USCorporatePage() {
               <div className="absolute bottom-0 left-0 p-6 lg:p-8">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#5dade2]">Sectors we support</p>
                 <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90">
-                  Programs built for warehouse throughput, food-safe environments, and plant-adjacent sites across Indiana.
+                  Facility support for warehouses, logistics centers, and commercial sites across Indiana.
                 </p>
               </div>
             </div>
@@ -172,7 +169,7 @@ export default function USCorporatePage() {
             <div className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100 lg:p-8">
               <h2 className="text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">Industries we serve</h2>
               <p className="mt-2 text-sm text-neutral-600">
-                Facility management tailored to your sector&apos;s operating requirements.
+                Facility support tailored to your sector&apos;s operating requirements within Indiana.
               </p>
               <ul className="mt-6 divide-y divide-neutral-100">
                 {US_INDUSTRIES.map((industry) => (
@@ -219,7 +216,7 @@ export default function USCorporatePage() {
               Phixall Facility Management Company
             </h2>
             <p className="mt-4 text-lg leading-relaxed text-white/85">
-              Building on a legacy of managing over 10,000 facility projects, Phixall Facility Management Company was formally established in 2026 to provide dedicated, high-compliance solutions for enterprise partners.
+              Our leadership brings years of experience supporting facility operations. Phixall was established in 2026 to serve Indiana commercial facilities.
             </p>
           </div>
           <p className="mt-14 text-center text-sm font-semibold uppercase tracking-wider text-[#3498db]">
@@ -228,8 +225,8 @@ export default function USCorporatePage() {
           <div className="mt-6 grid gap-8 md:grid-cols-3">
             {[
               {
-                title: 'Field coordination',
-                body: 'Daily safety briefings, trade scheduling, and subcontractor check-in—keeping active carpentry, MEP, and painting work safe and on track inside your operating windows.',
+                title: 'Vendor communication',
+                body: 'Vendor communication and documentation support—scheduling visits, tracking requests, and keeping facility managers informed on routine activities.',
                 icon: (
                   <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
@@ -237,8 +234,8 @@ export default function USCorporatePage() {
                 ),
               },
               {
-                title: 'Qualified field execution',
-                body: 'Licensed, insured technicians trained for industrial and logistics environments—with safety and compliance treated as part of the job.',
+                title: 'On-site assistance',
+                body: 'On-site assistance for routine facility activities—non-technical support that helps warehouses and logistics sites stay organized and operational.',
                 icon: (
                   <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -246,8 +243,8 @@ export default function USCorporatePage() {
                 ),
               },
               {
-                title: 'Indiana enterprise coverage',
-                body: 'On-shore coordination for authorized commercial and industrial sites across Indiana—responsive support scoped to your contract and locations.',
+                title: 'Indiana-based operations',
+                body: 'Indiana-based operations with services available only within Indiana—focused support for warehouses, logistics, and commercial facilities.',
                 icon: (
                   <svg className="h-8 w-8 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -289,16 +286,11 @@ export default function USCorporatePage() {
       {/* Why Choose Phixall */}
       <section className="border-t border-neutral-200 bg-white py-14">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Why Phixall</p>
-              <h2 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">
-                Built for enterprise warehouse programs
-              </h2>
-            </div>
-            <p className="max-w-lg text-sm text-neutral-600 lg:text-right">
-              One coordinated partner for trades, coatings, procurement, field coordination, and modernization programs—without adding headcount to your plant team.
-            </p>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Why Phixall</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">
+              Built for Indiana warehouse &amp; logistics facilities
+            </h2>
           </div>
 
           <div className="mt-10 grid gap-8 lg:grid-cols-2">
@@ -306,15 +298,15 @@ export default function USCorporatePage() {
               {[
                 {
                   title: 'Indiana footprint',
-                  description: 'On-shore coordination from authorized Indiana sites with documented procedures at every contracted location.',
+                  description: 'Indiana-based operations with services available only within Indiana.',
                 },
                 {
-                  title: 'Vetted field teams',
-                  description: 'Background-checked, licensed, and insured technicians trained for warehouse and industrial environments.',
+                  title: 'Experienced support staff',
+                  description: 'Background-checked support staff trained for warehouse and commercial facility environments.',
                 },
                 {
-                  title: 'Safety-first execution',
-                  description: 'OSHA 1910/1926 discipline, daily briefings, and ISNetworld-aligned subcontractor oversight on every job.',
+                  title: 'Safety-minded approach',
+                  description: 'Safety-conscious procedures for all on-site facility support activities.',
                 },
               ].map((item) => (
                 <li key={item.title} className="px-5 py-4 first:rounded-t-2xl last:rounded-b-2xl">
@@ -328,15 +320,15 @@ export default function USCorporatePage() {
               {[
                 {
                   title: 'Warehouse & distribution know-how',
-                  description: 'Programs shaped around docks, throughput, outage windows, and the realities of fulfillment operations.',
+                  description: 'Support shaped around docks, throughput, and the realities of fulfillment operations in Indiana.',
                 },
                 {
                   title: 'Cost-smart delivery',
-                  description: 'Preventive maintenance, bundled procurement, and coordinated trades that reduce downtime and vendor sprawl.',
+                  description: 'Bundled facility support and coordinated vendor communication that reduces administrative overhead.',
                 },
                 {
                   title: 'Responsive account support',
-                  description: 'Dedicated coordination from first scope review through turnover—one desk, clear accountability.',
+                  description: 'Dedicated coordination from first inquiry through service delivery—one desk, clear accountability.',
                 },
               ].map((item) => (
                 <li key={item.title} className="px-5 py-4 first:rounded-t-2xl last:rounded-b-2xl">
@@ -353,9 +345,9 @@ export default function USCorporatePage() {
       <section className="relative overflow-hidden border-t border-neutral-200 bg-gradient-to-br from-[#3498db]/30 via-[#2c3e50] to-[#1e3a5f] py-20">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" aria-hidden />
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center lg:px-8">
-          <h2 className="text-4xl font-bold tracking-tight text-white">Ready to Optimize Your Warehouse Facility?</h2>
+          <h2 className="text-4xl font-bold tracking-tight text-white">Ready to discuss facility support?</h2>
           <p className="mt-6 text-lg text-white/90">
-            Contact our team and discover how Phixall can enhance your warehouse operations, reduce costs, and improve efficiency.
+            Contact our Indiana team to learn how Phixall can support your warehouse or commercial facility.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link 
@@ -375,7 +367,7 @@ export default function USCorporatePage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/70">
-            Professional enterprise facility management services
+            Indiana-based facility support services
           </p>
         </div>
       </section>

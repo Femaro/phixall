@@ -78,7 +78,7 @@ export default function USCorporateFooter() {
             <div className="text-center text-sm text-neutral-600 md:text-left">
               <p>© {new Date().getFullYear()} Phixall Facility Management LLC. All rights reserved.</p>
               <p className="mt-1 text-xs text-neutral-500">
-                Phixall is powered by Phixall Facility Management LLC. Licensed and insured.
+                Phixall is powered by Phixall Facility Management LLC. Insured.
               </p>
             </div>
             
@@ -97,9 +97,9 @@ export default function USCorporateFooter() {
               </div>
               <div className="flex items-center gap-1.5">
                 <svg className="h-3.5 w-3.5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                 </svg>
-                <span>Licensed</span>
+                <span>Indiana-based</span>
               </div>
             </div>
           </div>

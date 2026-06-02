@@ -32,19 +32,6 @@ function IconDiversity({ className }: { className?: string }) {
   );
 }
 
-function IconSafetyAlert({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.008v.008H12v-.008z"
-      />
-    </svg>
-  );
-}
-
 function IconQuality({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -53,24 +40,11 @@ function IconQuality({ className }: { className?: string }) {
   );
 }
 
-function IconLeaf({ className }: { className?: string }) {
+function IconLocation({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21c4-3 7-7 7-12a7 7 0 10-14 0c0 5 3 9 7 12z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 21V11" />
-    </svg>
-  );
-}
-
-function IconFlameShield({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M12 3s-4 4.5-4 9.5a4 4 0 108 0c0-5-4-9.5-4-9.5zm0 13.5v3"
-      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   );
 }
@@ -98,7 +72,7 @@ function CompactBadge({ title, subtext, icon }: TrustItem) {
 const verifiedCredentials: TrustItem[] = [
   {
     title: 'ISNetworld Member',
-    subtext: 'Safety & compliance vetted',
+    subtext: 'Contractor management network participant',
     icon: <IconShieldCheck className="h-5 w-5" />,
   },
   {
@@ -115,24 +89,14 @@ const verifiedCredentials: TrustItem[] = [
 
 const operationalStandards: TrustItem[] = [
   {
-    title: 'OSHA Compliant',
-    subtext: '1910 & 1926 safety standards',
-    icon: <IconSafetyAlert className="h-4 w-4" />,
-  },
-  {
     title: 'Quality Assured',
-    subtext: 'Standardized QA/QC framework',
+    subtext: 'Consistent service delivery standards',
     icon: <IconQuality className="h-4 w-4" />,
   },
   {
-    title: 'EPA Aligned',
-    subtext: 'Environmental stewardship',
-    icon: <IconLeaf className="h-4 w-4" />,
-  },
-  {
-    title: 'Fire & Life Safety',
-    subtext: 'NFPA code adherence',
-    icon: <IconFlameShield className="h-4 w-4" />,
+    title: 'Indiana-Based',
+    subtext: 'Services available only within Indiana',
+    icon: <IconLocation className="h-4 w-4" />,
   },
 ];
 
@@ -142,13 +106,13 @@ export default function TrustComplianceBadges() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Trust &amp; compliance</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#3498db]">Trust &amp; credentials</p>
             <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 lg:text-3xl">
-              Verified for enterprise programs
+              Professional facility support
             </h2>
           </div>
           <p className="max-w-md text-sm text-slate-600 sm:text-right">
-            Third-party verification and field standards for program reviews and RFPs.
+            A small, Indiana-based team focused on facility support services.
           </p>
         </div>
 
@@ -158,14 +122,14 @@ export default function TrustComplianceBadges() {
           ))}
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {operationalStandards.map((badge) => (
             <CompactBadge key={badge.title} {...badge} />
           ))}
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-500">
-          Phixall Facility Management LLC · Licensed and insured · Indiana operations
+          Phixall Facility Management LLC · Insured · Indiana-based operations only
         </p>
       </div>
     </section>

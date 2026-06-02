@@ -8,12 +8,12 @@ export const US_INDUSTRIES: readonly USIndustry[] = [
   {
     id: 'ecommerce',
     label: 'E-Commerce',
-    summary: 'Fulfillment centers, sortation, docks, and surge-ready maintenance windows.',
+    summary: 'Fulfillment centers and distribution sites needing routine facility support.',
   },
   {
     id: 'logistics',
     label: 'Logistics & 3PL',
-    summary: 'Warehouses, distribution hubs, and third-party logistics footprints.',
+    summary: 'Warehouses and third-party logistics facilities across Indiana.',
   },
   {
     id: 'manufacturing',
@@ -23,26 +23,26 @@ export const US_INDUSTRIES: readonly USIndustry[] = [
   {
     id: 'cold-storage',
     label: 'Cold Storage',
-    summary: 'Refrigerated warehousing, thermal envelope care, and dock programs.',
+    summary: 'Refrigerated warehousing and dock-area facility support.',
   },
   {
     id: 'retail-distribution',
     label: 'Retail Distribution',
-    summary: 'RDC operations tied to inbound, reserve, and outbound flow.',
+    summary: 'Distribution centers tied to inbound, reserve, and outbound flow.',
   },
   {
     id: 'food-beverage',
     label: 'Food & Beverage',
-    summary: 'Sanitary-conscious upkeep for food logistics and washdown-rated spaces.',
+    summary: 'Food logistics facilities requiring sanitary-conscious facility upkeep.',
   },
   {
     id: 'pharmaceutical',
     label: 'Pharmaceutical',
-    summary: 'Controlled staging, QA holds, and compliance-minded facility programs.',
+    summary: 'Controlled staging areas and compliance-minded facility support.',
   },
   {
     id: 'automotive-parts',
     label: 'Automotive Parts',
-    summary: 'Heavy-parts DCs, sequencing bays, and aftermarket distribution.',
+    summary: 'Parts distribution centers and sequencing facility support.',
   },
 ] as const;

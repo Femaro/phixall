@@ -8,24 +8,18 @@ const phixallUsOrigin = getPhixallUsOrigin();
 
 export const metadata: Metadata = {
   metadataBase: new URL(phixallUsOrigin),
-  title: 'Warehouse Facility Management Solutions | Phixall US',
+  title: 'Indiana Facility Support Services | Phixall US',
   description:
-    'On-shore warehouse and industrial facility management in Indiana—trades, coatings, procurement, project support, automation coordination, and owner\'s-representative services with coordinated on-site technicians.',
+    'Indiana-based facility support for warehouses and commercial sites—maintenance support, light repairs, basic painting, vendor coordination, and materials handling. Services available only within Indiana.',
   keywords: [
-    'warehouse facility management',
-    'warehouse electrical services',
-    'warehouse plumbing services',
-    'warehouse carpentry services',
-    'warehouse painting services',
-    'warehouse installation supplies',
-    'facility management advisory',
-    'automation coordination',
-    'owners representative',
-    'owners rep facility',
-    'engineering project management',
-    'warehouse maintenance USA',
-    'distribution center services',
-    'warehouse operations management'
+    'Indiana facility support',
+    'warehouse facility maintenance',
+    'facility painting Indiana',
+    'vendor coordination',
+    'materials handling support',
+    'commercial facility upkeep',
+    'logistics facility support',
+    'distribution center support Indiana',
   ],
   alternates: {
     languages: {
@@ -34,9 +28,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'Warehouse Facility Management Solutions | Phixall US',
+    title: 'Indiana Facility Support Services | Phixall US',
     description:
-      'Trades, coatings, procurement, project support, automation coordination, and owner\'s-representative services for land-based warehouse and industrial programs in authorized Indiana service areas.',
+      'Facility support for Indiana warehouses and commercial facilities—maintenance, light repairs, painting, vendor coordination, and materials handling.',
     type: 'website',
     url: '/us',
   },

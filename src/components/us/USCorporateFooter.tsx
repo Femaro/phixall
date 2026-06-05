@@ -15,11 +15,12 @@ export default function USCorporateFooter() {
           <div className="lg:col-span-2">
             <Link href="/us" className="flex items-center">
               <Image
-                src="/us/logo.png"
+                src="/us/logo.png?v=2"
                 alt="Phixall.us"
-                width={2000}
-                height={2000}
-                className="h-16 w-auto"
+                width={1613}
+                height={1539}
+                className="h-24 w-auto bg-transparent"
+                unoptimized
               />
             </Link>
           </div>
@@ -82,9 +83,6 @@ export default function USCorporateFooter() {
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="text-center text-sm text-neutral-600 md:text-left">
               <p>© {new Date().getFullYear()} Phixall Facility Management LLC. All rights reserved.</p>
-              <p className="mt-1 text-xs text-neutral-500">
-                Phixall is powered by Phixall Facility Management LLC. Insured.
-              </p>
               <p className="mt-3 max-w-2xl text-xs leading-relaxed text-neutral-500">
                 Phixall Facility Management Company LLC is an independent U.S. company operating exclusively in Indiana. It is not affiliated with any foreign or international entities.
               </p>

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import Logo from '@/app/logo.png';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
 import { US_INDUSTRIES } from '@/data/usIndustries';
 
@@ -15,7 +14,13 @@ export default function USCorporateFooter() {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link href="/us" className="flex items-center">
-              <Image src={Logo} alt="Phixall" width={72} height={72} />
+              <Image
+                src="/us/logo.png"
+                alt="Phixall.us"
+                width={2000}
+                height={2000}
+                className="h-16 w-auto"
+              />
             </Link>
           </div>
 
@@ -79,6 +84,9 @@ export default function USCorporateFooter() {
               <p>© {new Date().getFullYear()} Phixall Facility Management LLC. All rights reserved.</p>
               <p className="mt-1 text-xs text-neutral-500">
                 Phixall is powered by Phixall Facility Management LLC. Insured.
+              </p>
+              <p className="mt-3 max-w-2xl text-xs leading-relaxed text-neutral-500">
+                Phixall Facility Management Company LLC is an independent U.S. company operating exclusively in Indiana. It is not affiliated with any foreign or international entities.
               </p>
             </div>
             

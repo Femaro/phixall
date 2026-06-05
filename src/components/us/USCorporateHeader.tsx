@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
-import Logo from '@/app/logo.png';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
 
 export default function USCorporateHeader() {
@@ -40,7 +39,14 @@ export default function USCorporateHeader() {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link href="/us" className="flex items-center">
-              <Image src={Logo} alt="Phixall" width={64} height={64} />
+              <Image
+                src="/us/logo.png"
+                alt="Phixall.us"
+                width={2000}
+                height={2000}
+                className="h-14 w-auto"
+                priority
+              />
             </Link>
           </div>
 

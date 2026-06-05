@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
 
@@ -39,14 +38,12 @@ export default function USCorporateHeader() {
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link href="/us" className="flex items-center">
-              <Image
-                src="/us/logo.png?v=2"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/us/logo.png?v=3"
                 alt="Phixall.us"
-                width={1613}
-                height={1539}
-                className="h-16 w-auto bg-transparent"
-                unoptimized
-                priority
+                className="h-16 w-auto"
+                decoding="async"
               />
             </Link>
           </div>

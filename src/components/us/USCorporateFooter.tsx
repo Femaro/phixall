@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
 
 export default function USCorporateFooter() {
@@ -13,13 +12,12 @@ export default function USCorporateFooter() {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link href="/us" className="flex items-center">
-              <Image
-                src="/us/logo.png?v=2"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/us/logo.png?v=3"
                 alt="Phixall.us"
-                width={1613}
-                height={1539}
-                className="h-20 w-auto bg-transparent"
-                unoptimized
+                className="h-20 w-auto"
+                decoding="async"
               />
             </Link>
           </div>

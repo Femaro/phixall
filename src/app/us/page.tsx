@@ -5,7 +5,6 @@ import Image from 'next/image';
 import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
 import PartnerLogosStrip from '@/components/us/PartnerLogosStrip';
 import { US_CORE_SERVICES, US_HOMEPAGE_SPOTLIGHTS } from '@/data/usCoreServices';
-import { US_INDUSTRIES } from '@/data/usIndustries';
 import { US_SITE_IMAGES } from '@/data/usSiteImages';
 
 export default function USCorporatePage() {
@@ -142,69 +141,6 @@ export default function USCorporatePage() {
       </section>
 
       <TrustComplianceBadges />
-
-      {/* Industries Served */}
-      <section className="border-t border-neutral-200 bg-neutral-50/60 py-14">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Image card */}
-            <div className="relative min-h-[280px] overflow-hidden rounded-2xl ring-1 ring-neutral-200 lg:min-h-[360px]">
-              <Image
-                src={US_SITE_IMAGES.warehouseDistribution.src}
-                alt={US_SITE_IMAGES.warehouseDistribution.alt}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1e3a5f]/80 via-[#1e3a5f]/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6 lg:p-8">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#5dade2]">Sectors we support</p>
-                <p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90">
-                  Facility support for warehouses, logistics centers, and commercial sites across Indiana.
-                </p>
-              </div>
-            </div>
-
-            {/* Industries list card */}
-            <div className="flex flex-col rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100 lg:p-8">
-              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 lg:text-3xl">Industries we serve</h2>
-              <p className="mt-2 text-sm text-neutral-600">
-                Facility support tailored to your sector&apos;s operating requirements within Indiana.
-              </p>
-              <ul className="mt-6 divide-y divide-neutral-100">
-                {US_INDUSTRIES.map((industry) => (
-                  <li key={industry.id}>
-                    <Link
-                      href={`/us/industries#${industry.id}`}
-                      className="group flex items-center justify-between py-3 text-sm font-medium text-neutral-800 transition-colors hover:text-[#3498db]"
-                    >
-                      {industry.label}
-                      <svg
-                        className="h-4 w-4 text-neutral-400 transition-transform group-hover:translate-x-0.5 group-hover:text-[#3498db]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/us/industries"
-                className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#3498db] hover:underline"
-              >
-                View all industries
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Company foundation + how we deliver */}
       <section className="relative overflow-hidden bg-gradient-to-br from-[#1e3a5f] via-[#243b55] to-[#1e3a5f] py-20">

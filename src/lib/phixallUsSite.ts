@@ -28,5 +28,4 @@ export const PHIXALL_US_PATHS: readonly string[] = [
 	'services/facility-painting',
 	'services/vendor-coordination',
 	'services/materials-procurement',
-	'industries',
 ];

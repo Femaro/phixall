@@ -36,8 +36,13 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: '/us/industries',
+        destination: '/us',
+        permanent: true,
+      },
+      {
         source: '/us/industries/:slug',
-        destination: '/us/industries',
+        destination: '/us',
         permanent: true,
       },
       ...LEGACY_SERVICE_REDIRECTS.map((slug) => ({

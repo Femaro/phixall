@@ -25,16 +25,6 @@ export const US_SITE_IMAGES = {
     src: '/us/images/us-logistics-fulfillment.jpg',
     alt: 'Warehouse logistics floor with materials handling and routine facility support',
   },
-  /** Homepage industries block */
-  warehouseDistribution: {
-    src: '/us/images/us-warehouse-distribution.jpg',
-    alt: 'Indiana warehouse and distribution facility interior',
-  },
-  /** Industries page hero */
-  logisticsFulfillment: {
-    src: '/us/images/us-logistics-fulfillment.jpg',
-    alt: 'Fulfillment and logistics operations inside an Indiana distribution facility',
-  },
   /** Facility maintenance support service detail */
   maintenanceSupport: {
     src: '/us/images/us-logistics-fulfillment.jpg',

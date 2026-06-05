@@ -3,14 +3,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
-import { US_INDUSTRIES } from '@/data/usIndustries';
 
 export default function USCorporateFooter() {
   return (
     <footer className="border-t-4 border-t-[#3498db]/40 border-neutral-200 bg-gradient-to-b from-neutral-50 to-neutral-100/80">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-5">
+        <div className="grid gap-12 lg:grid-cols-4">
           {/* Company Info */}
           <div className="lg:col-span-2">
             <Link href="/us" className="flex items-center">
@@ -41,28 +40,6 @@ export default function USCorporateFooter() {
                   Browse all services
                 </Link>
               </li>
-            </ul>
-          </div>
-
-          {/* Industries */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-900">Industries</h3>
-            <ul className="mt-4 space-y-3 text-sm">
-              <li>
-                <Link href="/us/industries" className="text-neutral-600 transition-colors hover:text-[#3498db]">
-                  All industries
-                </Link>
-              </li>
-              {US_INDUSTRIES.map((industry) => (
-                <li key={industry.id}>
-                  <Link
-                    href={`/us/industries#${industry.id}`}
-                    className="text-neutral-600 transition-colors hover:text-[#3498db]"
-                  >
-                    {industry.label}
-                  </Link>
-                </li>
-              ))}
             </ul>
           </div>
 

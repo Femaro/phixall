@@ -19,7 +19,7 @@ export default function USCorporateFooter() {
                 alt="Phixall.us"
                 width={1613}
                 height={1539}
-                className="h-24 w-auto bg-transparent"
+                className="h-20 w-auto bg-transparent"
                 unoptimized
               />
             </Link>

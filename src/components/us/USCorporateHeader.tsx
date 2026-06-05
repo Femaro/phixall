@@ -35,7 +35,7 @@ export default function USCorporateHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200/80 bg-white/90 shadow-sm shadow-neutral-900/5 backdrop-blur-md transition-shadow">
       <nav className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="flex h-24 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
             <Link href="/us" className="flex items-center">
@@ -44,7 +44,7 @@ export default function USCorporateHeader() {
                 alt="Phixall.us"
                 width={1613}
                 height={1539}
-                className="h-20 w-auto bg-transparent"
+                className="h-16 w-auto bg-transparent"
                 unoptimized
                 priority
               />

@@ -68,25 +68,15 @@ export function useIsUSUser(): boolean | null {
 /**
  * Get company name based on user location
  */
-export function getCompanyName(isUS: boolean | null): string {
-  if (isUS === null) {
-    // Server-side: return generic name
-    return 'Phixall';
-  }
-  return isUS ? 'Phixall Facility Management LLC' : 'Phixall Technical Company Limited';
+export function getCompanyName(_isUS: boolean | null): string {
+  return 'Phixall Technical Company Limited';
 }
 
 /**
- * Get owner/operator text based on user location
+ * Get owner/operator text for marketing copy
  */
-export function getOwnerText(isUS: boolean | null): string {
-  if (isUS === null) {
-    return 'Phixall';
-  }
-  if (isUS) {
-    return 'Phixall, powered by Phixall Facility Management LLC';
-  }
-  return 'Phixall';
+export function getOwnerText(_isUS: boolean | null): string {
+  return 'Phixall, a product of Phixall Technical Company Limited';
 }
 
 /**

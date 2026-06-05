@@ -9,7 +9,7 @@ export const defaultMetadata: Metadata = {
     default: 'Phixall - Professional Facility Management & Maintenance Services',
     template: '%s | Phixall'
   },
-  description: 'Phixall, powered by Phixall Facility Management LLC, connects you with verified, skilled artisans for facility maintenance. Professional plumbing, electrical, HVAC, and more—focused on domestic U.S. facility operations.',
+  description: 'Phixall is a product of Phixall Technical Company Limited, connecting you with verified, skilled artisans for facility maintenance. Professional plumbing, electrical, HVAC, and more.',
   keywords: [
     'facility management',
     'maintenance services',
@@ -18,14 +18,11 @@ export const defaultMetadata: Metadata = {
     'electrical services',
     'HVAC services',
     'professional artisans',
-    'US facility management',
-    'United States facility management',
-    'Indiana facility management',
     'building maintenance',
     'preventive maintenance',
     'emergency repairs',
     'skilled technicians',
-    'Phixall Facility Management LLC'
+    'Phixall Technical Company Limited',
   ],
   authors: [{ name: 'Phixall' }],
   creator: 'Phixall',
@@ -41,7 +38,7 @@ export const defaultMetadata: Metadata = {
     url: '/',
     siteName: 'Phixall',
     title: 'Phixall - Professional Facility Management & Maintenance Services',
-    description: 'Phixall, powered by Phixall Facility Management LLC, connects you with verified, skilled artisans for facility maintenance across domestic U.S. programs.',
+    description: 'Phixall is a product of Phixall Technical Company Limited, connecting you with verified, skilled artisans for facility maintenance worldwide.',
     images: [
       {
         url: '/og-image.png',

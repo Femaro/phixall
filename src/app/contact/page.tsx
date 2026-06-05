@@ -231,44 +231,16 @@ export default function ContactPage() {
               </div>
 
               {/* Office Address */}
-              {isUS ? (
-                <div className="mt-8 space-y-4">
-                  <div className="border border-neutral-200 bg-neutral-50 p-6">
-                    <h3 className="font-bold text-neutral-900">Phixall Facility Management LLC</h3>
-                    <p className="mt-2 text-sm text-neutral-600">Phixall is powered by Phixall Facility Management LLC</p>
-                    <p className="mt-2 text-neutral-700">
-                      United States
-                    </p>
-                    <p className="mt-4 text-sm text-neutral-600">
-                      <strong>Business Hours:</strong> Monday - Friday, {businessHours.open} - {businessHours.close} {timezone}
-                    </p>
-                  </div>
-                  <div className="border border-neutral-200 bg-neutral-50 p-6">
-                    <h3 className="font-bold text-neutral-900">International Operations</h3>
-                    <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC</p>
-                    <p className="mt-2 text-neutral-700">
-                      Phixall Technical Company Limited
-                      <br />
-                      Lagos, Nigeria
-                    </p>
-                    <p className="mt-4 text-sm text-neutral-600">
-                      <strong>Business Hours:</strong> Monday - Friday, 9:00 AM - 6:00 PM WAT
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-8 border border-neutral-200 bg-neutral-50 p-6">
-                  <h3 className="font-bold text-neutral-900">Office Address</h3>
-                  <p className="mt-2 text-neutral-700">
-                    Phixall Technical Company Limited
-                    <br />
-                    Lagos, Nigeria
-                  </p>
-                  <p className="mt-4 text-sm text-neutral-600">
-                    <strong>Business Hours:</strong> Monday - Friday, {businessHours.open} - {businessHours.close} {businessHours.timezone}
-                  </p>
-                </div>
-              )}
+              <div className="mt-8 border border-neutral-200 bg-neutral-50 p-6">
+                <h3 className="font-bold text-neutral-900">Phixall Technical Company Limited</h3>
+                <p className="mt-2 text-sm text-neutral-600">Phixall is a product of Phixall Technical Company Limited</p>
+                <p className="mt-2 text-neutral-700">
+                  Lagos, Nigeria
+                </p>
+                <p className="mt-4 text-sm text-neutral-600">
+                  <strong>Business Hours:</strong> Monday - Friday, {businessHours.open} - {businessHours.close} {timezone}
+                </p>
+              </div>
             </div>
           </div>
         </div>

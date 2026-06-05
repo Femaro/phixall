@@ -4,20 +4,14 @@ export const organizationSchema: WithContext<Organization> = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
   name: 'Phixall',
-  legalName: 'Phixall Facility Management LLC',
-  description: 'Phixall, powered by Phixall Facility Management LLC, provides professional facility management and maintenance services connecting clients with verified skilled artisans. Serving customers in the United States and worldwide.',
+  legalName: 'Phixall Technical Company Limited',
+  description: 'Phixall is a product of Phixall Technical Company Limited, providing professional facility management and maintenance services connecting clients with verified skilled artisans worldwide.',
   url: 'https://phixall.vercel.app',
   logo: 'https://phixall.vercel.app/logo.png',
   image: 'https://phixall.vercel.app/og-image.png',
   email: 'info@phixall.com',
   telephone: '+234-800-000-0000',
   address: [
-    {
-      '@type': 'PostalAddress',
-      addressCountry: 'US',
-      addressLocality: 'United States',
-      name: 'Phixall Facility Management LLC',
-    },
     {
       '@type': 'PostalAddress',
       addressCountry: 'NG',

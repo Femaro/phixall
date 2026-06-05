@@ -1,10 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useIsUSUser } from '@/hooks/useIsUSUser';
 
 export default function AboutPage() {
-  const isUS = useIsUSUser();
   return (
     <main className="min-h-screen bg-white">
       {/* Hero */}
@@ -20,11 +18,7 @@ export default function AboutPage() {
               <span className="text-gradient"> Management</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-neutral-600">
-              {isUS ? (
-                <>Phixall, powered by Phixall Facility Management LLC, is a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers. We serve customers in the United States and worldwide.</>
-              ) : (
-                <>We&apos;re building a leading platform for on-demand facility maintenance, connecting property owners with verified skilled Artisans called Phixall's Phixers.</>
-              )}
+              Phixall is a product of Phixall Technical Company Limited—a leading platform for on-demand facility maintenance, connecting property owners with verified skilled artisans called Phixall&apos;s Phixers.
             </p>
           </div>
         </div>
@@ -46,11 +40,7 @@ export default function AboutPage() {
                   We saw firsthand how difficult it was for facility owners to find trustworthy artisans, get fair quotes, and track work progress. At the same time, skilled tradespeople struggled to find consistent work and build their professional reputation.
                 </p>
                 <p>
-                  {isUS ? (
-                    <>Today, Phixall, powered by Phixall Facility Management LLC, serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers. International operations are conducted by Phixall Technical Company Limited under license from Phixall Facility Management LLC.</>
-                  ) : (
-                    <>Today, Phixall serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.</>
-                  )}
+                  Today, Phixall serves facilities across multiple markets, completing thousands of jobs annually. Our platform has become the trusted bridge between property owners seeking quality maintenance and artisans building thriving careers.
                 </p>
               </div>
             </div>
@@ -85,11 +75,7 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Mission</h3>
               <p className="mt-4 text-neutral-600">
-                {isUS ? (
-                  <>To empower facilities and Phixers worldwide with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service in the United States and beyond.</>
-                ) : (
-                  <>To empower facilities and Phixers worldwide with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service.</>
-                )}
+                To empower facilities and Phixers worldwide with technology that makes maintenance simple, transparent, and efficient. We&apos;re committed to building a platform that creates economic opportunities while delivering world-class service.
               </p>
             </div>
             <div className="rounded-2xl border border-neutral-200 bg-white p-10 shadow-soft">
@@ -101,11 +87,7 @@ export default function AboutPage() {
               </div>
               <h3 className="mt-6 text-2xl font-bold text-neutral-900">Our Vision</h3>
               <p className="mt-4 text-neutral-600">
-                {isUS ? (
-                  <>To become the leading facility management platform globally, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance, whether in the United States or around the world.</>
-                ) : (
-                  <>To become the leading facility management platform globally, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.</>
-                )}
+                To become the leading facility management platform globally, known for connecting world-class Phixers with the facilities that need them. We envision a future where every property owner has instant access to reliable maintenance.
               </p>
             </div>
           </div>

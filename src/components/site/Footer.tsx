@@ -3,10 +3,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import Logo from '@/app/logo.png';
-import { useIsUSUser } from '@/hooks/useIsUSUser';
 
 export default function Footer() {
-  const isUS = useIsUSUser();
   return (
     <footer className="border-t border-neutral-200 bg-neutral-50">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
@@ -16,11 +14,7 @@ export default function Footer() {
               <Image src={Logo} alt="Phixall" width={56} height={56} className="drop-shadow-lg" style={{ filter: 'contrast(1.2) brightness(1.1)' }} />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-neutral-600">
-              {isUS ? (
-                <>Phixall, powered by Phixall Facility Management LLC, is a professional facility management platform connecting clients with skilled artisans. Serving customers in the United States and worldwide.</>
-              ) : (
-                <>Professional facility management platform connecting clients with skilled artisans. Serving customers worldwide.</>
-              )}
+              Phixall is a product of Phixall Technical Company Limited—a professional facility management platform connecting clients with skilled artisans worldwide.
             </p>
           </div>
 
@@ -147,11 +141,7 @@ export default function Footer() {
         <div className="mt-12 border-t border-neutral-200 pt-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-center text-sm text-neutral-500 sm:text-left">
-              {isUS ? (
-                <>© {new Date().getFullYear()} Phixall Facility Management LLC. All rights reserved. Phixall is powered by Phixall Facility Management LLC.</>
-              ) : (
-                <>© {new Date().getFullYear()} Phixall Technical Company Limited. All rights reserved.</>
-              )}
+              © {new Date().getFullYear()} Phixall Technical Company Limited. All rights reserved.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-neutral-500">
               <div className="flex items-center gap-1.5">

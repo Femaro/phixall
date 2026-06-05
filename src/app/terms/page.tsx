@@ -1,9 +1,6 @@
 'use client';
 
-import { useIsUSUser } from '@/hooks/useIsUSUser';
-
 export default function TermsPage() {
-  const isUS = useIsUSUser();
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-6 py-16 lg:px-8 lg:py-24">
@@ -114,11 +111,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-neutral-900">7. Intellectual Property</h2>
             <p className="mt-4 text-neutral-700">
-              {isUS ? (
-                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Facility Management LLC. Phixall is powered by Phixall Facility Management LLC. Phixall Technical Company Limited operates Phixall outside the United States under license from Phixall Facility Management LLC. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
-              ) : (
-                <>All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Technical Company Limited. You may not use, copy, reproduce, or distribute any content without our express written permission.</>
-              )}
+              All content, trademarks, logos, and intellectual property on the Phixall platform are owned by Phixall Technical Company Limited. Phixall is a product of Phixall Technical Company Limited. You may not use, copy, reproduce, or distribute any content without our express written permission.
             </p>
           </section>
 
@@ -178,34 +171,12 @@ export default function TermsPage() {
             <p className="mt-4 text-neutral-700">
               For questions about these Terms, please contact us:
             </p>
-            {isUS ? (
-              <div className="mt-4 space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">Phixall Facility Management LLC</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Phixall is powered by Phixall Facility Management LLC</p>
-                  <ul className="mt-2 space-y-1 text-neutral-700">
-                    <li><strong>Email:</strong> legal@phixall.com</li>
-                    <li><strong>Address:</strong> Phixall Facility Management LLC, United States</li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">International Operations</h3>
-                  <p className="mt-2 text-sm text-neutral-600">Operated by Phixall Technical Company Limited under license from Phixall Facility Management LLC</p>
-                  <ul className="mt-2 space-y-1 text-neutral-700">
-                    <li><strong>Email:</strong> legal@phixall.com</li>
-                    <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
-                    <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
-                  </ul>
-                </div>
-              </div>
-            ) : (
-              <ul className="mt-4 space-y-2 text-neutral-700">
-                <li><strong>Company:</strong> Phixall Technical Company Limited</li>
-                <li><strong>Email:</strong> legal@phixall.com</li>
-                <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
-                <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
-              </ul>
-            )}
+            <ul className="mt-4 space-y-2 text-neutral-700">
+              <li><strong>Company:</strong> Phixall Technical Company Limited</li>
+              <li><strong>Email:</strong> legal@phixall.com</li>
+              <li><strong>Phone:</strong> +234 XXX XXX XXXX</li>
+              <li><strong>Address:</strong> Phixall Technical Company Limited, Lagos, Nigeria</li>
+            </ul>
           </section>
         </div>
       </div>

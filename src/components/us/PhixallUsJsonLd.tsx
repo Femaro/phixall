@@ -1,4 +1,5 @@
 import { getPhixallUsHomeUrl } from '@/lib/phixallUsSite';
+import { US_OFFICE } from '@/lib/usOffice';
 
 const sameAsProfiles = [
 	'https://x.com/phixallng',
@@ -15,9 +16,18 @@ export default function PhixallUsJsonLd() {
 			'@type': 'Organization',
 			'@id': `${homeUrl}#organization`,
 			name: 'Phixall',
-			alternateName: ['Phixall US'],
+			legalName: US_OFFICE.company,
+			alternateName: ['Phixall US', 'Phixall Facility Management Company LLC'],
 			url: homeUrl,
 			sameAs: [...sameAsProfiles],
+			address: {
+				'@type': 'PostalAddress',
+				streetAddress: `${US_OFFICE.streetAddress}, ${US_OFFICE.suite}`,
+				addressLocality: US_OFFICE.addressLocality,
+				addressRegion: US_OFFICE.addressRegion,
+				postalCode: US_OFFICE.postalCode,
+				addressCountry: US_OFFICE.addressCountryCode,
+			},
 			areaServed: {
 				'@type': 'AdministrativeArea',
 				name: 'Indiana',

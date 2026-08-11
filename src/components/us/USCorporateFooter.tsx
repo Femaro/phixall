@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { US_CORE_SERVICES } from '@/data/usCoreServices';
+import { US_OFFICE, US_OFFICE_LINES } from '@/lib/usOffice';
 
 export default function USCorporateFooter() {
   return (
@@ -20,6 +21,16 @@ export default function USCorporateFooter() {
                 decoding="async"
               />
             </Link>
+            <address className="mt-6 text-sm not-italic leading-relaxed text-neutral-600">
+              <p className="font-semibold text-neutral-800">{US_OFFICE.company}</p>
+              <p className="mt-2">
+                {US_OFFICE_LINES.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </p>
+            </address>
           </div>
 
           {/* Services */}

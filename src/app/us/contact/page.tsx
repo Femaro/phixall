@@ -1,5 +1,7 @@
 'use client';
 
+import { US_OFFICE, US_OFFICE_LINES } from '@/lib/usOffice';
+
 const EMAIL = 'ops@phixall.us';
 const PHONE_DISPLAY = '(317) 258-6799';
 const PHONE_HREF = 'tel:+13172586799';
@@ -58,6 +60,26 @@ export default function USContactPage() {
                     <p className="mt-2 text-xs text-neutral-500">Tell us about your Indiana facility sites and the support you need.</p>
                   </div>
                 </div>
+
+                <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm ring-1 ring-neutral-100">
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-neutral-900">
+                    <svg className="h-6 w-6 text-[#3498db]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Office
+                  </h3>
+                  <div className="mt-4 text-sm text-neutral-700">
+                    <p className="font-semibold text-neutral-900">{US_OFFICE.company}</p>
+                    <address className="mt-2 not-italic leading-relaxed text-neutral-600">
+                      {US_OFFICE_LINES.map((line) => (
+                        <span key={line} className="block">
+                          {line}
+                        </span>
+                      ))}
+                    </address>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -103,6 +125,13 @@ export default function USContactPage() {
           <p className="mx-auto mt-3 max-w-3xl text-center text-neutral-600">
             Phixall Facility Management LLC is an Indiana-based facility support company. Our team serves warehouses, logistics centers, and commercial facilities—available only within Indiana.
           </p>
+          <address className="mx-auto mt-6 max-w-xl text-center text-sm not-italic leading-relaxed text-neutral-600">
+            {US_OFFICE_LINES.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </address>
         </div>
       </section>
     </main>

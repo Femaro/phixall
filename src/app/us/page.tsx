@@ -19,7 +19,7 @@ export default function USCorporatePage() {
                 Indiana Facility Support Services
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
-                Phixall provides facility support services for Indiana commercial sites including maintenance assistance, repairs, painting, vendor coordination, and materials handling.
+                Phixall provides facility support services for Indiana commercial sites including maintenance assistance, repairs, painting, vendor and project coordination, and materials handling.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 

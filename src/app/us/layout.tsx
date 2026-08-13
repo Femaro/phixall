@@ -10,12 +10,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(phixallUsOrigin),
   title: 'Indiana Facility Support Services | Phixall US',
   description:
-    'Indiana-based facility support for warehouses and commercial sites—maintenance support, light repairs, basic painting, vendor coordination, and materials handling. Services available only within Indiana.',
+    'Indiana-based facility support for warehouses and commercial sites—maintenance support, light repairs, basic painting, vendor and project coordination, and materials handling. Services available only within Indiana.',
   keywords: [
     'Indiana facility support',
     'warehouse facility maintenance',
     'facility painting Indiana',
-    'vendor coordination',
+    'vendor and project coordination',
     'materials handling support',
     'commercial facility upkeep',
     'logistics facility support',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Indiana Facility Support Services | Phixall US',
     description:
-      'Facility support for Indiana warehouses and commercial facilities—maintenance, light repairs, painting, vendor coordination, and materials handling.',
+      'Facility support for Indiana warehouses and commercial facilities—maintenance, light repairs, painting, vendor and project coordination, and materials handling.',
     type: 'website',
     url: '/us',
   },

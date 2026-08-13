@@ -6,7 +6,7 @@ import { US_CORE_SERVICES } from '@/data/usCoreServices';
 export const metadata: Metadata = {
   title: 'Facility Support Services | Phixall US',
   description:
-    'Indiana-based facility support—maintenance assistance, light repairs, basic painting, vendor coordination, and materials handling. Services available only within Indiana.',
+    'Indiana-based facility support—maintenance assistance, light repairs, basic painting, vendor and project coordination, and materials handling. Services available only within Indiana.',
 };
 
 export default function USServicesIndexPage() {

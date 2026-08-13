@@ -87,7 +87,7 @@ export default function USContactPage() {
               <div className="sticky top-24 rounded-2xl border border-[#3498db]/40 bg-gradient-to-br from-blue-50/80 to-white p-8 shadow-md ring-1 ring-[#3498db]/20">
                 <h3 className="text-2xl font-bold tracking-tight text-neutral-900">Need facility support?</h3>
                 <p className="mt-4 text-neutral-600">
-                  Outline your Indiana facilities and priorities—we will align maintenance support, light repairs, painting, vendor coordination, and materials handling under one desk.
+                  Outline your Indiana facilities and priorities—we will align maintenance support, light repairs, painting, vendor and project coordination, and materials handling under one desk.
                 </p>
                 <a
                   href={`mailto:${EMAIL}?subject=${encodeURIComponent('Phixall US facility support inquiry')}`}

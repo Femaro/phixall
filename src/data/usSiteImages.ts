@@ -15,7 +15,7 @@ export const US_SITE_IMAGES = {
     src: '/us/images/us-industrial-painting.jpg',
     alt: 'Facility painting and surface maintenance with proper protective equipment',
   },
-  /** Homepage spotlight: vendor coordination */
+  /** Homepage spotlight: vendor & project coordination */
   vendorCoordination: {
     src: '/us/images/us-proof-planning.jpg',
     alt: 'Facility support team reviewing schedules and documentation in a warehouse setting',

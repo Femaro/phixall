@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import TrustComplianceBadges from '@/components/us/TrustComplianceBadges';
-import PartnerLogosStrip from '@/components/us/PartnerLogosStrip';
 import { US_CORE_SERVICES, US_HOMEPAGE_SPOTLIGHTS } from '@/data/usCoreServices';
 import { US_SITE_IMAGES } from '@/data/usSiteImages';
 
@@ -20,7 +19,7 @@ export default function USCorporatePage() {
                 Indiana Facility Support Services
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-white/90">
-                Phixall provides facility support services for Indiana commercial sites including maintenance assistance, repairs, painting, vendor coordination, and materials handling.
+                Phixall provides facility support services for Indiana commercial sites including maintenance assistance, repairs, painting, vendor and project coordination, and materials handling.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link 
@@ -61,8 +60,6 @@ export default function USCorporatePage() {
           </div>
         </div>
       </section>
-
-      <PartnerLogosStrip />
 
       {/* Service categories — compact overview */}
       <section className="relative border-t border-neutral-200/80 bg-gradient-to-b from-slate-100/90 via-white to-[#3498db]/[0.06] py-16">
